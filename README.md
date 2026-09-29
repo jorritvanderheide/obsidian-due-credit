@@ -36,12 +36,18 @@ so a link to a note of your own becomes its words rather than a dead link.
 | --- | --- |
 | `[[jacobs2024]]` | (Jacobs 2024) |
 | `[[jacobs2024#p. 12]]` | (Jacobs 2024, 12) |
+| `[[jacobs2024\|jacobs2024, p. 12]]` | (Jacobs 2024, 12) |
+| `[[jacobs2024\|see jacobs2024, p. 12, emphasis added]]` | (see Jacobs 2024, 12, emphasis added) |
 | `[[jacobs2024#p. 12]]; [[keshav2007]]` | (Jacobs 2024, 12; Keshav 2007) |
 | `[[My idea\|this idea]]` | this idea |
 
 A page is anything after `#` that starts with a number, `§`, or a locator such
 as `p.`, `pp.`, `ch.`, `sec.` or `fig.`; `[[jacobs2024#Claim]]` is the paper.
-Citations next to each other, separated by at most a `;`, share brackets.
+An alias that repeats the key is read the way pandoc reads `[see @key, p. 12]`:
+what comes before the key is a prefix, and what comes after it is the page and
+anything else. That is how Paper Trail writes a citation from Better BibTeX's
+dialog. Any other alias is only what Obsidian shows. Citations next to each
+other, separated by at most a `;`, share brackets.
 
 A link to a paper the bibliography does not have is listed before the export
 runs, because otherwise it would quietly come out as a name. That is almost

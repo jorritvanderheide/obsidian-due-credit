@@ -44,6 +44,14 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 		['[[a]], [[b]]', '(A 2024), (B 2025)'],
 		['[[a]] and [[b]]', '(A 2024) and (B 2025)'],
 		['[[My idea|this idea]] holds', 'this idea holds'],
+		// Paper Trail's form for Better BibTeX's dialog: everything around the key, in the alias.
+		['[[a|a, p. 4]]', '(A 2024, 4)'],
+		['[[a|see a, p. 4, emphasis added]]', '(see A 2024, 4, emphasis added)'],
+		['[[a|a, p. 4]]; [[b]]', '(A 2024, 4; B 2025)'],
+		['[[a|about a, ch. 2]]', '(about A 2024, ch. 2)'],
+		['[[a#p. 12|a]]', '(A 2024, 12)'],
+		['[[a#p. 12|a, p. 4]]', '(A 2024, 4)'],
+		['[[a|Ann’s paper]]', '(A 2024)'],
 	])('%s exports as %s', (written, exported) => {
 		expect(cite(written)).toBe(exported);
 	});

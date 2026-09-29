@@ -9,6 +9,9 @@
 --- - A page after `#`: `[[key#p. 12]]` cites page 12, as `[@key, p. 12]`
 ---   would. Obsidian shows it as "key > p. 12" and it is still a link to the
 ---   paper, so it stays in the backlinks.
+--- - Or everything in the alias, around the key, the way Paper Trail writes a
+---   citation from Better BibTeX's dialog: `[[a|see a, p. 4, emphasis added]]`
+---   is `[see @a, p. 4, emphasis added]`.
 --- - Neighbouring citations share brackets: `[[a#p. 12]]; [[b#p. 3]]` is
 ---   "(A 2024, 12; B 2025, 3)", as `[@a, p. 12; @b, p. 3]` would be.
 ---
@@ -115,6 +118,29 @@ local function locator_of(target)
   return nil
 end
 
+--- The prefix and suffix an alias spells out around the key, or nil when it
+--- spells none.
+---
+--- Paper Trail writes a citation from Better BibTeX's dialog as the key with
+--- everything else around it in the alias: `[[a|see a, p. 4, emphasis added]]`
+--- is `[see @a, p. 4, emphasis added]`. Text before the key is the prefix and
+--- text after it the suffix, where citeproc finds the page just as it does in
+--- pandoc's own syntax. Only an alias that repeats the key as a word counts:
+--- any other is what Obsidian shows, and nothing more.
+local function spelled(alias, key)
+  local from = 1
+  while true do
+    local s, e = alias:find(key, from, true)
+    if not s then return nil end
+    local before = s == 1 or alias:sub(s - 1, s - 1):match('%s')
+    local after = e == #alias or alias:sub(e + 1, e + 1):match('[%s,;]')
+    if before and after then
+      return alias:sub(1, s - 1):gsub('^%s+', ''):gsub('%s+$', ''), (alias:sub(e + 1):gsub('%s+$', ''))
+    end
+    from = s + 1
+  end
+end
+
 --- One link: a citation, a link, or the words it was made of.
 ---
 --- `NormalCitation` rather than `AuthorInText`, because `[[key]]` stands in a
@@ -132,11 +158,23 @@ local function link(el)
   local key = key_of(el.target)
   if keys[key] then
     local citation = pandoc.Citation(key, 'NormalCitation')
-    local text = '@' .. key
+    -- Without an alias the link's words are its target.
+    local alias = pandoc.utils.stringify(el.content)
+    local prefix, suffix
+    if alias ~= el.target then prefix, suffix = spelled(alias, key) end
+
+    -- The alias's suffix wins over a page after `#`: it is the one Obsidian shows.
     local locator = locator_of(el.target)
-    if locator then
-      citation.suffix = pandoc.Inlines(', ' .. locator)
-      text = text .. ', ' .. locator
+    if (suffix == nil or suffix == '') and locator then suffix = ', ' .. locator end
+
+    local text = '@' .. key
+    if prefix and prefix ~= '' then
+      citation.prefix = pandoc.Inlines(prefix)
+      text = prefix .. ' ' .. text
+    end
+    if suffix and suffix ~= '' then
+      citation.suffix = pandoc.Inlines(suffix)
+      text = text .. suffix
     end
     return pandoc.Cite({ pandoc.Str(text) }, { citation })
   end
