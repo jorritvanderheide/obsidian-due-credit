@@ -166,6 +166,11 @@ describe('citeByKey', () => {
 		expect(citeByKey('[[@oldkey|@oldkey]] [[Literature/oldkey.md]]', keyFor)).toBe('[[newkey|@newkey]] [[newkey]]');
 	});
 
+	it('leaves a link within the note alone, which Obsidian resolves to the note itself', () => {
+		const own = (linkpath: string) => (linkpath === '' ? 'ownkey' : null);
+		expect(citeByKey('[[#Summary]] [[#Summary|the summary]]', own)).toBe('[[#Summary]] [[#Summary|the summary]]');
+	});
+
 	it('leaves links without a key, embeds and code as written', () => {
 		const text = '[[My idea|this idea]] ![[oldkey]] `[[oldkey]]`';
 		expect(citeByKey(text, keyFor)).toBe(text);

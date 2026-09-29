@@ -203,6 +203,9 @@ export function citeByKey(text: string, keyFor: (linkpath: string) => string | n
 	return outsideCode(text, (prose) =>
 		prose.replace(LINK, (link: string, target: string, alias?: string) => {
 			const linkpath = linkpathOf(target);
+			// A link within the note, `[[#Heading]]`, has no linkpath, and Obsidian
+			// resolves that to the note itself: a paper note would cite itself.
+			if (linkpath.trim() === '') return link;
 			const key = keyFor(linkpath.trim());
 			if (key === null) return link;
 			const fragment = target.slice(linkpath.length);

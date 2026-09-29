@@ -49,6 +49,8 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		const keys = bibKeys(await app.vault.cachedRead(bibliography));
 		const keyFor = (target: string) => {
 			const linkpath = linkpathOf(target).trim();
+			// A link within the note is no paper, though Obsidian resolves it to the note.
+			if (linkpath === '') return null;
 			const dest = resolve(linkpath);
 			if (dest === null) return null;
 			return propertyOf(linkpath) ?? (inFolder(dest.path, settings.literatureFolder) ? keyOf(target) : null);

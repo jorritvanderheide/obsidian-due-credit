@@ -53,6 +53,10 @@ describe('renameInAlias', () => {
 		expect(renameInAlias('me@old', 'old', 'new')).toBe('me@old');
 	});
 
+	it('leaves the alias alone for an empty key, rather than finding it everywhere', () => {
+		expect(renameInAlias('the summary', '', 'new')).toBe('the summary');
+	});
+
 	it('leaves the key inside another word alone', () => {
 		expect(renameInAlias('bold old; x', 'old', 'new')).toBe('bold new; x');
 		expect(renameInAlias('oldest', 'old', 'new')).toBe('oldest');

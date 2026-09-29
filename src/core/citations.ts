@@ -53,6 +53,8 @@ export function propertyKey(frontmatter: unknown, property: string): string | nu
  * keeps its page.
  */
 export function renameInAlias(alias: string, from: string, to: string): string {
+	// An empty key is found everywhere, and at the end of the alias for ever.
+	if (from === '') return alias;
 	let at = alias.indexOf(from);
 	while (at !== -1) {
 		// An `@` against the key, and a `-` that leaves the author out, stay
