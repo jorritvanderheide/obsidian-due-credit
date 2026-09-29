@@ -33,6 +33,8 @@ Obsidian:
   you, not your reader.
 - **Plugin blocks.** A `dataview`, `dataviewjs`, `tasks`, `query` or `base`
   code block is left out. Exported, it would only be its query.
+- **Tags.** A line of `#tags` is left out, and a tag in a sentence stays as its
+  word: `#project/alpha` is "project/alpha".
 
 ## Citations
 

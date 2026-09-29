@@ -170,6 +170,25 @@ export function dropPluginBlocks(text: string): string {
 		.join('');
 }
 
+// A tag as Obsidian reads it: after a space or at the start of a line, of
+// letters, digits, `_`, `-` and `/`, and not of digits alone.
+const TAG_BODY = '[\\p{L}\\p{N}_/-]+';
+const TAG = new RegExp(`(^|[ \\t])#(${TAG_BODY})`, 'gmu');
+const TAG_LINE = new RegExp(`^[ \\t]*#${TAG_BODY}(?:[ \\t]+#${TAG_BODY})*[ \\t]*(?:\\r?\\n|$)`, 'gmu');
+const isTag = (body: string) => !/^\p{N}+$/u.test(body);
+
+/**
+ * The note without its tags, which organise the vault and mean nothing to a
+ * reader. A line of tags goes, line and all; a tag in a sentence stays as its
+ * word, since the sentence may need it: `#project/alpha` is "project/alpha".
+ * `#1`, and the `#` in `[[note#Heading]]`, `(#id)` or a URL, are no tags. The
+ * lines are read whole, past backtick spans, since a line of tags has none.
+ */
+export function stripTags(text: string): string {
+	const lines = outsideCode(text, (prose) => prose.replace(TAG_LINE, (line: string) => ([...line.matchAll(/#([^\s#]+)/g)].every((tag) => isTag(tag[1] ?? '')) ? '' : line)), false);
+	return outsideCode(lines, (prose) => prose.replace(TAG, (tag: string, before: string, body: string) => (isTag(body) ? before + body : tag)));
+}
+
 const BLOCK_ID = /(?:^|[ \t]+)\^[A-Za-z0-9-]+[ \t]*(?=\r?$)/gm;
 
 /**

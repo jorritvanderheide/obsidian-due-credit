@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { citeByKey, dropPluginBlocks, imageEmbeds, liftHeadings, segments, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../src/core/markdown';
+import { citeByKey, dropPluginBlocks, imageEmbeds, liftHeadings, segments, splitFrontmatter, stripBlockIds, stripComments, stripTags, wikilinkTargets } from '../src/core/markdown';
 
 describe('segments', () => {
 	it('concatenates back to the note', () => {
@@ -130,6 +130,21 @@ describe('dropPluginBlocks', () => {
 		expect(dropPluginBlocks('```tasks\nnot done\n```\n```js\nx()\n```\n')).toBe('```js\nx()\n```\n');
 		const kept = '```dataviews\nx\n```\n```python\nquery = 1\n```\nA `dataview` query in prose.\n';
 		expect(dropPluginBlocks(kept)).toBe(kept);
+	});
+});
+
+describe('stripTags', () => {
+	it('drops a line of tags, line and all', () => {
+		expect(stripTags('Text.\n#todo #draft\r\n  #réflexion/deux  \nMore.\n#end')).toBe('Text.\nMore.\n');
+	});
+
+	it('keeps a tag in a sentence as its word', () => {
+		expect(stripTags('About #project/alpha and #ideas.\n#first word')).toBe('About project/alpha and ideas.\nfirst word');
+	});
+
+	it('leaves what is no tag, and code, alone', () => {
+		const text = '#1 in the list\n#1 #2\n[[note#Heading]] (#id) https://x.org/#top C# \n# Heading\n`#code` and\n```\n#tag\n```\n';
+		expect(stripTags(text)).toBe(text);
 	});
 });
 

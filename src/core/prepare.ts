@@ -2,7 +2,7 @@
 import { inFolder } from './paths';
 import { keyOf, linkpathOf, missingKeys, propertyKey } from './citations';
 import { documentMetadata } from './document';
-import { citeByKey, dropPluginBlocks, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from './markdown';
+import { citeByKey, dropPluginBlocks, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, stripTags, wikilinkTargets } from './markdown';
 
 /** What a link resolves to, from the note being exported. */
 export interface Linked {
@@ -55,8 +55,8 @@ export interface Missing {
 /**
  * The note, made into pandoc's input.
  *
- * First what never leaves: comments, then block IDs and plugins' code blocks,
- * which mean nothing outside the vault. The check reads the note
+ * First what never leaves: comments, then block IDs, plugins' code blocks and
+ * tags, which mean nothing outside the vault. The check reads the note
  * then, before any link has been rewritten. Then links to paper notes are
  * pointed at their keys, the title is lifted, and images are resolved on what
  * is left.
@@ -82,7 +82,7 @@ export function prepare(text: string, vault: Vault, options: Options): Prepared 
 	};
 
 	const { yaml, body } = splitFrontmatter(text);
-	const prose = dropPluginBlocks(stripBlockIds(stripComments(body)));
+	const prose = stripTags(dropPluginBlocks(stripBlockIds(stripComments(body))));
 	const targets = wikilinkTargets(prose).map((target) => ({ target, linkpath: linkpathOf(target).trim() }));
 	const check = (named: (link: { target: string; linkpath: string }) => string | null) =>
 		options.keys ? missingKeys(targets, named, options.keys) : [];
