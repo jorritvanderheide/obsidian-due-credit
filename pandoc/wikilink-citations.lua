@@ -80,10 +80,14 @@ end
 --- remembers choosing: bare, with the folder in front, and occasionally with
 --- the extension. A heading or block reference can follow. All of them are the
 --- same paper, so all of them are the same citation.
+---
+--- A leading `@` is dropped too: the Citations plugin and many templates name a
+--- literature note `@key`, so their links are `[[@key]]`, and those are the
+--- same citation as well.
 local function key_of(target)
   local path = target:gsub('[#^].*$', '')
   local name = path:match('([^/]+)$') or path
-  return (name:gsub('%.md$', ''))
+  return (name:gsub('%.md$', ''):gsub('^@', ''))
 end
 
 --- Whether a link still means anything once the vault is behind you.

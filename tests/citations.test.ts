@@ -10,7 +10,7 @@ describe('bibKeys', () => {
 
 describe('keyOf', () => {
 	it('reads the key however Obsidian wrote the target', () => {
-		expect(['key', 'Literature/key', 'Literature/key.md', 'key#p. 12', 'key#^block'].map(keyOf)).toEqual(['key', 'key', 'key', 'key', 'key']);
+		expect(['key', 'Literature/key', 'Literature/key.md', 'key#p. 12', 'key#^block', '@key', 'Literature/@key.md#p. 3'].map(keyOf)).toEqual(['key', 'key', 'key', 'key', 'key', 'key', 'key']);
 	});
 });
 

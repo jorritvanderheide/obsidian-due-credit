@@ -34,6 +34,8 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 	it.each([
 		['[[a]]', '(A 2024)'],
 		['[[Literature/a.md]]', '(A 2024)'],
+		['[[@a]]', '(A 2024)'],
+		['[[Literature/@a.md#p. 12]]', '(A 2024, 12)'],
 		['[[a#p. 12]]', '(A 2024, 12)'],
 		['[[a#pp. 12-14]]', '(A 2024, 12–14)'],
 		['[[a#ch. 3]]', '(A 2024, ch. 3)'],

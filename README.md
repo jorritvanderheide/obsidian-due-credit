@@ -30,11 +30,14 @@ Obsidian:
 ## Citations
 
 A wikilink becomes a citation when the bibliography has an entry by that name,
-so a link to a note of your own becomes its words rather than a dead link.
+so a link to a note of your own becomes its words rather than a dead link. A
+leading `@`, as in notes named the way the Citations plugin names them, is not
+part of the name. Pandoc's own `[@jacobs2024, p. 12]` works as well.
 
 | Written | Exported |
 | --- | --- |
 | `[[jacobs2024]]` | (Jacobs 2024) |
+| `[[@jacobs2024]]` | (Jacobs 2024) |
 | `[[jacobs2024#p. 12]]` | (Jacobs 2024, 12) |
 | `[[jacobs2024\|jacobs2024, p. 12]]` | (Jacobs 2024, 12) |
 | `[[jacobs2024\|see jacobs2024, p. 12, emphasis added]]` | (see Jacobs 2024, 12, emphasis added) |

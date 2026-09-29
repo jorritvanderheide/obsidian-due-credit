@@ -25,11 +25,15 @@ export function linkpathOf(target: string): string {
 
 /**
  * The key a wikilink target names, as the filter's `key_of` reads it: without a
- * heading or block reference, a folder, or `.md`.
+ * heading or block reference, a folder, `.md`, or the `@` that the Citations
+ * plugin puts in front of a literature note's name.
  */
 export function keyOf(target: string): string {
 	const path = linkpathOf(target);
-	return path.slice(path.lastIndexOf('/') + 1).replace(/\.md$/, '');
+	return path
+		.slice(path.lastIndexOf('/') + 1)
+		.replace(/\.md$/, '')
+		.replace(/^@/, '');
 }
 
 /**
