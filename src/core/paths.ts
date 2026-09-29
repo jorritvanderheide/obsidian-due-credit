@@ -9,11 +9,12 @@ export function expandHome(path: string, home: string): string {
 }
 
 /**
- * Where the bibliography is on disk: a path relative to the vault inside it,
- * or an absolute one, or one starting with `~`, outside it. Better BibTeX
- * often keeps its auto-export in a folder of its own.
+ * Where a file a setting names is on disk, the bibliography or the Word
+ * template: a path relative to the vault inside it, or an absolute one, or one
+ * starting with `~`, outside it. Better BibTeX often keeps its auto-export in
+ * a folder of its own, and a university its template on a shared drive.
  */
-export function bibliographyPath(value: string, vault: string, home: string): string {
+export function settingPath(value: string, vault: string, home: string): string {
 	const path = expandHome(value, home);
 	return isAbsolute(path) ? path : join(vault, path);
 }

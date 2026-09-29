@@ -81,6 +81,8 @@ export interface Run {
 	resourcePath: string;
 	/** Whether one newline is a line break, from `lineBreaks`. */
 	hardLineBreaks: boolean;
+	/** The Word template, on disk, or null for pandoc's own styles. */
+	referenceDoc: string | null;
 	output: string;
 }
 
@@ -124,6 +126,7 @@ export function pandocArgs(format: Format, run: Run): string[] {
 	} else {
 		args.push('--natbib', '--to=latex');
 	}
+	if (format === 'docx' && run.referenceDoc) args.push(`--reference-doc=${run.referenceDoc}`);
 	// xelatex rather than pandoc's default pdflatex, which stops at any Unicode
 	// character its input encoding has not been set up for.
 	if (format === 'pdf') args.push('--pdf-engine=xelatex');

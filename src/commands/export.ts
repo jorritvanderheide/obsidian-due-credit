@@ -7,7 +7,7 @@ import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
 import { bibKeys } from '../core/citations';
 import { FORMATS, lineBreaks, pandocArgs, styled, type Format } from '../core/document';
-import { bibliographyPath, cslPath, expandHome, insideVault, withExtension } from '../core/paths';
+import { settingPath, cslPath, expandHome, insideVault, withExtension } from '../core/paths';
 import { prepare, type Missing, type Vault } from '../core/prepare';
 import { startFolder } from '../core/settings';
 import { ExportError, run, withFiles } from '../pandoc';
@@ -21,11 +21,15 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const vault = adapter.getBasePath();
 	const home = homedir();
 
-	const bibliography = settings.bibliography ? bibliographyPath(settings.bibliography, vault, home) : null;
+	const bibliography = settings.bibliography ? settingPath(settings.bibliography, vault, home) : null;
 	if (bibliography && !existsSync(bibliography)) {
 		throw new ExportError(
 			`There is no bibliography at ${bibliography}. Point the Due Credit setting at your Better BibTeX export, or clear it to export without citations.`,
 		);
+	}
+	const referenceDoc = settings.referenceDoc && format === 'docx' ? settingPath(settings.referenceDoc, vault, home) : null;
+	if (referenceDoc && !existsSync(referenceDoc)) {
+		throw new ExportError(`There is no Word template at ${referenceDoc}. Point the Due Credit setting at a .docx, or clear it to use pandoc's own styles.`);
 	}
 	const csl = settings.csl && styled(format) ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;
 	if (csl && !existsSync(csl)) {
@@ -97,6 +101,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 					csl,
 					resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),
 					hardLineBreaks: lineBreaks(appConfig),
+					referenceDoc,
 					output,
 				}),
 				markdown,

@@ -142,6 +142,7 @@ None has a hotkey, so pick your own.
 | --- | --- | --- |
 | **Pandoc** | `pandoc` | Its name if it is on your PATH, or its full path. |
 | **Output folder** | `~/Documents` | Where the save dialog opens the first time. After that it opens where the last export went, until you change this. |
+| **Word template** | Pandoc's own | A `.docx` whose styles a Word export takes: fonts, headings and margins, as your university or journal wants them. A path in your vault, or outside it, starting with `/` or `~`. `pandoc -o reference.docx --print-default-data-file reference.docx` writes pandoc's own to start from. |
 | **Bibliography** | `Literature/library.bib` | The `.bib` file that decides which links are citations: a path in your vault, or one outside it, starting with `/` or `~`. Empty exports without citations. |
 | **Papers folder** | `Literature` | Where your paper notes are, for the check before exporting. |
 | **Citation key property** | `citekey` | The frontmatter property holding a paper note's citation key. |

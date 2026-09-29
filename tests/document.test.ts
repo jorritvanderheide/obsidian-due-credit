@@ -33,7 +33,7 @@ describe('lineBreaks', () => {
 });
 
 describe('pandocArgs', () => {
-	const run: Run = { obsidian: '/tmp/o.lua', filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, hardLineBreaks: false, resourcePath: '/v', output: '/out/n.docx' };
+	const run: Run = { obsidian: '/tmp/o.lua', filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, hardLineBreaks: false, referenceDoc: null, resourcePath: '/v', output: '/out/n.docx' };
 
 	it('runs the filter before citeproc, which can only cite what the filter made', () => {
 		const args = pandocArgs('docx', run);
@@ -53,6 +53,12 @@ describe('pandocArgs', () => {
 	it('reads one newline as a line break when Obsidian does', () => {
 		expect(pandocArgs('docx', { ...run, hardLineBreaks: true })[0]).toMatch(/^--from=markdown\+wikilinks_title_after_pipe\+mark\+lists_without_preceding_blankline\+hard_line_breaks-/);
 		expect(pandocArgs('docx', run)[0]).not.toContain('hard_line_breaks');
+	});
+
+	it('passes a Word template to a Word export only', () => {
+		expect(pandocArgs('docx', { ...run, referenceDoc: '/t/uni.docx' })).toContain('--reference-doc=/t/uni.docx');
+		expect(pandocArgs('pdf', { ...run, referenceDoc: '/t/uni.docx' }).some((arg) => arg.startsWith('--reference-doc'))).toBe(false);
+		expect(pandocArgs('docx', run).some((arg) => arg.startsWith('--reference-doc'))).toBe(false);
 	});
 
 	it('passes a style when there is one', () => {

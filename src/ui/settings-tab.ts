@@ -3,7 +3,7 @@ import { homedir } from 'os';
 import { join } from 'path';
 import { FileSystemAdapter, PluginSettingTab, type App, type SettingDefinitionItem } from 'obsidian';
 import { loadSettings, type Settings } from '../core/settings';
-import { bibliographyPath, cslPath, expandHome } from '../core/paths';
+import { settingPath, cslPath, expandHome } from '../core/paths';
 import type DueCredit from '../main';
 
 export class SettingsTab extends PluginSettingTab {
@@ -29,12 +29,11 @@ export class SettingsTab extends PluginSettingTab {
 	}
 
 	/** A setting that must agree with something outside the plugin says when it does not. */
-	private bibliographyStatus(): string {
-		const value = this.plugin.settings.bibliography;
+	private fileStatus(value: string, stops: string): string {
 		const adapter = this.app.vault.adapter;
 		if (value === '' || !(adapter instanceof FileSystemAdapter)) return '';
-		const path = bibliographyPath(value, adapter.getBasePath(), homedir());
-		return existsSync(path) ? '' : ` ⚠ There is no file at ${path}, so exports stop until it is fixed or cleared.`;
+		const path = settingPath(value, adapter.getBasePath(), homedir());
+		return existsSync(path) ? '' : ` ⚠ There is no file at ${path}, so ${stops} until it is fixed or cleared.`;
 	}
 
 	private cslStatus(): string {
@@ -61,6 +60,13 @@ export class SettingsTab extends PluginSettingTab {
 						desc: 'Where the save dialog opens until you have exported something; after that it opens where the last export went, until you change this. ~ is your home folder. An export can replace a file you pick, but is never saved inside the vault.',
 						control: { type: 'text', key: 'outputFolder', placeholder: '~/Documents' },
 					},
+					{
+						name: 'Word template',
+						desc:
+							'A .docx whose styles a Word export takes: fonts, headings and margins, as your university or journal wants them. A path in the vault, or outside it, starting with / or ~. Empty uses pandoc’s own. To start from those: pandoc -o reference.docx --print-default-data-file reference.docx' +
+							this.fileStatus(this.plugin.settings.referenceDoc, 'Word exports stop'),
+						control: { type: 'text', key: 'referenceDoc', placeholder: 'Pandoc’s own' },
+					},
 				],
 			},
 			{
@@ -71,7 +77,7 @@ export class SettingsTab extends PluginSettingTab {
 						name: 'Bibliography',
 						desc:
 							'The .bib file Better BibTeX keeps current: a path in the vault, or outside it, starting with / or ~. A wikilink whose name is one of its keys exports as a citation, and every other wikilink as its words. Empty exports without citations.' +
-							this.bibliographyStatus(),
+							this.fileStatus(this.plugin.settings.bibliography, 'exports stop'),
 						control: { type: 'text', key: 'bibliography', placeholder: 'Literature/library.bib' },
 					},
 					{

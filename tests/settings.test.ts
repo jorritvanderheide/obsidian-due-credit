@@ -20,7 +20,8 @@ describe('loadSettings', () => {
 	});
 
 	it('keeps an empty bibliography, style and last folder, where empty is an answer', () => {
-		expect(loadSettings({ bibliography: '', csl: '', lastFolder: '' })).toMatchObject({ bibliography: '', csl: '', lastFolder: '' });
+		expect(loadSettings({ bibliography: '', csl: '', lastFolder: '', referenceDoc: '' })).toMatchObject({ bibliography: '', csl: '', lastFolder: '', referenceDoc: '' });
+		expect(loadSettings(null).referenceDoc).toBe('');
 	});
 
 	it('drops what is not a string, and keys it does not know', () => {
