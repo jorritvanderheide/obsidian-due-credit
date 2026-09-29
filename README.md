@@ -168,6 +168,18 @@ npm run lint
 `src/commands/` and `src/ui/` wire that to Obsidian, and `src/pandoc.ts` runs
 pandoc.
 
+Pandoc reads its own markdown, which is not Obsidian's, and has to: its
+CommonMark reader, closer to Obsidian, has no `[@key]` citations. To find where
+the two read your notes differently, run the conformance check on a vault, or
+any folder of markdown:
+
+```sh
+VAULT=~/path/to/vault npx vitest run tests/conformance.test.ts
+```
+
+It lists every note whose blocks pandoc reads unlike CommonMark, and any text
+the plugin would take for code, where a comment would be kept.
+
 ## License
 
 [EUPL-1.2](LICENSE)
