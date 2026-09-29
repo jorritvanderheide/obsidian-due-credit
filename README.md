@@ -41,6 +41,7 @@ part of the name. Pandoc's own `[@jacobs2024, p. 12]` works as well.
 | `[[jacobs2024#p. 12]]` | (Jacobs 2024, 12) |
 | `[[jacobs2024\|jacobs2024, p. 12]]` | (Jacobs 2024, 12) |
 | `[[jacobs2024\|see jacobs2024, p. 12, emphasis added]]` | (see Jacobs 2024, 12, emphasis added) |
+| `[[jacobs2024\|Jacobs, p. 12]]` | (Jacobs 2024, 12) |
 | `[[jacobs2024#p. 12]]; [[keshav2007]]` | (Jacobs 2024, 12; Keshav 2007) |
 | `[[My idea\|this idea]]` | this idea |
 
@@ -49,8 +50,9 @@ as `p.`, `pp.`, `ch.`, `sec.` or `fig.`; `[[jacobs2024#Claim]]` is the paper.
 An alias that repeats the key is read the way pandoc reads `[see @key, p. 12]`:
 what comes before the key is a prefix, and what comes after it is the page and
 anything else. That is how Paper Trail writes a citation from Better BibTeX's
-dialog. Any other alias is only what Obsidian shows. Citations next to each
-other, separated by at most a `;`, share brackets.
+dialog. Any other alias is what Obsidian shows, apart from a page after its
+first comma, which is how Paper Trail adds a page to a label you wrote.
+Citations next to each other, separated by at most a `;`, share brackets.
 
 A paper note does not have to be named for its key. A link to a note whose
 `citekey` property holds one cites that key, so
