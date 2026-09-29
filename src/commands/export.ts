@@ -6,7 +6,7 @@ import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
 import { bibKeys } from '../core/citations';
 import { FORMATS, pandocArgs, styled, type Format } from '../core/document';
-import { cslPath, expandHome, insideVault } from '../core/paths';
+import { cslPath, expandHome, insideVault, withExtension } from '../core/paths';
 import { prepare, type Missing, type Vault } from '../core/prepare';
 import { startFolder } from '../core/settings';
 import { ExportError, run, withFiles } from '../pandoc';
@@ -59,7 +59,9 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		properties: ['showOverwriteConfirmation'],
 	});
 	if (answer.canceled || !answer.filePath) return;
-	const output = answer.filePath;
+	const output = withExtension(answer.filePath, extension);
+	// The dialog asked about replacing the name as typed, not this one.
+	if (output !== answer.filePath && existsSync(output) && !(await confirmReplace(context, output))) return;
 	// Nothing is written in the vault: a Markdown export saved next to its
 	// source would be the note, and the dialog only asks whether to replace a
 	// file.
@@ -85,6 +87,15 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	settings.lastFolder = dirname(output);
 	await context.saveSettings();
 	exported(output, warnings);
+}
+
+function confirmReplace(context: Context, output: string): Promise<boolean> {
+	return confirm(
+		context.app,
+		`Replace ${basename(output)}?`,
+		(el) => el.createEl('p', { text: `${dirname(output)} already has a file by that name, and the export would replace it.` }),
+		'Replace',
+	);
 }
 
 function confirmMissing(context: Context, missing: Missing, count: number, bib: string): Promise<boolean> {

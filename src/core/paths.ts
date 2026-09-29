@@ -1,5 +1,5 @@
 // Paths, as strings. Nothing here touches the disk.
-import { basename, dirname, isAbsolute, join, relative, sep } from 'path';
+import { basename, dirname, extname, isAbsolute, join, relative, sep } from 'path';
 
 /** `~` and `~/…` as the home folder, the way a shell reads them. */
 export function expandHome(path: string, home: string): string {
@@ -41,6 +41,15 @@ export function insideVault(vault: string, output: string, realpath: (path: stri
 	}
 	const vaults = [vault, realpath(vault)];
 	return [output, real].some((path) => vaults.some((folder) => within(folder, path)));
+}
+
+/**
+ * The path with the format's extension, unless it ends in it already. Pandoc
+ * picks the format from the extension, and without one makes HTML, so a name
+ * typed over the dialog's without it would be the wrong kind of file.
+ */
+export function withExtension(path: string, extension: string): string {
+	return extname(path).toLowerCase() === `.${extension}` ? path : `${path}.${extension}`;
 }
 
 /** Whether a vault path is inside a vault folder. */

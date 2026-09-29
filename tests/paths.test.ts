@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cslPath, expandHome, inFolder, insideVault, within } from '../src/core/paths';
+import { cslPath, expandHome, inFolder, insideVault, withExtension, within } from '../src/core/paths';
 
 describe('expandHome', () => {
 	it('reads ~ as the home folder, and nothing else', () => {
@@ -64,6 +64,19 @@ describe('insideVault', () => {
 
 	it('lets a new file outside the vault through', () => {
 		expect(insideVault('/data/vault', '/home/a/Out/new.md', realpath)).toBe(false);
+	});
+});
+
+describe('withExtension', () => {
+	it('adds the extension when the name does not end in it', () => {
+		expect(withExtension('/out/Chapter', 'docx')).toBe('/out/Chapter.docx');
+		expect(withExtension('/out/notes.txt', 'docx')).toBe('/out/notes.txt.docx');
+		expect(withExtension('/out/v1.2', 'pdf')).toBe('/out/v1.2.pdf');
+	});
+
+	it('leaves a name that ends in it, in any case', () => {
+		expect(withExtension('/out/Chapter.docx', 'docx')).toBe('/out/Chapter.docx');
+		expect(withExtension('/out/Chapter.PDF', 'pdf')).toBe('/out/Chapter.PDF');
 	});
 });
 
