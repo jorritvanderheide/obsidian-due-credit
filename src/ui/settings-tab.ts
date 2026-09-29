@@ -20,7 +20,10 @@ export class SettingsTab extends PluginSettingTab {
 
 	/** Write a value back through the loader, so what is stored is what it would read. */
 	async setControlValue(key: string, value: unknown): Promise<void> {
-		this.plugin.settings = loadSettings({ ...this.plugin.settings, [key]: value });
+		// Choosing an output folder is choosing where the dialog opens next, which
+		// the remembered folder would otherwise overrule without a word.
+		const forget = key === 'outputFolder' ? { lastFolder: '' } : {};
+		this.plugin.settings = loadSettings({ ...this.plugin.settings, ...forget, [key]: value });
 		await this.plugin.saveSettings();
 		this.update();
 	}
@@ -53,7 +56,7 @@ export class SettingsTab extends PluginSettingTab {
 					},
 					{
 						name: 'Output folder',
-						desc: 'Where the save dialog opens; ~ is your home folder. An export can replace a file you pick, but never one inside the vault.',
+						desc: 'Where the save dialog opens until you have exported something; after that it opens where the last export went, until you change this. ~ is your home folder. An export can replace a file you pick, but never one inside the vault.',
 						control: { type: 'text', key: 'outputFolder', placeholder: '~/Documents' },
 					},
 				],

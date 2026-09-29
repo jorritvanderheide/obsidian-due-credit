@@ -8,6 +8,7 @@ import { bibKeys, keyOf, linkpathOf, missingKeys, propertyKey } from '../core/ci
 import { documentMetadata, FORMATS, pandocArgs, type Format } from '../core/document';
 import { citeByKey, imageEmbeds, liftHeadings, splitFrontmatter, stripComments, wikilinkTargets } from '../core/markdown';
 import { cslPath, expandHome, inFolder, within } from '../core/paths';
+import { startFolder } from '../core/settings';
 import { ExportError, run, withFilter } from '../pandoc';
 import { confirm } from '../ui/confirm';
 import type { Context } from '../context';
@@ -67,7 +68,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 
 	const { name, extension } = FORMATS[format];
 	const answer = await remote.dialog.showSaveDialog({
-		defaultPath: join(expandHome(settings.outputFolder, home), `${file.basename}.${extension}`),
+		defaultPath: join(expandHome(startFolder(settings, existsSync), home), `${file.basename}.${extension}`),
 		filters: [{ name, extensions: [extension] }],
 		properties: ['showOverwriteConfirmation'],
 	});
@@ -93,6 +94,9 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 			vault,
 		),
 	);
+
+	settings.lastFolder = dirname(output);
+	await context.saveSettings();
 	exported(output, warnings);
 }
 

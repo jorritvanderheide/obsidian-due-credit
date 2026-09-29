@@ -6,4 +6,5 @@ import type { Settings } from './core/settings';
 export interface Context {
 	app: App;
 	settings: Settings;
+	saveSettings(): Promise<void>;
 }

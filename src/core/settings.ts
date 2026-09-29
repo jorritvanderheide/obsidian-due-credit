@@ -13,8 +13,16 @@ export interface Settings {
 	version: number;
 	/** The pandoc executable: a name found on the PATH, or a full path. */
 	pandocPath: string;
-	/** Where the save dialog opens, outside the vault by default. `~` is your home folder. */
+	/**
+	 * Where the save dialog opens until you have exported something, outside the
+	 * vault by default. `~` is your home folder.
+	 */
 	outputFolder: string;
+	/**
+	 * The folder the last export was saved in, empty until there is one.
+	 * Remembered rather than set: the tab does not show it.
+	 */
+	lastFolder: string;
 	/**
 	 * The `.bib` file in the vault that decides which wikilinks are citations,
 	 * kept current by Better BibTeX's auto-export. Empty exports without
@@ -44,6 +52,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	version: SETTINGS_VERSION,
 	pandocPath: 'pandoc',
 	outputFolder: '~/Documents',
+	lastFolder: '',
 	bibliography: 'Literature/library.bib',
 	literatureFolder: 'Literature',
 	keyProperty: 'citekey',
@@ -59,21 +68,30 @@ function text(value: unknown): string | undefined {
  * key nothing reads any more is dropped.
  *
  * Trimmed, because a stray space in a path is a silent miss. A blanked address
- * falls back to its default rather than pointing at nothing, except the two
- * where empty is an answer: no bibliography, and the built-in style.
+ * falls back to its default rather than pointing at nothing, except where
+ * empty is an answer: no bibliography, the built-in style, and no export yet.
  */
 export function loadSettings(data: unknown): Settings {
 	const saved = (data ?? {}) as Record<string, unknown>;
 	const address = (key: 'pandocPath' | 'outputFolder' | 'literatureFolder' | 'keyProperty') => text(saved[key]) || DEFAULT_SETTINGS[key];
-	const optional = (key: 'bibliography' | 'csl') => text(saved[key]) ?? DEFAULT_SETTINGS[key];
+	const optional = (key: 'lastFolder' | 'bibliography' | 'csl') => text(saved[key]) ?? DEFAULT_SETTINGS[key];
 
 	return {
 		version: SETTINGS_VERSION,
 		pandocPath: address('pandocPath'),
 		outputFolder: address('outputFolder'),
+		lastFolder: optional('lastFolder'),
 		bibliography: optional('bibliography'),
 		literatureFolder: address('literatureFolder'),
 		keyProperty: address('keyProperty'),
 		csl: optional('csl'),
 	};
+}
+
+/**
+ * Where the save dialog opens: where the last export went, while that folder
+ * is still there, and otherwise the output folder.
+ */
+export function startFolder(settings: Settings, exists: (folder: string) => boolean): string {
+	return settings.lastFolder !== '' && exists(settings.lastFolder) ? settings.lastFolder : settings.outputFolder;
 }
