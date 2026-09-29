@@ -9,7 +9,7 @@ import { documentMetadata, FORMATS, pandocArgs, type Format } from '../core/docu
 import { citeByKey, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../core/markdown';
 import { cslPath, expandHome, inFolder, within } from '../core/paths';
 import { startFolder } from '../core/settings';
-import { ExportError, run, withFilter } from '../pandoc';
+import { ExportError, run, withFiles } from '../pandoc';
 import { confirm } from '../ui/confirm';
 import type { Context } from '../context';
 
@@ -80,11 +80,11 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		throw new ExportError(`${output} is already a file in your vault, and an export never replaces one. Save it somewhere else.`);
 	}
 
-	const warnings = await withFilter((filter) =>
+	const warnings = await withFiles((files) =>
 		run(
 			settings.pandocPath,
 			pandocArgs(format, {
-				filter,
+				...files,
 				bibliography: bibliography ? adapter.getFullPath(bibliography.path) : null,
 				csl,
 				resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),

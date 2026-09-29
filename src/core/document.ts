@@ -40,9 +40,18 @@ export function documentMetadata(frontmatter: unknown, heading: string | null, n
 	return metadata;
 }
 
+/**
+ * Markdown has no title block of its own, so the title goes on top as a
+ * heading. Only the title: the rest of the metadata, and the bibliography's
+ * path on your disk with it, stays out of text meant for pasting elsewhere.
+ */
+export const MARKDOWN_TEMPLATE = '$if(title)$# $title$\n\n$endif$$body$\n';
+
 export interface Run {
 	/** The citation filter, on disk. */
 	filter: string;
+	/** `MARKDOWN_TEMPLATE`, on disk. */
+	template: string;
 	/** The bibliography, on disk, or null to export without citations. */
 	bibliography: string | null;
 	/** A `.csl` file, or null for pandoc's built-in style. */
@@ -60,6 +69,9 @@ export interface Run {
  *
  * - Word, PDF and Markdown render citations and a reference list with
  *   citeproc, in the chosen style.
+ * - Markdown has its title as a heading on top, and every other heading,
+ *   References too, a level under it. Shifted by pandoc rather than in
+ *   `liftHeadings`, because citeproc adds References after the note is read.
  * - LaTeX is a body to paste into a journal's or conference's class, with the
  *   `\cite` commands intact so its own bibliography style formats them. No
  *   style is applied, because the class decides.
@@ -78,7 +90,10 @@ export function pandocArgs(format: Format, run: Run): string[] {
 	// xelatex rather than pandoc's default pdflatex, which stops at any Unicode
 	// character its input encoding has not been set up for.
 	if (format === 'pdf') args.push('--pdf-engine=xelatex');
-	if (format === 'md') args.push('--to=markdown-bracketed_spans-fenced_divs-native_divs-native_spans-raw_html');
+	if (format === 'md') {
+		args.push('--to=markdown-bracketed_spans-fenced_divs-native_divs-native_spans-raw_html');
+		args.push('--standalone', `--template=${run.template}`, '--shift-heading-level-by=1');
+	}
 
 	args.push(`--output=${run.output}`);
 	return args;

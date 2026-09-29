@@ -20,7 +20,7 @@ describe('documentMetadata', () => {
 });
 
 describe('pandocArgs', () => {
-	const run: Run = { filter: '/tmp/f.lua', bibliography: '/v/lib.bib', csl: null, resourcePath: '/v', output: '/out/n.docx' };
+	const run: Run = { filter: '/tmp/f.lua', template: '/tmp/t.md', bibliography: '/v/lib.bib', csl: null, resourcePath: '/v', output: '/out/n.docx' };
 
 	it('runs the filter before citeproc, which can only cite what the filter made', () => {
 		const args = pandocArgs('docx', run);
@@ -35,6 +35,12 @@ describe('pandocArgs', () => {
 
 	it('makes PDF with xelatex', () => {
 		expect(pandocArgs('pdf', run)).toContain('--pdf-engine=xelatex');
+	});
+
+	it('puts a Markdown export under its title, References too', () => {
+		const args = pandocArgs('md', run);
+		expect(args).toEqual(expect.arrayContaining(['--standalone', '--template=/tmp/t.md', '--shift-heading-level-by=1']));
+		expect(pandocArgs('docx', run).some((arg) => arg.startsWith('--template') || arg.startsWith('--shift'))).toBe(false);
 	});
 
 	it('leaves LaTeX citations to the class: natbib, no citeproc, no style', () => {

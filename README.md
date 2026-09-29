@@ -99,7 +99,7 @@ None has a hotkey, so pick your own.
 | --- | --- |
 | **Export to Word** | A `.docx` with rendered citations and a reference list. |
 | **Export to PDF** | The same, typeset with xelatex. |
-| **Export to Markdown** | Plain Markdown with rendered citations, for pasting elsewhere. |
+| **Export to Markdown** | Plain Markdown under its title, with rendered citations, for pasting elsewhere. |
 | **Export to LaTeX** | A body with `\cite` commands, for a journal's or conference's class. |
 
 ## Settings

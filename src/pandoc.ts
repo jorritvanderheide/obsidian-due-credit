@@ -4,22 +4,25 @@ import { mkdtemp, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import citations from '../pandoc/wikilink-citations.lua';
+import { MARKDOWN_TEMPLATE } from './core/document';
 
 /** A failure already written as a sentence for the person reading it. */
 export class ExportError extends Error {}
 
 /**
- * Call `use` with the citation filter on disk, and clean up afterwards.
+ * Call `use` with the citation filter and the Markdown template on disk, and
+ * clean up afterwards.
  *
- * Pandoc takes a filter as a path, and a plugin ships as one `main.js`, so the
- * filter is bundled into it as text and written out for each export.
+ * Pandoc takes both as paths, and a plugin ships as one `main.js`, so they are
+ * bundled into it as text and written out for each export.
  */
-export async function withFilter<T>(use: (filter: string) => Promise<T>): Promise<T> {
+export async function withFiles<T>(use: (files: { filter: string; template: string }) => Promise<T>): Promise<T> {
 	const dir = await mkdtemp(join(tmpdir(), 'obsidian-due-credit-'));
 	try {
-		const filter = join(dir, 'wikilink-citations.lua');
-		await writeFile(filter, citations);
-		return await use(filter);
+		const files = { filter: join(dir, 'wikilink-citations.lua'), template: join(dir, 'markdown.template') };
+		await writeFile(files.filter, citations);
+		await writeFile(files.template, MARKDOWN_TEMPLATE);
+		return await use(files);
 	} finally {
 		await rm(dir, { recursive: true, force: true });
 	}

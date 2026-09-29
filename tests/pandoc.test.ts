@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { documentMetadata, pandocArgs } from '../src/core/document';
+import { documentMetadata, MARKDOWN_TEMPLATE, pandocArgs } from '../src/core/document';
 import { liftHeadings, splitFrontmatter, stripComments } from '../src/core/markdown';
 
 function installed(): boolean {
@@ -18,6 +18,8 @@ function installed(): boolean {
 
 const dir = mkdtempSync(join(tmpdir(), 'due-credit-test-'));
 const filter = join(process.cwd(), 'pandoc', 'wikilink-citations.lua');
+const template = join(dir, 'markdown.template');
+writeFileSync(template, MARKDOWN_TEMPLATE);
 const bib = join(dir, 'library.bib');
 writeFileSync(bib, '@article{a,\n  author = {A, Ann},\n  title = {First},\n  year = {2024}\n}\n@article{b,\n  author = {B, Bob},\n  title = {Second},\n  year = {2025}\n}\n');
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
@@ -25,7 +27,7 @@ afterAll(() => rmSync(dir, { recursive: true, force: true }));
 /** The body of a one-paragraph note, cited and rendered to plain text. */
 function cite(markdown: string): string {
 	const output = join(dir, 'out.md');
-	const args = pandocArgs('md', { filter, bibliography: bib, csl: null, resourcePath: dir, output });
+	const args = pandocArgs('md', { filter, template, bibliography: bib, csl: null, resourcePath: dir, output });
 	execFileSync('pandoc', [...args.filter((arg) => !arg.startsWith('--to=')), '--to=plain', '--wrap=none'], { input: markdown });
 	return readFileSync(output, 'utf8').split('\n')[0] ?? '';
 }
@@ -79,7 +81,7 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 describe.skipIf(!installed())('a markdown link', () => {
 	it('to a heading by its pandoc ID stays a link', () => {
 		const output = join(dir, 'anchor.md');
-		const args = pandocArgs('md', { filter, bibliography: bib, csl: null, resourcePath: dir, output });
+		const args = pandocArgs('md', { filter, template, bibliography: bib, csl: null, resourcePath: dir, output });
 		execFileSync('pandoc', args, { input: '# Intro {#intro}\n\n[back](#intro)\n' });
 		expect(readFileSync(output, 'utf8')).toContain('[back](#intro)');
 	});
@@ -88,7 +90,7 @@ describe.skipIf(!installed())('a markdown link', () => {
 describe.skipIf(!installed())('a table', () => {
 	it('reads a citation whose pipe the cell escaped', () => {
 		const output = join(dir, 'table.md');
-		const args = pandocArgs('md', { filter, bibliography: bib, csl: null, resourcePath: dir, output });
+		const args = pandocArgs('md', { filter, template, bibliography: bib, csl: null, resourcePath: dir, output });
 		const table = '| x | y |\n|---|---|\n| [[a\\|a, p. 4]] | [[a#p. 5\\|a]] |\n| [[b\\|Bob, p. 6]] | [[My idea\\|this idea]] |\n';
 		execFileSync('pandoc', [...args.filter((arg) => !arg.startsWith('--to=')), '--to=plain'], { input: table });
 		const exported = readFileSync(output, 'utf8');
@@ -98,7 +100,7 @@ describe.skipIf(!installed())('a table', () => {
 });
 
 describe.skipIf(!installed())('a note, end to end', () => {
-	it('exports without comments, titled by its H1, with sections and references at the top level', () => {
+	it('exports without comments, titled by its H1, with sections and references under it', () => {
 		const note = '---\ntitle: Old title\ntags: [private]\n---\n# On authenticity\n\n## Argument\n\nAs shown [[a]].%%not for you%%\n';
 		const { yaml, body } = splitFrontmatter(note);
 		const { title, body: lifted } = liftHeadings(stripComments(body));
@@ -106,14 +108,14 @@ describe.skipIf(!installed())('a note, end to end', () => {
 		const input = `---\n${Object.entries(metadata).map(([key, value]) => `${key}: ${String(value)}`).join('\n')}\n---\n\n${lifted}`;
 
 		const output = join(dir, 'note.md');
-		execFileSync('pandoc', [...pandocArgs('md', { filter, bibliography: bib, csl: null, resourcePath: dir, output }), '--standalone'], { input });
+		execFileSync('pandoc', pandocArgs('md', { filter, template, bibliography: bib, csl: null, resourcePath: dir, output }), { input });
 		const exported = readFileSync(output, 'utf8');
 
-		expect(exported).toContain('title: On authenticity');
+		expect(exported).toMatch(/^# On authenticity\n\n## Argument$/m);
 		expect(exported).not.toContain('private');
 		expect(exported).not.toContain('not for you');
-		expect(exported).toMatch(/^# Argument$/m);
-		expect(exported).toMatch(/^# References/m);
+		expect(exported).not.toContain(bib);
+		expect(exported).toMatch(/^## References/m);
 		expect(exported).toContain('As shown (A 2024).');
 	});
 });
