@@ -72,6 +72,11 @@ Any other alias is what Obsidian shows, apart from a page after its first
 comma, which is how Paper Trail adds a page to a label you wrote. Citations next
 to each other, separated by at most a `;`, share brackets.
 
+Don't put your own parentheses around a citation: the export adds them, and
+`([[marsh2024]])` comes out as "((Marsh 2024))". For a sentence that names the
+author, leave the author out, `Marsh [[marsh2024|-marsh2024]] argues`, or write
+pandoc's own `As @marsh2024 argues`, which is "As Marsh (2024) argues".
+
 A page after `#` is read too, when it starts with a number, `§`, or a locator
 such as `p.`, `pp.`, `ch.`, `sec.` or `fig.`; `[[marsh2024#Claim]]` is the
 paper. Paper Trail does not write it that way, because Obsidian takes it for a
@@ -96,10 +101,13 @@ name instead of a citation, because otherwise that would happen quietly:
 
 A link to a note of your own is never listed.
 
-LaTeX keeps `\cite` commands for the journal's own class to format. The filter
-that does the converting is
-[`pandoc/wikilink-citations.lua`](pandoc/wikilink-citations.lua), and works
-without the plugin too.
+LaTeX keeps `\cite` commands for the journal's own class to format.
+
+The filter that makes links citations,
+[`pandoc/wikilink-citations.lua`](pandoc/wikilink-citations.lua), works with
+pandoc on its own, for citations and nothing else. Everything under How it
+works is the plugin's: run by hand, pandoc prints your comments, and a Word file
+carries every property of the note inside it, tags and all.
 
 ## Requirements
 
