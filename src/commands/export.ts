@@ -3,7 +3,7 @@ import { existsSync, realpathSync } from 'fs';
 import { homedir } from 'os';
 import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
-import { FileSystemAdapter, MarkdownView, Notice, parseYaml, stringifyYaml, type TFile } from 'obsidian';
+import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
 import { bibKeys, keyOf, linkpathOf, missingKeys, propertyKey } from '../core/citations';
 import { documentMetadata, FORMATS, pandocArgs, styled, type Format } from '../core/document';
 import { citeByKey, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../core/markdown';
@@ -66,7 +66,6 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		return dest ? adapter.getFullPath(dest.path).replace(/\\/g, '/') : null;
 	});
 	const metadata = documentMetadata(yaml === null ? null : parseYaml(yaml), title, file.basename);
-	const input = `---\n${stringifyYaml(metadata)}---\n\n${markdown}`;
 
 	const { name, extension } = FORMATS[format];
 	const answer = await remote.dialog.showSaveDialog({
@@ -84,7 +83,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		throw new ExportError(`${output} is inside your vault, and an export writes nothing there. Save it somewhere else.`);
 	}
 
-	const warnings = await withFiles((files) =>
+	const warnings = await withFiles(metadata, (files) =>
 		run(
 			settings.pandocPath,
 			pandocArgs(format, {
@@ -94,7 +93,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 				resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),
 				output,
 			}),
-			input,
+			markdown,
 			vault,
 		),
 	);

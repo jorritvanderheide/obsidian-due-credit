@@ -10,18 +10,27 @@ import { MARKDOWN_TEMPLATE } from './core/document';
 export class ExportError extends Error {}
 
 /**
- * Call `use` with the citation filter and the Markdown template on disk, and
- * clean up afterwards.
+ * Call `use` with the citation filter, the Markdown template and the
+ * document's metadata on disk, and clean up afterwards.
  *
- * Pandoc takes both as paths, and a plugin ships as one `main.js`, so they are
- * bundled into it as text and written out for each export.
+ * Pandoc takes all three as paths. A plugin ships as one `main.js`, so the
+ * filter and the template are bundled into it as text and written out for each
+ * export. The metadata is JSON, which pandoc reads as the YAML it is.
  */
-export async function withFiles<T>(use: (files: { filter: string; template: string }) => Promise<T>): Promise<T> {
+export async function withFiles<T>(
+	metadata: Record<string, unknown>,
+	use: (files: { filter: string; template: string; metadata: string }) => Promise<T>,
+): Promise<T> {
 	const dir = await mkdtemp(join(tmpdir(), 'obsidian-due-credit-'));
 	try {
-		const files = { filter: join(dir, 'wikilink-citations.lua'), template: join(dir, 'markdown.template') };
+		const files = {
+			filter: join(dir, 'wikilink-citations.lua'),
+			template: join(dir, 'markdown.template'),
+			metadata: join(dir, 'metadata.json'),
+		};
 		await writeFile(files.filter, citations);
 		await writeFile(files.template, MARKDOWN_TEMPLATE);
+		await writeFile(files.metadata, JSON.stringify(metadata));
 		return await use(files);
 	} finally {
 		await rm(dir, { recursive: true, force: true });

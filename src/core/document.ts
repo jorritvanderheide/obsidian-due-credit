@@ -57,6 +57,8 @@ export interface Run {
 	filter: string;
 	/** `MARKDOWN_TEMPLATE`, on disk. */
 	template: string;
+	/** The document's metadata, as JSON on disk. */
+	metadata: string;
 	/** The bibliography, on disk, or null to export without citations. */
 	bibliography: string | null;
 	/** A `.csl` file, or null for pandoc's built-in style. */
@@ -67,7 +69,11 @@ export interface Run {
 }
 
 /**
- * Pandoc's arguments for one format. The note itself goes in on stdin.
+ * Pandoc's arguments for one format. The note itself goes in on stdin, and its
+ * metadata in a file of its own: pandoc reads a block between `---` lines as
+ * metadata wherever it is, and in the note that is text Obsidian shows, whose
+ * keys would travel inside a Word file. The two table syntaxes Obsidian does
+ * not have go too, since they read the same block as a table.
  *
  * The order matters: pandoc runs filters and citeproc in the order they are
  * given, and citeproc can only resolve citations the filter has already made.
@@ -82,7 +88,11 @@ export interface Run {
  *   style is applied, because the class decides.
  */
 export function pandocArgs(format: Format, run: Run): string[] {
-	const args = ['--from=markdown+wikilinks_title_after_pipe', `--lua-filter=${run.filter}`];
+	const args = [
+		'--from=markdown+wikilinks_title_after_pipe-yaml_metadata_block-simple_tables-multiline_tables',
+		`--metadata-file=${run.metadata}`,
+		`--lua-filter=${run.filter}`,
+	];
 	if (run.bibliography) args.push(`--bibliography=${run.bibliography}`);
 	args.push(`--resource-path=${run.resourcePath}`);
 
