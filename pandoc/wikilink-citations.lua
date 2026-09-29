@@ -108,8 +108,8 @@ end
 ---
 --- Every abbreviation Better BibTeX writes is here, since Paper Trail writes
 --- them into labels, with the plurals and the full words someone might type.
---- Paper Trail keeps a copy of this file and a test holding its own list to
---- this one.
+--- Paper Trail reads labels by the same words, as `LOCATOR_TERMS` in its
+--- `src/core/zotero.ts`: a change here is a change there.
 local LOCATOR_TERMS = {}
 for term in ([[
   p. pp. page pages
