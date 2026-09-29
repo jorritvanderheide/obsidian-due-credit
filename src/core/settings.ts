@@ -1,0 +1,71 @@
+// Settings are addresses, not opinions: where pandoc is, where exports go,
+// which bibliography and which style. How a note becomes a document is the
+// product and stays in code.
+
+/**
+ * Stamped on every save, and bumped when a saved key is renamed or its meaning
+ * changes. Here from the start because it is the one thing that cannot be added
+ * afterwards: by then the data is already on disk unlabelled.
+ */
+export const SETTINGS_VERSION = 1;
+
+export interface Settings {
+	version: number;
+	/** The pandoc executable: a name found on the PATH, or a full path. */
+	pandocPath: string;
+	/** Where exports are written, outside the vault by default. `~` is your home folder. */
+	outputFolder: string;
+	/**
+	 * The `.bib` file in the vault that decides which wikilinks are citations,
+	 * kept current by Better BibTeX's auto-export. Empty exports without
+	 * citations: every wikilink becomes its words.
+	 */
+	bibliography: string;
+	/**
+	 * The folder in the vault that holds one note per paper. A link into it
+	 * whose key the bibliography lacks is a citation about to be lost, and the
+	 * export says so before it runs.
+	 */
+	literatureFolder: string;
+	/**
+	 * Citation style: the name of one Zotero has installed (`apa`), or a path to
+	 * a `.csl` file. Empty is pandoc's built-in Chicago author-date.
+	 */
+	csl: string;
+}
+
+export const DEFAULT_SETTINGS: Settings = {
+	version: SETTINGS_VERSION,
+	pandocPath: 'pandoc',
+	outputFolder: '~/Documents',
+	bibliography: 'Literature/library.bib',
+	literatureFolder: 'Literature',
+	csl: '',
+};
+
+function text(value: unknown): string | undefined {
+	return typeof value === 'string' ? value.trim() : undefined;
+}
+
+/**
+ * Settings from whatever was saved, built fresh from the names known here so a
+ * key nothing reads any more is dropped.
+ *
+ * Trimmed, because a stray space in a path is a silent miss. A blanked address
+ * falls back to its default rather than pointing at nothing, except the two
+ * where empty is an answer: no bibliography, and the built-in style.
+ */
+export function loadSettings(data: unknown): Settings {
+	const saved = (data ?? {}) as Record<string, unknown>;
+	const address = (key: 'pandocPath' | 'outputFolder' | 'literatureFolder') => text(saved[key]) || DEFAULT_SETTINGS[key];
+	const optional = (key: 'bibliography' | 'csl') => text(saved[key]) ?? DEFAULT_SETTINGS[key];
+
+	return {
+		version: SETTINGS_VERSION,
+		pandocPath: address('pandocPath'),
+		outputFolder: address('outputFolder'),
+		bibliography: optional('bibliography'),
+		literatureFolder: address('literatureFolder'),
+		csl: optional('csl'),
+	};
+}

@@ -1,0 +1,50 @@
+import { describe, expect, it } from 'vitest';
+import { documentMetadata, pandocArgs, type Run } from '../src/core/document';
+
+describe('documentMetadata', () => {
+	it('takes the title from the heading first, then the property, then the name', () => {
+		expect(documentMetadata({ title: 'Property' }, 'Heading', 'name').title).toBe('Heading');
+		expect(documentMetadata({ title: 'Property' }, null, 'name').title).toBe('Property');
+		expect(documentMetadata({ title: ' ' }, null, 'name').title).toBe('name');
+		expect(documentMetadata(null, null, 'name').title).toBe('name');
+	});
+
+	it('passes on only the keys pandoc uses, so vault metadata stays out of the file', () => {
+		const metadata = documentMetadata({ tags: ['secret'], reading: 'queued', lang: 'nl', author: ['A', 'B'] }, 'T', 'n');
+		expect(metadata).toEqual({ title: 'T', 'reference-section-title': 'References', lang: 'nl', author: ['A', 'B'] });
+	});
+
+	it('lets a note head its references in its own language', () => {
+		expect(documentMetadata({ 'reference-section-title': 'Bronnen' }, null, 'n')['reference-section-title']).toBe('Bronnen');
+	});
+});
+
+describe('pandocArgs', () => {
+	const run: Run = { filter: '/tmp/f.lua', bibliography: '/v/lib.bib', csl: null, resourcePath: '/v', output: '/out/n.docx' };
+
+	it('runs the filter before citeproc, which can only cite what the filter made', () => {
+		const args = pandocArgs('docx', run);
+		expect(args.indexOf('--lua-filter=/tmp/f.lua')).toBeLessThan(args.indexOf('--citeproc'));
+		expect(args[0]).toBe('--from=markdown+wikilinks_title_after_pipe');
+		expect(args.at(-1)).toBe('--output=/out/n.docx');
+	});
+
+	it('passes a style when there is one', () => {
+		expect(pandocArgs('docx', { ...run, csl: '/s/apa.csl' })).toContain('--csl=/s/apa.csl');
+	});
+
+	it('makes PDF with xelatex', () => {
+		expect(pandocArgs('pdf', run)).toContain('--pdf-engine=xelatex');
+	});
+
+	it('leaves LaTeX citations to the class: natbib, no citeproc, no style', () => {
+		const args = pandocArgs('tex', { ...run, csl: '/s/apa.csl' });
+		expect(args).toContain('--natbib');
+		expect(args).not.toContain('--citeproc');
+		expect(args.some((arg) => arg.startsWith('--csl'))).toBe(false);
+	});
+
+	it('exports without a bibliography when there is none', () => {
+		expect(pandocArgs('md', { ...run, bibliography: null }).some((arg) => arg.startsWith('--bibliography'))).toBe(false);
+	});
+});

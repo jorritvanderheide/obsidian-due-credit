@@ -25,4 +25,9 @@ jobs:
             - run: npm ci
             - run: npm run build --if-present
             - run: npm run lint
+            # The filter tests run a real pandoc, pinned so citeproc's output does not drift under them.
+            - name: Install pandoc
+              run: |
+                  curl -fsSLo pandoc.deb https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-1-amd64.deb
+                  sudo dpkg -i pandoc.deb
             - run: npm test
