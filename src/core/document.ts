@@ -53,6 +53,8 @@ export function documentMetadata(frontmatter: unknown, heading: string | null, n
 export const MARKDOWN_TEMPLATE = '$if(title)$# $title$\n\n$endif$$body$\n';
 
 export interface Run {
+	/** The filter for Obsidian's syntax that is not about citations, on disk. */
+	obsidian: string;
 	/** The citation filter, on disk. */
 	filter: string;
 	/** The filter that clears the bibliography's and the style's paths after citeproc, on disk. */
@@ -75,7 +77,9 @@ export interface Run {
  * metadata in a file of its own: pandoc reads a block between `---` lines as
  * metadata wherever it is, and in the note that is text Obsidian shows, whose
  * keys would travel inside a Word file. The two table syntaxes Obsidian does
- * not have go too, since they read the same block as a table.
+ * not have go too, since they read the same block as a table, and so does the
+ * blank line pandoc wants before a quote, which Obsidian does not: a callout
+ * inside a callout is a quote right after a line.
  *
  * The order matters: pandoc runs filters and citeproc in the order they are
  * given, and citeproc can only resolve citations the filter has already made.
@@ -91,8 +95,9 @@ export interface Run {
  */
 export function pandocArgs(format: Format, run: Run): string[] {
 	const args = [
-		'--from=markdown+wikilinks_title_after_pipe-yaml_metadata_block-simple_tables-multiline_tables',
+		'--from=markdown+wikilinks_title_after_pipe-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote',
 		`--metadata-file=${run.metadata}`,
+		`--lua-filter=${run.obsidian}`,
 		`--lua-filter=${run.filter}`,
 	];
 	if (run.bibliography) args.push(`--bibliography=${run.bibliography}`);

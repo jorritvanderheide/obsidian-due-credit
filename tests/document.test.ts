@@ -26,12 +26,13 @@ describe('styled', () => {
 });
 
 describe('pandocArgs', () => {
-	const run: Run = { filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, resourcePath: '/v', output: '/out/n.docx' };
+	const run: Run = { obsidian: '/tmp/o.lua', filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, resourcePath: '/v', output: '/out/n.docx' };
 
 	it('runs the filter before citeproc, which can only cite what the filter made', () => {
 		const args = pandocArgs('docx', run);
 		expect(args.indexOf('--lua-filter=/tmp/f.lua')).toBeLessThan(args.indexOf('--citeproc'));
-		expect(args[0]).toBe('--from=markdown+wikilinks_title_after_pipe-yaml_metadata_block-simple_tables-multiline_tables');
+		expect(args[0]).toBe('--from=markdown+wikilinks_title_after_pipe-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote');
+		expect(args.indexOf('--lua-filter=/tmp/o.lua')).toBeLessThan(args.indexOf('--lua-filter=/tmp/f.lua'));
 		expect(args).toContain('--metadata-file=/tmp/m.json');
 		expect(args.at(-1)).toBe('--output=/out/n.docx');
 	});

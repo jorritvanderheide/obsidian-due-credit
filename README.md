@@ -33,6 +33,8 @@ Obsidian:
   you, not your reader.
 - **Plugin blocks.** A `dataview`, `dataviewjs`, `tasks`, `query` or `base`
   code block is left out. Exported, it would only be its query.
+- **Callouts.** `> [!note] Title` is a quote with its title in bold on the
+  first line; a callout without a title is a plain quote.
 - **Tags.** A line of `#tags` is left out, and a tag in a sentence stays as its
   word: `#project/alpha` is "project/alpha".
 

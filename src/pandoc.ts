@@ -4,6 +4,7 @@ import { mkdtemp, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import afterCiteproc from '../pandoc/after-citeproc.lua';
+import obsidian from '../pandoc/obsidian.lua';
 import citations from '../pandoc/wikilink-citations.lua';
 import { MARKDOWN_TEMPLATE } from './core/document';
 
@@ -20,16 +21,18 @@ export class ExportError extends Error {}
  */
 export async function withFiles<T>(
 	metadata: Record<string, unknown>,
-	use: (files: { filter: string; afterCiteproc: string; template: string; metadata: string }) => Promise<T>,
+	use: (files: { obsidian: string; filter: string; afterCiteproc: string; template: string; metadata: string }) => Promise<T>,
 ): Promise<T> {
 	const dir = await mkdtemp(join(tmpdir(), 'obsidian-due-credit-'));
 	try {
 		const files = {
+			obsidian: join(dir, 'obsidian.lua'),
 			filter: join(dir, 'wikilink-citations.lua'),
 			afterCiteproc: join(dir, 'after-citeproc.lua'),
 			template: join(dir, 'markdown.template'),
 			metadata: join(dir, 'metadata.json'),
 		};
+		await writeFile(files.obsidian, obsidian);
 		await writeFile(files.filter, citations);
 		await writeFile(files.afterCiteproc, afterCiteproc);
 		await writeFile(files.template, MARKDOWN_TEMPLATE);

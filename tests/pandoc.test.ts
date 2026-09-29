@@ -18,6 +18,7 @@ function installed(): boolean {
 }
 
 const dir = mkdtempSync(join(tmpdir(), 'due-credit-test-'));
+const obsidian = join(process.cwd(), 'pandoc', 'obsidian.lua');
 const filter = join(process.cwd(), 'pandoc', 'wikilink-citations.lua');
 const afterCiteproc = join(process.cwd(), 'pandoc', 'after-citeproc.lua');
 const template = join(dir, 'markdown.template');
@@ -31,7 +32,7 @@ afterAll(() => rmSync(dir, { recursive: true, force: true }));
 /** The body of a one-paragraph note, cited and rendered to plain text. */
 function cite(markdown: string): string {
 	const output = join(dir, 'out.md');
-	const args = pandocArgs('md', { filter, afterCiteproc, template, metadata, bibliography: bib, csl: null, resourcePath: dir, output });
+	const args = pandocArgs('md', { obsidian, filter, afterCiteproc, template, metadata, bibliography: bib, csl: null, resourcePath: dir, output });
 	execFileSync('pandoc', [...args.filter((arg) => !arg.startsWith('--to=')), '--to=plain', '--wrap=none'], { input: markdown });
 	return readFileSync(output, 'utf8').split('\n')[0] ?? '';
 }
@@ -137,16 +138,38 @@ describe.skipIf(!installed())('a bibliography with a byte order mark', () => {
 		const marked = join(dir, 'marked.bib');
 		writeFileSync(marked, '\uFEFF@article{c,\n  author = {C, Cy},\n  title = {Third},\n  year = {2023}\n}\n');
 		const output = join(dir, 'marked.txt');
-		const args = pandocArgs('md', { filter, afterCiteproc, template, metadata, bibliography: marked, csl: null, resourcePath: dir, output });
+		const args = pandocArgs('md', { obsidian, filter, afterCiteproc, template, metadata, bibliography: marked, csl: null, resourcePath: dir, output });
 		execFileSync('pandoc', [...args.filter((arg) => !arg.startsWith('--to=')), '--to=plain'], { input: '[[c]]\n' });
 		expect(readFileSync(output, 'utf8')).toContain('(C 2023)');
+	});
+});
+
+/** A note's body, exported as Markdown with the plugin's arguments. */
+function markdown(input: string): string {
+	const output = join(dir, 'export.md');
+	execFileSync('pandoc', pandocArgs('md', { obsidian, filter, afterCiteproc, template, metadata, bibliography: bib, csl: null, resourcePath: dir, output }), { input });
+	return readFileSync(output, 'utf8');
+}
+
+describe.skipIf(!installed())('obsidian.lua', () => {
+	it('exports a callout as a quote under its title in bold', () => {
+		expect(markdown('> [!note]- My *title*\n> Body [[a]].\n')).toBe('> **My *title***\\\n> Body (A 2024).\n\nA, Ann. 2024. "First."\n');
+	});
+
+	it('drops the marker of a callout without a title, and leaves a plain quote alone', () => {
+		expect(markdown('> [!tip]\n> Untitled.\n\n> A quote.\n')).toBe('> Untitled.\n\n> A quote.\n');
+		expect(markdown('> [!warning] Only a title\n')).toBe('> **Only a title**\n');
+	});
+
+	it('reads a callout inside a callout, without the blank line pandoc wants', () => {
+		expect(markdown('> [!info|wide] Outer\n> > [!quote] Inner\n> > Said.\n')).toBe('> **Outer**\n>\n> > **Inner**\\\n> > Said.\n');
 	});
 });
 
 describe.skipIf(!installed())('a markdown link', () => {
 	it('to a heading by its pandoc ID stays a link', () => {
 		const output = join(dir, 'anchor.md');
-		const args = pandocArgs('md', { filter, afterCiteproc, template, metadata, bibliography: bib, csl: null, resourcePath: dir, output });
+		const args = pandocArgs('md', { obsidian, filter, afterCiteproc, template, metadata, bibliography: bib, csl: null, resourcePath: dir, output });
 		execFileSync('pandoc', args, { input: '# Intro {#intro}\n\n[back](#intro)\n' });
 		expect(readFileSync(output, 'utf8')).toContain('[back](#intro)');
 	});
@@ -155,7 +178,7 @@ describe.skipIf(!installed())('a markdown link', () => {
 describe.skipIf(!installed())('a table', () => {
 	it('reads a citation whose pipe the cell escaped', () => {
 		const output = join(dir, 'table.md');
-		const args = pandocArgs('md', { filter, afterCiteproc, template, metadata, bibliography: bib, csl: null, resourcePath: dir, output });
+		const args = pandocArgs('md', { obsidian, filter, afterCiteproc, template, metadata, bibliography: bib, csl: null, resourcePath: dir, output });
 		const table = '| x | y |\n|---|---|\n| [[a\\|a, p. 4]] | [[a#p. 5\\|a]] |\n| [[b\\|Bob, p. 6]] | [[My idea\\|this idea]] |\n';
 		execFileSync('pandoc', [...args.filter((arg) => !arg.startsWith('--to=')), '--to=plain'], { input: table });
 		const exported = readFileSync(output, 'utf8');
@@ -173,7 +196,7 @@ describe.skipIf(!installed())('a note, end to end', () => {
 			parseYaml: () => ({ title: 'Old title', tags: ['private'] }),
 		};
 		const { markdown: input, metadata } = prepare(note, vault, { name: 'note', papersFolder: 'Literature', keyProperty: 'citekey', keys: null });
-		const files = { filter, afterCiteproc, template, metadata: join(dir, 'note.json'), bibliography: bib, csl: null, resourcePath: dir, output: join(dir, 'note.md') };
+		const files = { obsidian, filter, afterCiteproc, template, metadata: join(dir, 'note.json'), bibliography: bib, csl: null, resourcePath: dir, output: join(dir, 'note.md') };
 		writeFileSync(files.metadata, JSON.stringify(metadata));
 
 		execFileSync('pandoc', pandocArgs('md', files), { input });
