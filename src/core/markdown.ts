@@ -17,13 +17,23 @@ export interface Segment {
 // ```` ```npm i``` installs it ```` opens with inline code, as in CommonMark and
 // pandoc.
 const FENCE = /^ {0,3}(`{3,}(?=[^`]*$)|~{3,})/;
+// A line that starts a block of its own, which a code span cannot cross into.
+const BLOCK_START = /^ {0,3}(?:#{1,6}(?:[ \t]|$)|>|[-*+][ \t]|\d{1,9}[.)][ \t]|\|)/;
 
 /**
  * The note cut into code and everything else, which concatenate back to it.
  *
- * Code is a fenced block, and with `inline` also a backtick span within a line.
- * Headings want fences only, so that what is not code is always whole lines.
- * Each fenced block is a segment of its own, opening line first.
+ * Code is a fenced block, and with `inline` also a backtick span. Headings want
+ * fences only, so that what is not code is always whole lines. Each fenced
+ * block is a segment of its own, opening line first.
+ *
+ * A span can cross a line break, within a paragraph: read line by line, its
+ * closing backtick would open a span on the next line, and a comment after it
+ * would count as code and be kept. So spans are read over the lines of a
+ * paragraph together, broken at a blank line and at a line that starts a block
+ * of its own: a heading, a quote, a list item or a table row. An indented code
+ * block is not code here, since telling it from an indented paragraph in a
+ * list needs the list; read as text, it only loses what text loses.
  */
 export function segments(text: string, inline = true): Segment[] {
 	const out: Segment[] = [];
@@ -35,27 +45,38 @@ export function segments(text: string, inline = true): Segment[] {
 	};
 
 	let fence: string | null = null;
+	// The lines of the paragraph being read, for spans that cross a line break.
+	let paragraph = '';
+	const flush = () => {
+		spans(paragraph, push);
+		paragraph = '';
+	};
 	for (const line of text.split(/(?<=\n)/)) {
 		const marker = FENCE.exec(line)?.[1];
 		if (fence !== null) {
 			push(true, line);
 			if (marker && marker[0] === fence[0] && marker.length >= fence.length && line.trim() === marker) fence = null;
 		} else if (marker) {
+			flush();
 			fence = marker;
 			// A segment of its own, even right after another block, so that a
 			// block can be told by its opening line.
 			out.push({ code: true, text: line });
 		} else if (inline) {
-			spans(line, push);
+			const blank = line.trim() === '';
+			if (blank || BLOCK_START.test(line)) flush();
+			paragraph += line;
+			if (blank) flush();
 		} else {
 			push(false, line);
 		}
 	}
+	flush();
 	return out;
 }
 
 /**
- * One line, with its backtick spans marked as code. An unmatched run of
+ * A paragraph's lines, with its backtick spans marked as code. An unmatched run of
  * backticks is text, and so is a backtick escaped with `\`, though the rest of
  * its run can still open a span, as in CommonMark.
  */

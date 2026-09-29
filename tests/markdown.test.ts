@@ -50,6 +50,22 @@ describe('segments', () => {
 		]);
 	});
 
+	it('reads a span across a line break, within a paragraph', () => {
+		expect(segments('A `multi\nline` then %% and `x`\n')).toEqual([
+			{ code: false, text: 'A ' },
+			{ code: true, text: '`multi\nline`' },
+			{ code: false, text: ' then %% and ' },
+			{ code: true, text: '`x`' },
+			{ code: false, text: '\n' },
+		]);
+	});
+
+	it('reads no span across a blank line or into a block of its own', () => {
+		for (const text of ['a `x\n\nb` c', '- a `x\n- b` c', 'a `x\n# b` c', 'a `x\n> b` c', '| a `x |\n| b` c |']) {
+			expect(segments(text).some((segment) => segment.code)).toBe(false);
+		}
+	});
+
 	it('reads an unmatched backtick as text', () => {
 		expect(segments('it`s')).toEqual([{ code: false, text: 'it`s' }]);
 	});
@@ -112,6 +128,10 @@ describe('stripComments', () => {
 
 	it('hides a comment after an escaped backtick', () => {
 		expect(stripComments('Escape \\`, like so. %%private `code` here%% after\n\nNext.')).toBe('Escape \\`, like so.  after\n\nNext.');
+	});
+
+	it('hides a comment after a code span across a line break', () => {
+		expect(stripComments('A `multi\nline` then %%secret%% and `x`.')).toBe('A `multi\nline` then  and `x`.');
 	});
 
 	it('hides code inside a comment', () => {
