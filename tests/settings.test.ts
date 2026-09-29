@@ -11,10 +11,11 @@ describe('loadSettings', () => {
 	});
 
 	it('falls back when an address is blanked, rather than pointing at nothing', () => {
-		expect(loadSettings({ pandocPath: ' ', outputFolder: '', literatureFolder: '  ' })).toMatchObject({
+		expect(loadSettings({ pandocPath: ' ', outputFolder: '', literatureFolder: '  ', keyProperty: '' })).toMatchObject({
 			pandocPath: 'pandoc',
 			outputFolder: '~/Documents',
 			literatureFolder: 'Literature',
+			keyProperty: 'citekey',
 		});
 	});
 

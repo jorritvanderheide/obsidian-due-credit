@@ -28,6 +28,12 @@ export interface Settings {
 	 */
 	literatureFolder: string;
 	/**
+	 * The frontmatter property holding a paper note's citation key. A link to a
+	 * note with one cites that key, whatever the note is called. Paper Trail
+	 * writes `citekey`.
+	 */
+	keyProperty: string;
+	/**
 	 * Citation style: the name of one Zotero has installed (`apa`), or a path to
 	 * a `.csl` file. Empty is pandoc's built-in Chicago author-date.
 	 */
@@ -40,6 +46,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	outputFolder: '~/Documents',
 	bibliography: 'Literature/library.bib',
 	literatureFolder: 'Literature',
+	keyProperty: 'citekey',
 	csl: '',
 };
 
@@ -57,7 +64,7 @@ function text(value: unknown): string | undefined {
  */
 export function loadSettings(data: unknown): Settings {
 	const saved = (data ?? {}) as Record<string, unknown>;
-	const address = (key: 'pandocPath' | 'outputFolder' | 'literatureFolder') => text(saved[key]) || DEFAULT_SETTINGS[key];
+	const address = (key: 'pandocPath' | 'outputFolder' | 'literatureFolder' | 'keyProperty') => text(saved[key]) || DEFAULT_SETTINGS[key];
 	const optional = (key: 'bibliography' | 'csl') => text(saved[key]) ?? DEFAULT_SETTINGS[key];
 
 	return {
@@ -66,6 +73,7 @@ export function loadSettings(data: unknown): Settings {
 		outputFolder: address('outputFolder'),
 		bibliography: optional('bibliography'),
 		literatureFolder: address('literatureFolder'),
+		keyProperty: address('keyProperty'),
 		csl: optional('csl'),
 	};
 }

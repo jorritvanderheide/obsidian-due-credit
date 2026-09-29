@@ -36,19 +36,44 @@ export function keyOf(target: string): string {
 		.replace(/^@/, '');
 }
 
+/** A note's citation key, from the named frontmatter property, or null when it has none. */
+export function propertyKey(frontmatter: unknown, property: string): string | null {
+	if (frontmatter === null || typeof frontmatter !== 'object') return null;
+	const value = (frontmatter as Record<string, unknown>)[property];
+	return typeof value === 'string' && value.trim() !== '' ? value.trim() : null;
+}
+
+/**
+ * The alias with the key it repeats, as a word, swapped for another: the same
+ * rule the filter's `spelled` reads it by, so a citation whose target moves
+ * keeps its page.
+ */
+export function renameInAlias(alias: string, from: string, to: string): string {
+	let at = alias.indexOf(from);
+	while (at !== -1) {
+		const before = at === 0 || /\s/.test(alias[at - 1] ?? '');
+		const end = at + from.length;
+		const after = end === alias.length || /[\s,;]/.test(alias[end] ?? '');
+		if (before && after) return alias.slice(0, at) + to + alias.slice(end);
+		at = alias.indexOf(from, at + 1);
+	}
+	return alias;
+}
+
 /**
  * The keys of links to papers that the bibliography does not have, each once.
  *
- * Only links to papers, because every other link is meant to become its words.
- * A paper whose key is missing is almost always a key Better BibTeX changed, or
+ * `keyFor` says which key a link cites, or null when it links to something
+ * that is not a paper, since every other link is meant to become its words. A
+ * paper whose key is missing is almost always a key Better BibTeX changed, or
  * an auto-export that has not run yet, and the filter would print its name
  * where the citation should be.
  */
-export function missingKeys(targets: string[], isPaper: (target: string) => boolean, keys: Set<string>): string[] {
+export function missingKeys(targets: string[], keyFor: (target: string) => string | null, keys: Set<string>): string[] {
 	const missing = new Set<string>();
 	for (const target of targets) {
-		const key = keyOf(target);
-		if (!keys.has(key) && isPaper(target)) missing.add(key);
+		const key = keyFor(target);
+		if (key !== null && !keys.has(key)) missing.add(key);
 	}
 	return [...missing].sort();
 }

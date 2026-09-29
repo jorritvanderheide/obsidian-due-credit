@@ -75,6 +75,11 @@ export class SettingsTab extends PluginSettingTab {
 						control: { type: 'folder', key: 'literatureFolder', placeholder: 'Literature' },
 					},
 					{
+						name: 'Citation key property',
+						desc: 'The frontmatter property holding a paper note’s citation key. A link to a note with one cites that key, whatever the note is called, and follows it when Better BibTeX changes it. Paper Trail writes citekey.',
+						control: { type: 'text', key: 'keyProperty', placeholder: 'citekey' },
+					},
+					{
 						name: 'Citation style',
 						desc:
 							'The name of a style Zotero has installed, such as apa or ieee, or the path to a .csl file. Empty uses Chicago author-date. LaTeX exports leave styling to the journal’s class.' +

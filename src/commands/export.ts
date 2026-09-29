@@ -4,9 +4,9 @@ import { homedir } from 'os';
 import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, stringifyYaml, type TFile } from 'obsidian';
-import { bibKeys, linkpathOf, missingKeys } from '../core/citations';
+import { bibKeys, keyOf, linkpathOf, missingKeys, propertyKey } from '../core/citations';
 import { documentMetadata, FORMATS, pandocArgs, type Format } from '../core/document';
-import { imageEmbeds, liftHeadings, splitFrontmatter, stripComments, wikilinkTargets } from '../core/markdown';
+import { citeByKey, imageEmbeds, liftHeadings, splitFrontmatter, stripComments, wikilinkTargets } from '../core/markdown';
 import { cslPath, expandHome, inFolder, within } from '../core/paths';
 import { ExportError, run, withFilter } from '../pandoc';
 import { confirm } from '../ui/confirm';
@@ -38,17 +38,25 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const { yaml, body } = splitFrontmatter(text);
 	const prose = stripComments(body);
 
+	// A note's own key first, whatever it is called; then, for a note in the
+	// papers folder without one, its name.
+	const propertyOf = (linkpath: string) => {
+		const dest = resolve(linkpath);
+		return dest ? propertyKey(app.metadataCache.getFileCache(dest)?.frontmatter, settings.keyProperty) : null;
+	};
 	if (bibliography) {
 		const keys = bibKeys(await app.vault.cachedRead(bibliography));
-		const isPaper = (target: string) => {
-			const dest = resolve(linkpathOf(target));
-			return dest !== null && inFolder(dest.path, settings.literatureFolder);
+		const keyFor = (target: string) => {
+			const linkpath = linkpathOf(target).trim();
+			const dest = resolve(linkpath);
+			if (dest === null) return null;
+			return propertyOf(linkpath) ?? (inFolder(dest.path, settings.literatureFolder) ? keyOf(target) : null);
 		};
-		const missing = missingKeys(wikilinkTargets(prose), isPaper, keys);
+		const missing = missingKeys(wikilinkTargets(prose), keyFor, keys);
 		if (missing.length > 0 && !(await confirmMissing(context, missing, bibliography.name))) return;
 	}
 
-	const { title, body: lifted } = liftHeadings(prose);
+	const { title, body: lifted } = liftHeadings(citeByKey(prose, propertyOf));
 	const markdown = imageEmbeds(lifted, (linkpath) => {
 		const dest = resolve(linkpath);
 		// Forward slashes, which pandoc reads on every platform.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { imageEmbeds, liftHeadings, segments, splitFrontmatter, stripComments, wikilinkTargets } from '../src/core/markdown';
+import { citeByKey, imageEmbeds, liftHeadings, segments, splitFrontmatter, stripComments, wikilinkTargets } from '../src/core/markdown';
 
 describe('segments', () => {
 	it('concatenates back to the note', () => {
@@ -120,5 +120,27 @@ describe('imageEmbeds', () => {
 describe('wikilinkTargets', () => {
 	it('lists targets without labels, embeds or code', () => {
 		expect(wikilinkTargets('[[a]] [[b#p. 3|see]] ![[c.png]] `[[d]]` [[Literature/e.md]]')).toEqual(['a', 'b#p. 3', 'Literature/e.md']);
+	});
+});
+
+describe('citeByKey', () => {
+	const keys: Record<string, string> = { 'Jacobs (2024) The Authenticity Crisis': 'jacobs2024', oldkey: 'newkey', '@oldkey': 'newkey', 'Literature/oldkey.md': 'newkey' };
+	const keyFor = (linkpath: string) => keys[linkpath] ?? null;
+
+	it('points a link to a note named for its title at the note’s key', () => {
+		expect(citeByKey('as [[Jacobs (2024) The Authenticity Crisis]] shows', keyFor)).toBe('as [[jacobs2024]] shows');
+	});
+
+	it('follows a key Better BibTeX changed, keeping the page and the alias', () => {
+		expect(citeByKey('[[oldkey#p. 12|label]] [[oldkey|see oldkey, p. 4]]', keyFor)).toBe('[[newkey#p. 12|label]] [[newkey|see newkey, p. 4]]');
+	});
+
+	it('reads the target however Obsidian wrote it', () => {
+		expect(citeByKey('[[@oldkey|@oldkey]] [[Literature/oldkey.md]]', keyFor)).toBe('[[newkey|@oldkey]] [[newkey]]');
+	});
+
+	it('leaves links without a key, embeds and code as written', () => {
+		const text = '[[My idea|this idea]] ![[oldkey]] `[[oldkey]]`';
+		expect(citeByKey(text, keyFor)).toBe(text);
 	});
 });

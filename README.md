@@ -52,6 +52,12 @@ anything else. That is how Paper Trail writes a citation from Better BibTeX's
 dialog. Any other alias is only what Obsidian shows. Citations next to each
 other, separated by at most a `;`, share brackets.
 
+A paper note does not have to be named for its key. A link to a note whose
+`citekey` property holds one cites that key, so
+`[[Jacobs (2024) The Authenticity Crisis]]` is (Jacobs 2024), and a link made
+before Better BibTeX changed a key still cites the paper once the note's
+property has the new one.
+
 A link to a paper the bibliography does not have is listed before the export
 runs, because otherwise it would quietly come out as a name. That is almost
 always a key Better BibTeX changed, or an auto-export that has not run yet.
@@ -96,6 +102,7 @@ None has a hotkey, so pick your own.
 | **Output folder** | `~/Documents` | Where the save dialog opens. |
 | **Bibliography** | `Literature/library.bib` | The `.bib` file that decides which links are citations. Empty exports without citations. |
 | **Papers folder** | `Literature` | Where your paper notes are, for the check before exporting. |
+| **Citation key property** | `citekey` | The frontmatter property holding a paper note's citation key. |
 | **Citation style** | Chicago author-date | A style Zotero has installed, such as `apa`, or the path to a `.csl` file. |
 
 ## Safety

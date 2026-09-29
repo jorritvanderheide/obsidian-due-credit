@@ -5,6 +5,8 @@
 // works on the text of the note and never looks inside code, where all of these
 // are only characters.
 
+import { keyOf, linkpathOf, renameInAlias } from './citations';
+
 /** A run of the note that is code, or that is not. */
 export interface Segment {
 	code: boolean;
@@ -168,6 +170,31 @@ export function imageEmbeds(text: string, resolve: (linkpath: string) => string 
 			const width = /^\s*(\d+)(?:x\d+)?\s*$/.exec(label ?? '')?.[1];
 			const alt = width ? '' : (label ?? '').trim();
 			return `![${alt}](<${path}>)${width ? `{width=${width}px}` : ''}`;
+		}),
+	);
+}
+
+const LINK = /(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g;
+
+/**
+ * Every link to a paper note, pointed at the paper's citation key.
+ *
+ * The filter only knows a link's name, and a note is not always named for its
+ * key: a template can name it for its author and title, and Better BibTeX can
+ * change a key long after the note was named. `keyFor` asks the note itself, so
+ * `[[Jacobs (2024) The Authenticity Crisis|see p. 4]]` exports as the citation
+ * it is. A key the alias repeats changes with the target, so the alias still
+ * spells the citation out. A link to anything without a key is left as written.
+ */
+export function citeByKey(text: string, keyFor: (linkpath: string) => string | null): string {
+	return outsideCode(text, (prose) =>
+		prose.replace(LINK, (link: string, target: string, alias?: string) => {
+			const linkpath = linkpathOf(target);
+			const key = keyFor(linkpath.trim());
+			if (key === null) return link;
+			const fragment = target.slice(linkpath.length);
+			const label = alias === undefined ? '' : `|${renameInAlias(alias, keyOf(target), key)}`;
+			return `[[${key}${fragment}${label}]]`;
 		}),
 	);
 }
