@@ -47,6 +47,7 @@ part of the name. Pandoc's own `[@jacobs2024, p. 12]` works as well.
 | `[[jacobs2024\|Jacobs, p. 12]]` | (Jacobs 2024, 12) |
 | `[[jacobs2024#p. 12]]; [[keshav2007]]` | (Jacobs 2024, 12; Keshav 2007) |
 | `[[My idea\|this idea]]` | this idea |
+| `[[My idea#Section]]` | My idea |
 
 A page is anything after `#` that starts with a number, `§`, or a locator such
 as `p.`, `pp.`, `ch.`, `sec.` or `fig.`; `[[jacobs2024#Claim]]` is the paper.

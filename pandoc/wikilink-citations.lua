@@ -98,10 +98,13 @@ end
 ---
 --- A scheme means something outside this document knows how to resolve it: a
 --- reader can follow `https:`, and their machine can follow `zotero:`. A `#`
---- means somewhere in the exported document itself. Everything else points at a
---- file in the vault, which the export does not have and will never have.
-local function reachable(target)
-  return target:match('^%a[%w+.-]*:') ~= nil or target:sub(1, 1) == '#'
+--- in a markdown link means somewhere in the exported document itself, by the
+--- ID pandoc gives it. Everything else points at a file in the vault, which the
+--- export does not have and will never have, and so does a wikilink to a
+--- heading: its headings are the note's, for whoever wrote it.
+local function reachable(el, target)
+  if target:match('^%a[%w+.-]*:') then return true end
+  return target:sub(1, 1) == '#' and not el.classes:includes('wikilink')
 end
 
 --- Locator terms, so a heading or a label is read as a page only when it is
@@ -188,7 +191,9 @@ end
 --- In a Word file handed to a supervisor there is a dead reference to a path on
 --- your laptop, and the reader finds that out by clicking it. The words stay,
 --- which is all the sentence needed from it: whether that is the note's name or
---- a label you wrote, it is what you chose to have on the page.
+--- a label you wrote, it is what you chose to have on the page. Without a label
+--- the name is enough, so `[[Other note#Section]]` is "Other note"; a link
+--- within the note, `[[#Section]]`, is the heading's.
 local function link(el)
   -- In a table cell Obsidian writes the alias's pipe as `\|`, and pandoc keeps
   -- the backslash at the end of the target. No note's name ends in one.
@@ -222,7 +227,11 @@ local function link(el)
     return pandoc.Cite({ pandoc.Str(text) }, { citation })
   end
 
-  if reachable(target) then return nil end
+  if reachable(el, target) then return nil end
+  if pandoc.utils.stringify(el.content) == el.target then
+    local name, ref = target:match('^([^#]*)#?(.*)$')
+    return pandoc.Inlines(name ~= '' and name or (ref:gsub('^%^', '')))
+  end
   return el.content
 end
 

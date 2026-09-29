@@ -46,6 +46,11 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 		['[[a]], [[b]]', '(A 2024), (B 2025)'],
 		['[[a]] and [[b]]', '(A 2024) and (B 2025)'],
 		['[[My idea|this idea]] holds', 'this idea holds'],
+		// A note's headings are for whoever wrote it: a link to one is words.
+		['[[Other note#Section]] says', 'Other note says'],
+		['[[Other note#^abc123]] says', 'Other note says'],
+		['[[Other note#Section|there]] it is', 'there it is'],
+		['[[#Local heading]] above', 'Local heading above'],
 		// Paper Trail's form for Better BibTeX's dialog: everything around the key, in the alias.
 		['[[a|a, p. 4]]', '(A 2024, 4)'],
 		['[[a|see a, p. 4, emphasis added]]', '(see A 2024, 4, emphasis added)'],
@@ -68,6 +73,15 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 		['[[a|Jacobs, art. 12]]', '(A 2024, art. 12)'],
 	])('%s exports as %s', (written, exported) => {
 		expect(cite(written)).toBe(exported);
+	});
+});
+
+describe.skipIf(!installed())('a markdown link', () => {
+	it('to a heading by its pandoc ID stays a link', () => {
+		const output = join(dir, 'anchor.md');
+		const args = pandocArgs('md', { filter, bibliography: bib, csl: null, resourcePath: dir, output });
+		execFileSync('pandoc', args, { input: '# Intro {#intro}\n\n[back](#intro)\n' });
+		expect(readFileSync(output, 'utf8')).toContain('[back](#intro)');
 	});
 });
 
