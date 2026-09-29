@@ -9,6 +9,11 @@ export const FORMATS: Record<Format, { name: string; extension: string }> = {
 	tex: { name: 'LaTeX', extension: 'tex' },
 };
 
+/** Whether a format renders its citations in a style. LaTeX leaves them to the journal's class. */
+export function styled(format: Format): boolean {
+	return format !== 'tex';
+}
+
 /**
  * The frontmatter keys pandoc makes something of, and the only ones passed on.
  *
@@ -81,11 +86,11 @@ export function pandocArgs(format: Format, run: Run): string[] {
 	if (run.bibliography) args.push(`--bibliography=${run.bibliography}`);
 	args.push(`--resource-path=${run.resourcePath}`);
 
-	if (format === 'tex') {
-		args.push('--natbib', '--to=latex');
-	} else {
+	if (styled(format)) {
 		args.push('--citeproc');
 		if (run.csl) args.push(`--csl=${run.csl}`);
+	} else {
+		args.push('--natbib', '--to=latex');
 	}
 	// xelatex rather than pandoc's default pdflatex, which stops at any Unicode
 	// character its input encoding has not been set up for.

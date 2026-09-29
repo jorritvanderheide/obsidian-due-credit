@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { documentMetadata, pandocArgs, type Run } from '../src/core/document';
+import { documentMetadata, pandocArgs, styled, type Run } from '../src/core/document';
 
 describe('documentMetadata', () => {
 	it('takes the title from the heading first, then the property, then the name', () => {
@@ -16,6 +16,12 @@ describe('documentMetadata', () => {
 
 	it('lets a note head its references in its own language', () => {
 		expect(documentMetadata({ 'reference-section-title': 'Bronnen' }, null, 'n')['reference-section-title']).toBe('Bronnen');
+	});
+});
+
+describe('styled', () => {
+	it('is every format but LaTeX, whose class styles its citations', () => {
+		expect((['docx', 'pdf', 'md', 'tex'] as const).map(styled)).toEqual([true, true, true, false]);
 	});
 });
 

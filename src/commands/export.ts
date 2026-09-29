@@ -5,7 +5,7 @@ import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, stringifyYaml, type TFile } from 'obsidian';
 import { bibKeys, keyOf, linkpathOf, missingKeys, propertyKey } from '../core/citations';
-import { documentMetadata, FORMATS, pandocArgs, type Format } from '../core/document';
+import { documentMetadata, FORMATS, pandocArgs, styled, type Format } from '../core/document';
 import { citeByKey, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../core/markdown';
 import { cslPath, expandHome, inFolder, within } from '../core/paths';
 import { startFolder } from '../core/settings';
@@ -27,7 +27,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 			`There is no bibliography at ${settings.bibliography}. Point the Due Credit setting at your Better BibTeX export, or clear it to export without citations.`,
 		);
 	}
-	const csl = settings.csl ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;
+	const csl = settings.csl && styled(format) ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;
 	if (csl && !existsSync(csl)) {
 		throw new ExportError(`There is no citation style at ${csl}. Use the name of a style Zotero has installed, such as apa, or the path to a .csl file.`);
 	}
