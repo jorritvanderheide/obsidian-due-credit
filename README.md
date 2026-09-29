@@ -35,6 +35,8 @@ Obsidian:
   code block is left out. Exported, it would only be its query.
 - **Callouts.** `> [!note] Title` is a quote with its title in bold on the
   first line; a callout without a title is a plain quote.
+- **Line breaks.** One newline is a line break, as Obsidian shows it, unless
+  its strict line breaks are on.
 - **Highlights.** `==text==` is highlighted in Word, PDF and Markdown. A LaTeX
   body has it as plain text, since a journal's class does not load what `\hl`
   needs.

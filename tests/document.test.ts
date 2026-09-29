@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { documentMetadata, pandocArgs, styled, type Run } from '../src/core/document';
+import { documentMetadata, lineBreaks, pandocArgs, styled, type Run } from '../src/core/document';
 
 describe('documentMetadata', () => {
 	it('takes the title from the heading first, then the property, then the name', () => {
@@ -25,8 +25,15 @@ describe('styled', () => {
 	});
 });
 
+describe('lineBreaks', () => {
+	it('breaks lines unless strict line breaks are on, which by default they are not', () => {
+		expect([null, {}, { strictLineBreaks: false }, 'broken'].map(lineBreaks)).toEqual([true, true, true, true]);
+		expect(lineBreaks({ strictLineBreaks: true })).toBe(false);
+	});
+});
+
 describe('pandocArgs', () => {
-	const run: Run = { obsidian: '/tmp/o.lua', filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, resourcePath: '/v', output: '/out/n.docx' };
+	const run: Run = { obsidian: '/tmp/o.lua', filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, hardLineBreaks: false, resourcePath: '/v', output: '/out/n.docx' };
 
 	it('runs the filter before citeproc, which can only cite what the filter made', () => {
 		const args = pandocArgs('docx', run);
@@ -41,6 +48,11 @@ describe('pandocArgs', () => {
 		const args = pandocArgs('docx', run);
 		expect(args.indexOf('--lua-filter=/tmp/a.lua')).toBeGreaterThan(args.indexOf('--citeproc'));
 		expect(pandocArgs('tex', run)).not.toContain('--lua-filter=/tmp/a.lua');
+	});
+
+	it('reads one newline as a line break when Obsidian does', () => {
+		expect(pandocArgs('docx', { ...run, hardLineBreaks: true })[0]).toMatch(/^--from=markdown\+wikilinks_title_after_pipe\+mark\+hard_line_breaks-/);
+		expect(pandocArgs('docx', run)[0]).not.toContain('hard_line_breaks');
 	});
 
 	it('passes a style when there is one', () => {

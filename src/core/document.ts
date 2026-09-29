@@ -52,6 +52,16 @@ export function documentMetadata(frontmatter: unknown, heading: string | null, n
  */
 export const MARKDOWN_TEMPLATE = '$if(title)$# $title$\n\n$endif$$body$\n';
 
+/**
+ * Whether one newline in the note is a line break, as Obsidian shows it: unless
+ * its strict line breaks are on, which they are not by default, and pandoc
+ * would join the lines. `app` is the vault's `app.json`, which holds the
+ * setting, since the plugin API does not.
+ */
+export function lineBreaks(app: unknown): boolean {
+	return !(app !== null && typeof app === 'object' && (app as Record<string, unknown>).strictLineBreaks === true);
+}
+
 export interface Run {
 	/** The filter for Obsidian's syntax that is not about citations, on disk. */
 	obsidian: string;
@@ -69,6 +79,8 @@ export interface Run {
 	csl: string | null;
 	/** Where pandoc looks for images, joined with the platform's delimiter. */
 	resourcePath: string;
+	/** Whether one newline is a line break, from `lineBreaks`. */
+	hardLineBreaks: boolean;
 	output: string;
 }
 
@@ -94,8 +106,9 @@ export interface Run {
  *   style is applied, because the class decides.
  */
 export function pandocArgs(format: Format, run: Run): string[] {
+	const breaks = run.hardLineBreaks ? '+hard_line_breaks' : '';
 	const args = [
-		'--from=markdown+wikilinks_title_after_pipe+mark-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote',
+		`--from=markdown+wikilinks_title_after_pipe+mark${breaks}-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote`,
 		`--metadata-file=${run.metadata}`,
 		`--lua-filter=${run.obsidian}`,
 		`--lua-filter=${run.filter}`,

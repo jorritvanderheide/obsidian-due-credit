@@ -6,7 +6,7 @@ import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
 import { bibKeys } from '../core/citations';
-import { FORMATS, pandocArgs, styled, type Format } from '../core/document';
+import { FORMATS, lineBreaks, pandocArgs, styled, type Format } from '../core/document';
 import { bibliographyPath, cslPath, expandHome, insideVault, withExtension } from '../core/paths';
 import { prepare, type Missing, type Vault } from '../core/prepare';
 import { startFolder } from '../core/settings';
@@ -77,6 +77,13 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		throw new ExportError(`${output} is inside your vault, and an export writes nothing there. Save it somewhere else.`);
 	}
 
+	let appConfig: unknown = null;
+	try {
+		appConfig = JSON.parse(await adapter.read(`${app.vault.configDir}/app.json`));
+	} catch {
+		// No app.json, or one that does not parse: Obsidian's defaults.
+	}
+
 	// A PDF takes seconds, and without this the command looks like it did nothing.
 	const progress = new Notice(`Exporting ${basename(output)}…`, 0);
 	let warnings: string;
@@ -89,6 +96,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 					bibliography,
 					csl,
 					resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),
+					hardLineBreaks: lineBreaks(appConfig),
 					output,
 				}),
 				markdown,
