@@ -4,8 +4,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { documentMetadata, MARKDOWN_TEMPLATE, pandocArgs } from '../src/core/document';
-import { liftHeadings, splitFrontmatter, stripComments } from '../src/core/markdown';
+import { MARKDOWN_TEMPLATE, pandocArgs } from '../src/core/document';
+import { prepare } from '../src/core/prepare';
 
 function installed(): boolean {
 	try {
@@ -123,11 +123,15 @@ describe.skipIf(!installed())('a table', () => {
 
 describe.skipIf(!installed())('a note, end to end', () => {
 	it('exports without comments, titled by its H1, with sections and references under it', () => {
-		const note = '---\ntitle: Old title\ntags: [private]\n---\n# On archives\n\n## Argument\n\nAs shown [[a]].%%not for you%%\n\n---\nTODO: ask supervisor\n---\n';
-		const { yaml, body } = splitFrontmatter(note);
-		const { title, body: input } = liftHeadings(stripComments(body));
+		const note = '---\ntitle: Old title\ntags: [private]\n---\n# On archives\n\n## Argument\n\nAs shown [[a]] and [[First paper]].%%not for you%%\n\n---\nTODO: ask supervisor\n---\n';
+		// A paper note named for its title, whose key property says which paper it is.
+		const vault = {
+			resolve: (linkpath: string) => (linkpath === 'First paper' ? { path: 'Literature/First paper.md', file: join(dir, 'First paper.md'), frontmatter: { citekey: 'a' } } : null),
+			parseYaml: () => ({ title: 'Old title', tags: ['private'] }),
+		};
+		const { markdown: input, metadata } = prepare(note, vault, { name: 'note', papersFolder: 'Literature', keyProperty: 'citekey', keys: null });
 		const files = { filter, afterCiteproc, template, metadata: join(dir, 'note.json'), bibliography: bib, csl: null, resourcePath: dir, output: join(dir, 'note.md') };
-		writeFileSync(files.metadata, JSON.stringify(documentMetadata(yaml === null ? null : { title: 'Old title', tags: ['private'] }, title, 'note')));
+		writeFileSync(files.metadata, JSON.stringify(metadata));
 
 		execFileSync('pandoc', pandocArgs('md', files), { input });
 		const exported = readFileSync(files.output, 'utf8');
@@ -146,6 +150,6 @@ describe.skipIf(!installed())('a note, end to end', () => {
 		expect(exported).not.toContain('not for you');
 		expect(exported).not.toContain(bib);
 		expect(exported).toMatch(/^## References/m);
-		expect(exported).toContain('As shown (A 2024).');
+		expect(exported).toContain('As shown (A 2024) and (A 2024).');
 	});
 });

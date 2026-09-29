@@ -4,10 +4,10 @@ import { homedir } from 'os';
 import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
-import { bibKeys, keyOf, linkpathOf, missingKeys, propertyKey } from '../core/citations';
-import { documentMetadata, FORMATS, pandocArgs, styled, type Format } from '../core/document';
-import { citeByKey, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../core/markdown';
-import { cslPath, expandHome, inFolder, insideVault } from '../core/paths';
+import { bibKeys } from '../core/citations';
+import { FORMATS, pandocArgs, styled, type Format } from '../core/document';
+import { cslPath, expandHome, insideVault } from '../core/paths';
+import { prepare, type Vault } from '../core/prepare';
 import { startFolder } from '../core/settings';
 import { ExportError, run, withFiles } from '../pandoc';
 import { confirm } from '../ui/confirm';
@@ -19,7 +19,6 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	if (!(adapter instanceof FileSystemAdapter)) throw new ExportError('Exporting needs the desktop app.');
 	const vault = adapter.getBasePath();
 	const home = homedir();
-	const resolve = (linkpath: string) => app.metadataCache.getFirstLinkpathDest(linkpath, file.path);
 
 	const bibliography = settings.bibliography ? app.vault.getFileByPath(settings.bibliography) : null;
 	if (settings.bibliography && !bibliography) {
@@ -36,36 +35,21 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	// can be a couple of seconds behind what you just typed.
 	const view = app.workspace.getActiveViewOfType(MarkdownView);
 	const text = view?.file === file ? view.editor.getValue() : await app.vault.read(file);
-	const { yaml, body } = splitFrontmatter(text);
-	const prose = stripBlockIds(stripComments(body));
-
-	// A note's own key first, whatever it is called; then, for a note in the
-	// papers folder without one, its name.
-	const propertyOf = (linkpath: string) => {
-		const dest = resolve(linkpath);
-		return dest ? propertyKey(app.metadataCache.getFileCache(dest)?.frontmatter, settings.keyProperty) : null;
+	const lookup: Vault = {
+		resolve: (linkpath) => {
+			const dest = app.metadataCache.getFirstLinkpathDest(linkpath, file.path);
+			if (!dest) return null;
+			return { path: dest.path, file: adapter.getFullPath(dest.path), frontmatter: app.metadataCache.getFileCache(dest)?.frontmatter };
+		},
+		parseYaml,
 	};
-	if (bibliography) {
-		const keys = bibKeys(await app.vault.cachedRead(bibliography));
-		const keyFor = (target: string) => {
-			const linkpath = linkpathOf(target).trim();
-			// A link within the note is no paper, though Obsidian resolves it to the note.
-			if (linkpath === '') return null;
-			const dest = resolve(linkpath);
-			if (dest === null) return null;
-			return propertyOf(linkpath) ?? (inFolder(dest.path, settings.literatureFolder) ? keyOf(target) : null);
-		};
-		const missing = missingKeys(wikilinkTargets(prose), keyFor, keys);
-		if (missing.length > 0 && !(await confirmMissing(context, missing, bibliography.name))) return;
-	}
-
-	const { title, body: lifted } = liftHeadings(citeByKey(prose, propertyOf));
-	const markdown = imageEmbeds(lifted, (linkpath) => {
-		const dest = resolve(linkpath);
-		// Forward slashes, which pandoc reads on every platform.
-		return dest ? adapter.getFullPath(dest.path).replace(/\\/g, '/') : null;
+	const { markdown, metadata, missing } = prepare(text, lookup, {
+		name: file.basename,
+		papersFolder: settings.literatureFolder,
+		keyProperty: settings.keyProperty,
+		keys: bibliography ? bibKeys(await app.vault.cachedRead(bibliography)) : null,
 	});
-	const metadata = documentMetadata(yaml === null ? null : parseYaml(yaml), title, file.basename);
+	if (bibliography && missing.length > 0 && !(await confirmMissing(context, missing, bibliography.name))) return;
 
 	const { name, extension } = FORMATS[format];
 	const answer = await remote.dialog.showSaveDialog({
