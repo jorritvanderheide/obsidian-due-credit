@@ -23,6 +23,14 @@ describe('segments', () => {
 		expect(segments(text)[0]?.text).toBe('````\n```\n~~~~\n````\n');
 	});
 
+	it('reads a line that opens with inline code as a line, not a fence', () => {
+		expect(segments('```npm i``` installs it.\n\nMy point.')).toEqual([
+			{ code: true, text: '```npm i```' },
+			{ code: false, text: ' installs it.\n\nMy point.' },
+		]);
+		expect(segments('```js\nx\n```\n')).toEqual([{ code: true, text: '```js\nx\n```\n' }]);
+	});
+
 	it('reads an unmatched backtick as text', () => {
 		expect(segments('it`s')).toEqual([{ code: false, text: 'it`s' }]);
 	});
@@ -61,6 +69,10 @@ describe('stripComments', () => {
 
 	it('leaves %% in code alone', () => {
 		expect(stripComments('`a %% b` and\n```\n%%\n```\n')).toBe('`a %% b` and\n```\n%%\n```\n');
+	});
+
+	it('hides a comment after a line that opens with inline code', () => {
+		expect(stripComments('```npm i``` installs it.\n\nMy point. %%private%%\n')).toBe('```npm i``` installs it.\n\nMy point. \n');
 	});
 
 	it('hides code inside a comment', () => {

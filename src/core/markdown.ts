@@ -13,7 +13,10 @@ export interface Segment {
 	text: string;
 }
 
-const FENCE = /^ {0,3}(`{3,}|~{3,})/;
+// A backtick fence's info string holds no backtick, so a line such as
+// ```` ```npm i``` installs it ```` opens with inline code, as in CommonMark and
+// pandoc.
+const FENCE = /^ {0,3}(`{3,}(?=[^`]*$)|~{3,})/;
 
 /**
  * The note cut into code and everything else, which concatenate back to it.
