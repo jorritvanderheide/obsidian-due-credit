@@ -5,7 +5,7 @@ import { loadSettings, type Settings } from './core/settings';
 import { ExportError } from './pandoc';
 import { SettingsTab } from './ui/settings-tab';
 
-export default class Exporter extends Plugin {
+export default class SignOff extends Plugin {
 	settings!: Settings;
 
 	async onload() {

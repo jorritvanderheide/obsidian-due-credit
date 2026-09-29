@@ -31,7 +31,7 @@ export default defineConfig(
 	...obsidianmd.configs.recommended,
 	{
 		rules: {
-			'obsidianmd/ui/sentence-case': ['warn', { brands: ['Zotero', 'Better BibTeX'] }],
+			'obsidianmd/ui/sentence-case': ['warn', { brands: ['Zotero', 'Better BibTeX', 'Sign Off'] }],
 		},
 	},
 );

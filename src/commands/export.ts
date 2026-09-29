@@ -24,7 +24,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const bibliography = settings.bibliography ? app.vault.getFileByPath(settings.bibliography) : null;
 	if (settings.bibliography && !bibliography) {
 		throw new ExportError(
-			`There is no bibliography at ${settings.bibliography}. Point the Exporter setting at your Better BibTeX export, or clear it to export without citations.`,
+			`There is no bibliography at ${settings.bibliography}. Point the Sign Off setting at your Better BibTeX export, or clear it to export without citations.`,
 		);
 	}
 	const csl = settings.csl ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;

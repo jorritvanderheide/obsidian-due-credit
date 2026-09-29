@@ -1,5 +1,5 @@
 {
-  description = "Exporter Obsidian plugin";
+  description = "Sign Off Obsidian plugin";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -21,7 +21,7 @@
           inherit (package) version;
           src = ./.;
           # Update with: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
-          npmDepsHash = "sha256-Ddgfdp4K0VQFeprzPGIxYqk15dYJHd4Cb6KN6TOmXcw=";
+          npmDepsHash = "sha256-NGwxa9aVn/JpyrL5jzIFSw4uya9HRc7oTqkGFf1JlQM=";
           nodejs = pkgs.nodejs_24;
           installPhase = ''
             mkdir -p $out
