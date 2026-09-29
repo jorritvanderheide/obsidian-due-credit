@@ -42,7 +42,14 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 			if (!dest) return null;
 			return { path: dest.path, file: adapter.getFullPath(dest.path), frontmatter: app.metadataCache.getFileCache(dest)?.frontmatter };
 		},
-		parseYaml,
+		// Not exported without them: the author and date would go missing without a word.
+		parseYaml: (yaml) => {
+			try {
+				return parseYaml(yaml) as unknown;
+			} catch {
+				throw new ExportError(`The properties of ${file.basename} are not valid YAML, so it cannot be exported. Fix them in source mode, where Obsidian shows what is wrong.`);
+			}
+		},
 	};
 	const { markdown, metadata, missing } = prepare(text, lookup, {
 		name: file.basename,
