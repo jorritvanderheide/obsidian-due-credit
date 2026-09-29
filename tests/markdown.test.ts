@@ -83,6 +83,22 @@ describe('stripComments', () => {
 		expect(stripComments('`a %% b` and\n```\n%%\n```\n')).toBe('`a %% b` and\n```\n%%\n```\n');
 	});
 
+	it('removes an HTML comment, inline or across lines', () => {
+		expect(stripComments('a <!-- private --> b\n<!--\nfor me\n-->\nc')).toBe('a  b\n\nc');
+	});
+
+	it('closes a comment only with its own kind of marker', () => {
+		expect(stripComments('a <!-- 50%% sure --> b %% x --> y %% c')).toBe('a  b  c');
+	});
+
+	it('runs an unclosed HTML comment to the end of the note', () => {
+		expect(stripComments('kept <!-- not kept\nnor this')).toBe('kept ');
+	});
+
+	it('leaves <!-- in code alone', () => {
+		expect(stripComments('`<!-- a -->` and\n```html\n<!-- b -->\n```\n')).toBe('`<!-- a -->` and\n```html\n<!-- b -->\n```\n');
+	});
+
 	it('hides a comment after a line that opens with inline code', () => {
 		expect(stripComments('```npm i``` installs it.\n\nMy point. %%private%%\n')).toBe('```npm i``` installs it.\n\nMy point. \n');
 	});

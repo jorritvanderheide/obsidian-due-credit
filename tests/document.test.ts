@@ -43,6 +43,10 @@ describe('pandocArgs', () => {
 		expect(pandocArgs('pdf', run)).toContain('--pdf-engine=xelatex');
 	});
 
+	it('keeps pandoc syntax out of a Markdown export', () => {
+		expect(pandocArgs('md', run).find((arg) => arg.startsWith('--to='))).toMatch(/-raw_html-raw_attribute-header_attributes$/);
+	});
+
 	it('puts a Markdown export under its title, References too', () => {
 		const args = pandocArgs('md', run);
 		expect(args).toEqual(expect.arrayContaining(['--standalone', '--template=/tmp/t.md', '--shift-heading-level-by=1']));

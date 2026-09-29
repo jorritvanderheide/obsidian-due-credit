@@ -96,7 +96,9 @@ export function pandocArgs(format: Format, run: Run): string[] {
 	// character its input encoding has not been set up for.
 	if (format === 'pdf') args.push('--pdf-engine=xelatex');
 	if (format === 'md') {
-		args.push('--to=markdown-bracketed_spans-fenced_divs-native_divs-native_spans-raw_html');
+		// Text for pasting elsewhere, so none of pandoc's own syntax: no `{=html}`
+		// or `{#id .class}`, no divs or spans.
+		args.push('--to=markdown-bracketed_spans-fenced_divs-native_divs-native_spans-raw_html-raw_attribute-header_attributes');
 		args.push('--standalone', `--template=${run.template}`, '--shift-heading-level-by=1');
 	}
 

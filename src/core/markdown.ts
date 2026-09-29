@@ -110,26 +110,44 @@ export function splitFrontmatter(text: string): { yaml: string | null; body: str
 	return { yaml: match[1] ?? '', body: text.slice(match[0].length) };
 }
 
+const COMMENT = /%%|<!--/;
+
 /**
- * The note without its `%%comments%%`.
+ * The note without its `%%comments%%` and `<!-- HTML comments -->`.
  *
  * The one thing here that is about privacy rather than looks: a comment is what
- * you wrote for yourself, and pandoc would print it. A comment runs across
- * lines and past code, and one left open runs to the end of the note, the way
- * Obsidian hides it.
+ * you wrote for yourself, and pandoc would print it, or keep it as raw HTML in
+ * a Markdown export. Obsidian hides both kinds. A comment runs across lines
+ * and past code, only its own kind of marker closes it, and one left open runs
+ * to the end of the note, the cautious reading of a comment nobody closed.
  */
 export function stripComments(text: string): string {
-	let hidden = false;
+	// What closes the comment we are in, or null outside one.
+	let closer: string | null = null;
 	let out = '';
 	for (const segment of segments(text)) {
 		if (segment.code) {
-			if (!hidden) out += segment.text;
+			if (closer === null) out += segment.text;
 			continue;
 		}
-		segment.text.split('%%').forEach((part, i) => {
-			if (i > 0) hidden = !hidden;
-			if (!hidden) out += part;
-		});
+		let rest = segment.text;
+		while (rest !== '') {
+			if (closer === null) {
+				const open = COMMENT.exec(rest);
+				if (!open) {
+					out += rest;
+					break;
+				}
+				out += rest.slice(0, open.index);
+				closer = open[0] === '%%' ? '%%' : '-->';
+				rest = rest.slice(open.index + open[0].length);
+			} else {
+				const at = rest.indexOf(closer);
+				if (at === -1) break;
+				rest = rest.slice(at + closer.length);
+				closer = null;
+			}
+		}
 	}
 	return out;
 }
