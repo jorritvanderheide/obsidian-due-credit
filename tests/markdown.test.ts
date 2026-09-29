@@ -143,11 +143,11 @@ describe('wikilinkTargets', () => {
 });
 
 describe('citeByKey', () => {
-	const keys: Record<string, string> = { 'Jacobs (2024) The Authenticity Crisis': 'jacobs2024', oldkey: 'newkey', '@oldkey': 'newkey', 'Literature/oldkey.md': 'newkey' };
+	const keys: Record<string, string> = { 'Marsh (2024) The Quiet Archive': 'marsh2024', oldkey: 'newkey', '@oldkey': 'newkey', 'Literature/oldkey.md': 'newkey' };
 	const keyFor = (linkpath: string) => keys[linkpath] ?? null;
 
 	it('points a link to a note named for its title at the note’s key', () => {
-		expect(citeByKey('as [[Jacobs (2024) The Authenticity Crisis]] shows', keyFor)).toBe('as [[jacobs2024]] shows');
+		expect(citeByKey('as [[Marsh (2024) The Quiet Archive]] shows', keyFor)).toBe('as [[marsh2024]] shows');
 	});
 
 	it('follows a key Better BibTeX changed, keeping the page and the alias', () => {

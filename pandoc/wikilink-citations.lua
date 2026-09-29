@@ -15,7 +15,7 @@
 ---   author out, for a sentence that names them already: `[[a|-a, p. 4]]` is
 ---   `[-@a, p. 4]`.
 --- - Or a page after the first comma of an alias that does not repeat the key,
----   the way Paper Trail adds one to a label you wrote: `[[a|Jacobs, p. 4]]`.
+---   the way Paper Trail adds one to a label you wrote: `[[a|Marsh, p. 4]]`.
 --- - Neighbouring citations share brackets: `[[a#p. 12]]; [[b#p. 3]]` is
 ---   "(A 2024, 12; B 2025, 3)", as `[@a, p. 12; @b, p. 3]` would be.
 ---
@@ -146,7 +146,7 @@ local function locator_of(target)
 end
 
 --- The page after the first comma of an alias, or nil when what follows it is
---- not one. The first comma rather than the last, so `Jacobs, pp. 4, 6` keeps
+--- not one. The first comma rather than the last, so `Marsh, pp. 4, 6` keeps
 --- both pages.
 local function labelled(alias)
   local rest = alias:match(",(.*)$")
@@ -186,7 +186,7 @@ end
 ---
 --- `NormalCitation` rather than `AuthorInText`, because `[[key]]` stands in a
 --- sentence where `[@key]` would, and nothing in the link says whether the
---- author was named in the prose. Anyone wanting "as Keshav (2007) argues" can
+--- author was named in the prose. Anyone wanting "as Okafor (2019) argues" can
 --- still write `@key` by hand; pandoc reads that already.
 ---
 --- A link to one of your own notes is unwrapped rather than kept, because a
@@ -240,7 +240,7 @@ end
 
 --- Whether an inline is a citation that can share brackets with its neighbour.
 --- Anything in brackets, with its author or without, but never an in-text
---- citation, so "Jacobs (2024) argues", written as `@key`, is never pulled
+--- citation, so "Marsh (2024) argues", written as `@key`, is never pulled
 --- into the parentheses next to it.
 local function groupable(el)
   if el == nil or el.t ~= "Cite" then return false end

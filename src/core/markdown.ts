@@ -195,7 +195,7 @@ const LINK = /(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g;
  * The filter only knows a link's name, and a note is not always named for its
  * key: a template can name it for its author and title, and Better BibTeX can
  * change a key long after the note was named. `keyFor` asks the note itself, so
- * `[[Jacobs (2024) The Authenticity Crisis|see p. 4]]` exports as the citation
+ * `[[Marsh (2024) The Quiet Archive|see p. 4]]` exports as the citation
  * it is. A key the alias repeats changes with the target, so the alias still
  * spells the citation out. A link to anything without a key is left as written.
  */

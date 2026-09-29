@@ -72,12 +72,12 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 		['[[a#p. 12|a, p. 4]]', '(A 2024, 4)'],
 		['[[a|Ann’s paper]]', '(A 2024)'],
 		// Paper Trail's Add page to citation on a label you wrote: the page after its first comma.
-		['[[a|Jacobs, p. 4]]', '(A 2024, 4)'],
-		['[[a|Jacobs, pp. 4, 6]]', '(A 2024, 4, 6)'],
+		['[[a|Marsh, p. 4]]', '(A 2024, 4)'],
+		['[[a|Marsh, pp. 4, 6]]', '(A 2024, 4, 6)'],
 		['[[a|Smith, Jones]]', '(A 2024)'],
 		// Every abbreviation Better BibTeX writes counts as a locator.
 		['[[a|a, col. 2]]', '(A 2024, col. 2)'],
-		['[[a|Jacobs, art. 12]]', '(A 2024, art. 12)'],
+		['[[a|Marsh, art. 12]]', '(A 2024, art. 12)'],
 	])('%s exports as %s', (written, exported) => {
 		expect(cite(written)).toBe(exported);
 	});
@@ -106,7 +106,7 @@ describe.skipIf(!installed())('a table', () => {
 
 describe.skipIf(!installed())('a note, end to end', () => {
 	it('exports without comments, titled by its H1, with sections and references under it', () => {
-		const note = '---\ntitle: Old title\ntags: [private]\n---\n# On authenticity\n\n## Argument\n\nAs shown [[a]].%%not for you%%\n';
+		const note = '---\ntitle: Old title\ntags: [private]\n---\n# On archives\n\n## Argument\n\nAs shown [[a]].%%not for you%%\n';
 		const { yaml, body } = splitFrontmatter(note);
 		const { title, body: lifted } = liftHeadings(stripComments(body));
 		const metadata = documentMetadata(yaml === null ? null : { title: 'Old title', tags: ['private'] }, title, 'note');
@@ -116,7 +116,7 @@ describe.skipIf(!installed())('a note, end to end', () => {
 		execFileSync('pandoc', pandocArgs('md', { filter, template, bibliography: bib, csl: null, resourcePath: dir, output }), { input });
 		const exported = readFileSync(output, 'utf8');
 
-		expect(exported).toMatch(/^# On authenticity\n\n## Argument$/m);
+		expect(exported).toMatch(/^# On archives\n\n## Argument$/m);
 		expect(exported).not.toContain('private');
 		expect(exported).not.toContain('not for you');
 		expect(exported).not.toContain(bib);

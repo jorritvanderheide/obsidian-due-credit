@@ -34,23 +34,23 @@ Obsidian:
 A wikilink becomes a citation when the bibliography has an entry by that name,
 so a link to a note of your own becomes its words rather than a dead link. A
 leading `@`, as in notes named the way the Citations plugin names them, is not
-part of the name. Pandoc's own `[@jacobs2024, p. 12]` works as well.
+part of the name. Pandoc's own `[@marsh2024, p. 12]` works as well.
 
 | Written | Exported |
 | --- | --- |
-| `[[jacobs2024]]` | (Jacobs 2024) |
-| `[[@jacobs2024]]` | (Jacobs 2024) |
-| `[[jacobs2024#p. 12]]` | (Jacobs 2024, 12) |
-| `[[jacobs2024\|jacobs2024, p. 12]]` | (Jacobs 2024, 12) |
-| `[[jacobs2024\|see jacobs2024, p. 12, emphasis added]]` | (see Jacobs 2024, 12, emphasis added) |
-| `[[jacobs2024\|-jacobs2024, p. 12]]` | (2024, 12) |
-| `[[jacobs2024\|Jacobs, p. 12]]` | (Jacobs 2024, 12) |
-| `[[jacobs2024#p. 12]]; [[keshav2007]]` | (Jacobs 2024, 12; Keshav 2007) |
+| `[[marsh2024]]` | (Marsh 2024) |
+| `[[@marsh2024]]` | (Marsh 2024) |
+| `[[marsh2024#p. 12]]` | (Marsh 2024, 12) |
+| `[[marsh2024\|marsh2024, p. 12]]` | (Marsh 2024, 12) |
+| `[[marsh2024\|see marsh2024, p. 12, emphasis added]]` | (see Marsh 2024, 12, emphasis added) |
+| `[[marsh2024\|-marsh2024, p. 12]]` | (2024, 12) |
+| `[[marsh2024\|Marsh, p. 12]]` | (Marsh 2024, 12) |
+| `[[marsh2024#p. 12]]; [[okafor2019]]` | (Marsh 2024, 12; Okafor 2019) |
 | `[[My idea\|this idea]]` | this idea |
 | `[[My idea#Section]]` | My idea |
 
 A page is anything after `#` that starts with a number, `§`, or a locator such
-as `p.`, `pp.`, `ch.`, `sec.` or `fig.`; `[[jacobs2024#Claim]]` is the paper.
+as `p.`, `pp.`, `ch.`, `sec.` or `fig.`; `[[marsh2024#Claim]]` is the paper.
 An alias that repeats the key is read the way pandoc reads `[see @key, p. 12]`:
 what comes before the key is a prefix, and what comes after it is the page and
 anything else, with an `@` against the key or without. A `-` against the key
@@ -63,7 +63,7 @@ Citations next to each other, separated by at most a `;`, share brackets.
 
 A paper note does not have to be named for its key. A link to a note whose
 `citekey` property holds one cites that key, so
-`[[Jacobs (2024) The Authenticity Crisis]]` is (Jacobs 2024), and a link made
+`[[Marsh (2024) The Quiet Archive]]` is (Marsh 2024), and a link made
 before Better BibTeX changed a key still cites the paper once the note's
 property has the new one.
 
