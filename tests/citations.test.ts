@@ -6,6 +6,10 @@ describe('bibKeys', () => {
 		const bib = '@article{marsh2024,\n  title = {@misc{nope, x}},\n}\n\n@book{ okafor2019 ,\n}\n@inproceedings(paren2020,\n';
 		expect([...bibKeys(bib)]).toEqual(['marsh2024', 'okafor2019', 'paren2020']);
 	});
+
+	it('reads the first entry after a byte order mark, as the filter does', () => {
+		expect([...bibKeys('\uFEFF@article{marsh2024,\n}\n')]).toEqual(['marsh2024']);
+	});
 });
 
 describe('keyOf', () => {

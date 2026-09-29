@@ -53,6 +53,9 @@ local function read_bib(path)
     return
   end
   for line in file:lines() do
+    -- A byte order mark is no part of the first line. JavaScript's `\s`
+    -- matches it, so `bibKeys` reads that entry either way; Lua's `%s` does not.
+    line = line:gsub('^\239\187\191', '')
     -- `@article{key,` and every other entry type. Anything indented or inside
     -- a field cannot match, because the @ has to open the line.
     local key = line:match('^%s*@%w+%s*[{(]%s*([^,%s]+)%s*,')

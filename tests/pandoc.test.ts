@@ -89,6 +89,17 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 	});
 });
 
+describe.skipIf(!installed())('a bibliography with a byte order mark', () => {
+	it('keeps its first entry', () => {
+		const marked = join(dir, 'marked.bib');
+		writeFileSync(marked, '\uFEFF@article{c,\n  author = {C, Cy},\n  title = {Third},\n  year = {2023}\n}\n');
+		const output = join(dir, 'marked.txt');
+		const args = pandocArgs('md', { filter, afterCiteproc, template, metadata, bibliography: marked, csl: null, resourcePath: dir, output });
+		execFileSync('pandoc', [...args.filter((arg) => !arg.startsWith('--to=')), '--to=plain'], { input: '[[c]]\n' });
+		expect(readFileSync(output, 'utf8')).toContain('(C 2023)');
+	});
+});
+
 describe.skipIf(!installed())('a markdown link', () => {
 	it('to a heading by its pandoc ID stays a link', () => {
 		const output = join(dir, 'anchor.md');
