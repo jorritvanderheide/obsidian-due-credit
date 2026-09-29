@@ -121,7 +121,7 @@ None has a hotkey, so pick your own.
 | --- | --- | --- |
 | **Pandoc** | `pandoc` | Its name if it is on your PATH, or its full path. |
 | **Output folder** | `~/Documents` | Where the save dialog opens the first time. After that it opens where the last export went, until you change this. |
-| **Bibliography** | `Literature/library.bib` | The `.bib` file in your vault that decides which links are citations. Empty exports without citations. |
+| **Bibliography** | `Literature/library.bib` | The `.bib` file that decides which links are citations: a path in your vault, or one outside it, starting with `/` or `~`. Empty exports without citations. |
 | **Papers folder** | `Literature` | Where your paper notes are, for the check before exporting. |
 | **Citation key property** | `citekey` | The frontmatter property holding a paper note's citation key. |
 | **Citation style** | Chicago author-date | A style Zotero has installed, such as `apa`, or the path to a `.csl` file. |

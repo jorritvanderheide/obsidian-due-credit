@@ -1,12 +1,13 @@
 // Export a note: read it, make it pandoc's markdown, and run pandoc.
 import { existsSync, realpathSync } from 'fs';
+import { readFile } from 'fs/promises';
 import { homedir } from 'os';
 import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
 import { bibKeys } from '../core/citations';
 import { FORMATS, pandocArgs, styled, type Format } from '../core/document';
-import { cslPath, expandHome, insideVault, withExtension } from '../core/paths';
+import { bibliographyPath, cslPath, expandHome, insideVault, withExtension } from '../core/paths';
 import { prepare, type Missing, type Vault } from '../core/prepare';
 import { startFolder } from '../core/settings';
 import { ExportError, run, withFiles } from '../pandoc';
@@ -20,10 +21,10 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const vault = adapter.getBasePath();
 	const home = homedir();
 
-	const bibliography = settings.bibliography ? app.vault.getFileByPath(settings.bibliography) : null;
-	if (settings.bibliography && !bibliography) {
+	const bibliography = settings.bibliography ? bibliographyPath(settings.bibliography, vault, home) : null;
+	if (bibliography && !existsSync(bibliography)) {
 		throw new ExportError(
-			`There is no bibliography at ${settings.bibliography}. Point the Due Credit setting at your Better BibTeX export, or clear it to export without citations.`,
+			`There is no bibliography at ${bibliography}. Point the Due Credit setting at your Better BibTeX export, or clear it to export without citations.`,
 		);
 	}
 	const csl = settings.csl && styled(format) ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;
@@ -47,10 +48,10 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		name: file.basename,
 		papersFolder: settings.literatureFolder,
 		keyProperty: settings.keyProperty,
-		keys: bibliography ? bibKeys(await app.vault.cachedRead(bibliography)) : null,
+		keys: bibliography ? bibKeys(await readFile(bibliography, 'utf8')) : null,
 	});
 	const lost = missing.papers.length + missing.unresolved.length;
-	if (bibliography && lost > 0 && !(await confirmMissing(context, missing, lost, bibliography.name))) return;
+	if (bibliography && lost > 0 && !(await confirmMissing(context, missing, lost, basename(bibliography)))) return;
 
 	const { name, extension } = FORMATS[format];
 	const answer = await remote.dialog.showSaveDialog({
@@ -74,7 +75,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 			settings.pandocPath,
 			pandocArgs(format, {
 				...files,
-				bibliography: bibliography ? adapter.getFullPath(bibliography.path) : null,
+				bibliography,
 				csl,
 				resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),
 				output,

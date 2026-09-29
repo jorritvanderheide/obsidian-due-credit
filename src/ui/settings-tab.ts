@@ -1,9 +1,9 @@
 import { existsSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
-import { PluginSettingTab, type App, type SettingDefinitionItem } from 'obsidian';
+import { FileSystemAdapter, PluginSettingTab, type App, type SettingDefinitionItem } from 'obsidian';
 import { loadSettings, type Settings } from '../core/settings';
-import { cslPath, expandHome } from '../core/paths';
+import { bibliographyPath, cslPath, expandHome } from '../core/paths';
 import type DueCredit from '../main';
 
 export class SettingsTab extends PluginSettingTab {
@@ -30,9 +30,11 @@ export class SettingsTab extends PluginSettingTab {
 
 	/** A setting that must agree with something outside the plugin says when it does not. */
 	private bibliographyStatus(): string {
-		const path = this.plugin.settings.bibliography;
-		if (path === '' || this.app.vault.getFileByPath(path)) return '';
-		return ' ⚠ There is no file at this path, so exports stop until it is fixed or cleared.';
+		const value = this.plugin.settings.bibliography;
+		const adapter = this.app.vault.adapter;
+		if (value === '' || !(adapter instanceof FileSystemAdapter)) return '';
+		const path = bibliographyPath(value, adapter.getBasePath(), homedir());
+		return existsSync(path) ? '' : ` ⚠ There is no file at ${path}, so exports stop until it is fixed or cleared.`;
 	}
 
 	private cslStatus(): string {
@@ -68,9 +70,9 @@ export class SettingsTab extends PluginSettingTab {
 					{
 						name: 'Bibliography',
 						desc:
-							'The .bib file Better BibTeX keeps current. A wikilink whose name is one of its keys exports as a citation, and every other wikilink as its words. Empty exports without citations.' +
+							'The .bib file Better BibTeX keeps current: a path in the vault, or outside it, starting with / or ~. A wikilink whose name is one of its keys exports as a citation, and every other wikilink as its words. Empty exports without citations.' +
 							this.bibliographyStatus(),
-						control: { type: 'file', key: 'bibliography', placeholder: 'Literature/library.bib', filter: (file) => file.extension === 'bib' },
+						control: { type: 'text', key: 'bibliography', placeholder: 'Literature/library.bib' },
 					},
 					{
 						name: 'Papers folder',

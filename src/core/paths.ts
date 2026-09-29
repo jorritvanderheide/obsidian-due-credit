@@ -9,6 +9,16 @@ export function expandHome(path: string, home: string): string {
 }
 
 /**
+ * Where the bibliography is on disk: a path relative to the vault inside it,
+ * or an absolute one, or one starting with `~`, outside it. Better BibTeX
+ * often keeps its auto-export in a folder of its own.
+ */
+export function bibliographyPath(value: string, vault: string, home: string): string {
+	const path = expandHome(value, home);
+	return isAbsolute(path) ? path : join(vault, path);
+}
+
+/**
  * Where a citation style is: a path as given, or a bare name looked up among
  * the styles Zotero has installed, so `apa` works as well as a full path. One
  * place to manage them: Zotero ships a set and installs more under Settings >

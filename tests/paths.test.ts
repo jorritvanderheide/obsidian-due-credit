@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { cslPath, expandHome, inFolder, insideVault, withExtension, within } from '../src/core/paths';
+import { bibliographyPath, cslPath, expandHome, inFolder, insideVault, withExtension, within } from '../src/core/paths';
 
 describe('expandHome', () => {
 	it('reads ~ as the home folder, and nothing else', () => {
 		expect(expandHome('~', '/home/a')).toBe('/home/a');
 		expect(expandHome('~/Documents', '/home/a')).toBe('/home/a/Documents');
 		expect(expandHome('/srv/~x', '/home/a')).toBe('/srv/~x');
+	});
+});
+
+describe('bibliographyPath', () => {
+	it('reads a relative path in the vault, and an absolute or ~ one outside it', () => {
+		expect(bibliographyPath('Literature/library.bib', '/v', '/home/a')).toBe('/v/Literature/library.bib');
+		expect(bibliographyPath('/srv/zotero/library.bib', '/v', '/home/a')).toBe('/srv/zotero/library.bib');
+		expect(bibliographyPath('~/Zotero/library.bib', '/v', '/home/a')).toBe('/home/a/Zotero/library.bib');
 	});
 });
 

@@ -24,8 +24,9 @@ export interface Settings {
 	 */
 	lastFolder: string;
 	/**
-	 * The `.bib` file in the vault that decides which wikilinks are citations,
-	 * kept current by Better BibTeX's auto-export. Empty exports without
+	 * The `.bib` file that decides which wikilinks are citations, kept current
+	 * by Better BibTeX's auto-export: a path relative to the vault, or an
+	 * absolute one or one starting with `~` outside it. Empty exports without
 	 * citations: every wikilink becomes its words.
 	 */
 	bibliography: string;
