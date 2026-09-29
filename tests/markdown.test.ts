@@ -31,6 +31,18 @@ describe('segments', () => {
 		expect(segments('```js\nx\n```\n')).toEqual([{ code: true, text: '```js\nx\n```\n' }]);
 	});
 
+	it('reads an escaped backtick as text, and the rest of its run as a run', () => {
+		expect(segments('a \\`` b` c')).toEqual([
+			{ code: false, text: 'a \\`' },
+			{ code: true, text: '` b`' },
+			{ code: false, text: ' c' },
+		]);
+		expect(segments('\\\\`code`')).toEqual([
+			{ code: false, text: '\\\\' },
+			{ code: true, text: '`code`' },
+		]);
+	});
+
 	it('reads an unmatched backtick as text', () => {
 		expect(segments('it`s')).toEqual([{ code: false, text: 'it`s' }]);
 	});
@@ -73,6 +85,10 @@ describe('stripComments', () => {
 
 	it('hides a comment after a line that opens with inline code', () => {
 		expect(stripComments('```npm i``` installs it.\n\nMy point. %%private%%\n')).toBe('```npm i``` installs it.\n\nMy point. \n');
+	});
+
+	it('hides a comment after an escaped backtick', () => {
+		expect(stripComments('Escape \\`, like so. %%private `code` here%% after\n\nNext.')).toBe('Escape \\`, like so.  after\n\nNext.');
 	});
 
 	it('hides code inside a comment', () => {

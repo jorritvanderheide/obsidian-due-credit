@@ -51,12 +51,22 @@ export function segments(text: string, inline = true): Segment[] {
 	return out;
 }
 
-/** One line, with its backtick spans marked as code. An unmatched run of backticks is text. */
+/**
+ * One line, with its backtick spans marked as code. An unmatched run of
+ * backticks is text, and so is a backtick escaped with `\`, though the rest of
+ * its run can still open a span, as in CommonMark.
+ */
 function spans(line: string, push: (code: boolean, part: string) => void): void {
 	let start = 0;
 	let i = 0;
 	while (i < line.length) {
 		if (line[i] !== '`') {
+			i++;
+			continue;
+		}
+		let slashes = 0;
+		while (i - slashes > start && line[i - slashes - 1] === '\\') slashes++;
+		if (slashes % 2 === 1) {
 			i++;
 			continue;
 		}
