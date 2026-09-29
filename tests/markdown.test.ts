@@ -163,7 +163,7 @@ describe('citeByKey', () => {
 	});
 
 	it('reads the target however Obsidian wrote it', () => {
-		expect(citeByKey('[[@oldkey|@oldkey]] [[Literature/oldkey.md]]', keyFor)).toBe('[[newkey|@oldkey]] [[newkey]]');
+		expect(citeByKey('[[@oldkey|@oldkey]] [[Literature/oldkey.md]]', keyFor)).toBe('[[newkey|@newkey]] [[newkey]]');
 	});
 
 	it('leaves links without a key, embeds and code as written', () => {

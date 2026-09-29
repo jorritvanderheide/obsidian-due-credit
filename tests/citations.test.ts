@@ -47,6 +47,12 @@ describe('renameInAlias', () => {
 		expect(renameInAlias('re-old', 'old', 'new')).toBe('re-old');
 	});
 
+	it('keeps an @ against the key', () => {
+		expect(renameInAlias('see @old, p. 4', 'old', 'new')).toBe('see @new, p. 4');
+		expect(renameInAlias('-@old', 'old', 'new')).toBe('-@new');
+		expect(renameInAlias('me@old', 'old', 'new')).toBe('me@old');
+	});
+
 	it('leaves the key inside another word alone', () => {
 		expect(renameInAlias('bold old; x', 'old', 'new')).toBe('bold new; x');
 		expect(renameInAlias('oldest', 'old', 'new')).toBe('oldest');

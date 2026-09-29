@@ -53,8 +53,9 @@ A page is anything after `#` that starts with a number, `§`, or a locator such
 as `p.`, `pp.`, `ch.`, `sec.` or `fig.`; `[[jacobs2024#Claim]]` is the paper.
 An alias that repeats the key is read the way pandoc reads `[see @key, p. 12]`:
 what comes before the key is a prefix, and what comes after it is the page and
-anything else. A `-` against the key leaves the author out, as in
-`[-@key, p. 12]`, for a sentence that names them already. That is how Paper
+anything else, with an `@` against the key or without. A `-` against the key
+leaves the author out, as in `[-@key, p. 12]`, for a sentence that names them
+already. That is how Paper
 Trail writes a citation from Better BibTeX's dialog. Any other alias is what
 Obsidian shows, apart from a page after its first comma, which is how Paper
 Trail adds a page to a label you wrote.

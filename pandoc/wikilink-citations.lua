@@ -167,13 +167,16 @@ local function spelled(alias, key)
   while true do
     local s, e = alias:find(key, from, true)
     if not s then return nil end
-    -- A `-` against the key leaves the author out, as it does before `@key`.
+    -- An `@` against the key is pandoc's habit, and says nothing more. A `-`
+    -- against either leaves the author out, as it does before `@key`.
     local start = s
-    if s > 1 and alias:sub(s - 1, s - 1) == '-' then start = s - 1 end
+    if alias:sub(start - 1, start - 1) == '@' then start = start - 1 end
+    local suppressed = alias:sub(start - 1, start - 1) == '-'
+    if suppressed then start = start - 1 end
     local before = start == 1 or alias:sub(start - 1, start - 1):match('%s')
     local after = e == #alias or alias:sub(e + 1, e + 1):match('[%s,;]')
     if before and after then
-      return alias:sub(1, start - 1):gsub('^%s+', ''):gsub('%s+$', ''), (alias:sub(e + 1):gsub('%s+$', '')), start < s
+      return alias:sub(1, start - 1):gsub('^%s+', ''):gsub('%s+$', ''), (alias:sub(e + 1):gsub('%s+$', '')), suppressed
     end
     from = s + 1
   end

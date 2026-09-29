@@ -62,6 +62,11 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 		['[[a|see -a, p. 4]]', '(see 2024, 4)'],
 		['[[a|-a]]; [[b]]', '(2024; B 2025)'],
 		['[[a|re-a]]', '(A 2024)'],
+		// An @ against the key, the way pandoc writes it, is read the same.
+		['[[a|see @a, p. 4]]', '(see A 2024, 4)'],
+		['[[a|-@a, p. 4]]', '(2024, 4)'],
+		['[[@a|see @a, p. 4]]', '(see A 2024, 4)'],
+		['[[a|me@a]]', '(A 2024)'],
 		['[[a|about a, ch. 2]]', '(about A 2024, ch. 2)'],
 		['[[a#p. 12|a]]', '(A 2024, 12)'],
 		['[[a#p. 12|a, p. 4]]', '(A 2024, 4)'],
