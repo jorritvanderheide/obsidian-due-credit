@@ -77,20 +77,27 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		throw new ExportError(`${output} is inside your vault, and an export writes nothing there. Save it somewhere else.`);
 	}
 
-	const warnings = await withFiles(metadata, (files) =>
-		run(
-			settings.pandocPath,
-			pandocArgs(format, {
-				...files,
-				bibliography,
-				csl,
-				resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),
-				output,
-			}),
-			markdown,
-			vault,
-		),
-	);
+	// A PDF takes seconds, and without this the command looks like it did nothing.
+	const progress = new Notice(`Exporting ${basename(output)}…`, 0);
+	let warnings: string;
+	try {
+		warnings = await withFiles(metadata, (files) =>
+			run(
+				settings.pandocPath,
+				pandocArgs(format, {
+					...files,
+					bibliography,
+					csl,
+					resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),
+					output,
+				}),
+				markdown,
+				vault,
+			),
+		);
+	} finally {
+		progress.hide();
+	}
 
 	settings.lastFolder = dirname(output);
 	await context.saveSettings();
