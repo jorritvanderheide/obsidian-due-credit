@@ -177,6 +177,12 @@ describe.skipIf(!installed())('a heading', () => {
 	});
 });
 
+describe.skipIf(!installed())('a list', () => {
+	it('is one right after a line of text, as in Obsidian', () => {
+		expect(markdown('Some points:\n- one\n- two\n\nSteps:\n1. first\n2. second\n')).toBe('Some points:\n\n- one\n- two\n\nSteps:\n\n1.  first\n2.  second\n');
+	});
+});
+
 describe.skipIf(!installed())('a line break', () => {
 	it('is kept where Obsidian shows one, in a paragraph and a list item', () => {
 		const output = join(dir, 'breaks.md');

@@ -38,7 +38,7 @@ describe('pandocArgs', () => {
 	it('runs the filter before citeproc, which can only cite what the filter made', () => {
 		const args = pandocArgs('docx', run);
 		expect(args.indexOf('--lua-filter=/tmp/f.lua')).toBeLessThan(args.indexOf('--citeproc'));
-		expect(args[0]).toBe('--from=markdown+wikilinks_title_after_pipe+mark-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote-blank_before_header');
+		expect(args[0]).toBe('--from=markdown+wikilinks_title_after_pipe+mark+lists_without_preceding_blankline-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote-blank_before_header');
 		expect(args.indexOf('--lua-filter=/tmp/o.lua')).toBeLessThan(args.indexOf('--lua-filter=/tmp/f.lua'));
 		expect(args).toContain('--metadata-file=/tmp/m.json');
 		expect(args.at(-1)).toBe('--output=/out/n.docx');
@@ -51,7 +51,7 @@ describe('pandocArgs', () => {
 	});
 
 	it('reads one newline as a line break when Obsidian does', () => {
-		expect(pandocArgs('docx', { ...run, hardLineBreaks: true })[0]).toMatch(/^--from=markdown\+wikilinks_title_after_pipe\+mark\+hard_line_breaks-/);
+		expect(pandocArgs('docx', { ...run, hardLineBreaks: true })[0]).toMatch(/^--from=markdown\+wikilinks_title_after_pipe\+mark\+lists_without_preceding_blankline\+hard_line_breaks-/);
 		expect(pandocArgs('docx', run)[0]).not.toContain('hard_line_breaks');
 	});
 
