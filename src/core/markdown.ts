@@ -121,7 +121,20 @@ export function stripComments(text: string): string {
 	return out;
 }
 
-const LEADING_H1 = /^(?:[ \t]*\r?\n)*# +(.+?)(?:[ \t]+#+)?[ \t]*(?:\r?\n|$)/;
+const BLOCK_ID = /(?:^|[ \t]+)\^[A-Za-z0-9-]+[ \t]*(?=\r?$)/gm;
+
+/**
+ * The note without its block IDs: `^abc123` at the end of a line, or on a line
+ * of its own after a table or a quote. They name a block for a link inside the
+ * vault, and mean nothing to a reader. Fences only, so that the text is whole
+ * lines, and an ID at the end of a line is never mistaken for the end of a
+ * piece of it; a backtick span cannot end a line with an ID in it.
+ */
+export function stripBlockIds(text: string): string {
+	return outsideCode(text, (prose) => prose.replace(BLOCK_ID, ''), false);
+}
+
+const LEADING_H1 =/^(?:[ \t]*\r?\n)*# +(.+?)(?:[ \t]+#+)?[ \t]*(?:\r?\n|$)/;
 
 /**
  * The title the note opens with, and the note under it with its headings

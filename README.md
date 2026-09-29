@@ -17,6 +17,8 @@ file is written. Before pandoc runs, the note loses what only makes sense in
 Obsidian:
 
 - **Comments.** `%%…%%` is what you wrote for yourself, and never leaves.
+- **Block IDs.** `^abc123` names a paragraph for a link inside the vault, and
+  means nothing in the file.
 - **The title.** An H1 on the first line is the document's title. Without one,
   the `title` property is, and then the file name. Under it, every heading
   moves up a level, so `## Section` is a top-level section; not when the note

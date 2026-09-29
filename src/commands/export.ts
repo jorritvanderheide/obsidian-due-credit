@@ -6,7 +6,7 @@ import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, stringifyYaml, type TFile } from 'obsidian';
 import { bibKeys, keyOf, linkpathOf, missingKeys, propertyKey } from '../core/citations';
 import { documentMetadata, FORMATS, pandocArgs, type Format } from '../core/document';
-import { citeByKey, imageEmbeds, liftHeadings, splitFrontmatter, stripComments, wikilinkTargets } from '../core/markdown';
+import { citeByKey, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../core/markdown';
 import { cslPath, expandHome, inFolder, within } from '../core/paths';
 import { startFolder } from '../core/settings';
 import { ExportError, run, withFilter } from '../pandoc';
@@ -37,7 +37,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const view = app.workspace.getActiveViewOfType(MarkdownView);
 	const text = view?.file === file ? view.editor.getValue() : await app.vault.read(file);
 	const { yaml, body } = splitFrontmatter(text);
-	const prose = stripComments(body);
+	const prose = stripBlockIds(stripComments(body));
 
 	// A note's own key first, whatever it is called; then, for a note in the
 	// papers folder without one, its name.

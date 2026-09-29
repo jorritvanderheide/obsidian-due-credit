@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { citeByKey, imageEmbeds, liftHeadings, segments, splitFrontmatter, stripComments, wikilinkTargets } from '../src/core/markdown';
+import { citeByKey, imageEmbeds, liftHeadings, segments, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../src/core/markdown';
 
 describe('segments', () => {
 	it('concatenates back to the note', () => {
@@ -65,6 +65,21 @@ describe('stripComments', () => {
 
 	it('hides code inside a comment', () => {
 		expect(stripComments('a %% `code` %% b')).toBe('a  b');
+	});
+});
+
+describe('stripBlockIds', () => {
+	it('removes an ID at the end of a line', () => {
+		expect(stripBlockIds('Paragraph. ^abc123\n- item ^li-1\r\nlast ^x')).toBe('Paragraph.\n- item\r\nlast');
+	});
+
+	it('empties a line that holds only an ID', () => {
+		expect(stripBlockIds('| a |\n|---|\n\n^tbl\n\nafter')).toBe('| a |\n|---|\n\n\n\nafter');
+	});
+
+	it('leaves footnotes, IDs in links, mid-line carets and code alone', () => {
+		const text = 'a[^1] and [[note#^abc]]\n2 ^ 3 is x^2^\n`code ^x`\n```\nline ^id\n```\n';
+		expect(stripBlockIds(text)).toBe(text);
 	});
 });
 
