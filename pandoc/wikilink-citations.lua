@@ -244,6 +244,26 @@ local function link(el)
   return el.content
 end
 
+--- An in-text citation that swallowed the wikilink after it, given back.
+---
+--- Pandoc reads a bracket right after `@key` as that citation's locator,
+--- before it reads wikilinks, so `As @a [[b]] argues` has `[b]` as the
+--- suffix of `@a` and would export as "As A (2024[b]) argues". The citation's
+--- words are still as written, `@a [[b]]`: when they are the key and one
+--- wikilink, the suffix goes, and the wikilink is read again, for the `Link`
+--- pass to make a citation or words. `@a [p. 4]` keeps its page.
+local function unswallow(cite)
+  local citation = cite.citations[1]
+  if #cite.citations ~= 1 or citation.mode ~= 'AuthorInText' then return nil end
+  local key, wikilink = pandoc.utils.stringify(cite.content):match('^(@%S+)%s+(%[%[.-%]%])$')
+  if not key then return nil end
+  citation.suffix = pandoc.Inlines({})
+  local read = pandoc.read(wikilink, 'markdown+wikilinks_title_after_pipe').blocks[1]
+  local out = pandoc.Inlines({ pandoc.Cite({ pandoc.Str(key) }, { citation }), pandoc.Space() })
+  out:extend(read and read.content or { pandoc.Str(wikilink) })
+  return out
+end
+
 --- Whether an inline is a citation that can share brackets with its neighbour.
 --- Anything in brackets, with its author or without, but never an in-text
 --- citation, so "Marsh (2024) argues", written as `@key`, is never pulled
@@ -295,11 +315,13 @@ local function group(inlines)
   return out
 end
 
--- Three passes, in this order, and not one filter with all of them in it: a
+-- Four passes, in this order, and not one filter with all of them in it: a
 -- single filter walks inlines before it reaches the metadata, so every link
--- would be tested against a bibliography that had not been read yet.
+-- would be tested against a bibliography that had not been read yet, and a
+-- wikilink an in-text citation swallowed is given back before links are read.
 return {
   { Meta = load },
+  { Cite = unswallow },
   { Link = link },
   { Inlines = group },
 }

@@ -58,6 +58,11 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 		['[[Other note#^abc123]] says', 'Other note says'],
 		['[[Other note#Section|there]] it is', 'there it is'],
 		['[[#Local heading]] above', 'Local heading above'],
+		// An in-text citation does not swallow the wikilink after it, and keeps a page in brackets.
+		['As @a [[b]] argues', 'As A (2024) (B 2025) argues'],
+		['As @a [[My idea|this idea]] argues', 'As A (2024) this idea argues'],
+		['@a [[b|see b, p. 3]]', 'A (2024) (see B 2025, 3)'],
+		['@a [p. 4] says', 'A (2024, 4) says'],
 		// A web link stays one, even when its last part is a key.
 		['[the page](https://example.org/a) says', 'the page says'],
 		['<https://example.org/a>', 'https://example.org/a'],
