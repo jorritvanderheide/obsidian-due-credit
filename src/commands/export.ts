@@ -1,9 +1,8 @@
 // Export a note: read it, make it pandoc's markdown, and run pandoc.
 import { existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
 import { homedir } from 'os';
 import { basename, delimiter, dirname, join } from 'path';
-import { shell } from 'electron';
+import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, stringifyYaml, type TFile } from 'obsidian';
 import { bibKeys, linkpathOf, missingKeys } from '../core/citations';
 import { documentMetadata, FORMATS, pandocArgs, type Format } from '../core/document';
@@ -58,14 +57,19 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const metadata = documentMetadata(yaml === null ? null : parseYaml(yaml), title, file.basename);
 	const input = `---\n${stringifyYaml(metadata)}---\n\n${markdown}`;
 
-	const folder = expandHome(settings.outputFolder, home);
-	const output = join(folder, `${file.basename}.${FORMATS[format].extension}`);
-	// Outside the vault an export replaces its own last run. Inside it, a file
-	// of that name is somebody's note.
+	const { name, extension } = FORMATS[format];
+	const answer = await remote.dialog.showSaveDialog({
+		defaultPath: join(expandHome(settings.outputFolder, home), `${file.basename}.${extension}`),
+		filters: [{ name, extensions: [extension] }],
+		properties: ['showOverwriteConfirmation'],
+	});
+	if (answer.canceled || !answer.filePath) return;
+	const output = answer.filePath;
+	// The dialog asks before replacing a file, but not whether that file is a
+	// note, and for a Markdown export saved next to its source it is the note.
 	if (within(vault, output) && existsSync(output)) {
-		throw new ExportError(`${output} is already a file in your vault, and an export only replaces files outside it. Choose another output folder.`);
+		throw new ExportError(`${output} is already a file in your vault, and an export never replaces one. Save it somewhere else.`);
 	}
-	await mkdir(folder, { recursive: true });
 
 	const warnings = await withFilter((filter) =>
 		run(

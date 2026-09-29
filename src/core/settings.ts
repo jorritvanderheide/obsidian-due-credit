@@ -13,7 +13,7 @@ export interface Settings {
 	version: number;
 	/** The pandoc executable: a name found on the PATH, or a full path. */
 	pandocPath: string;
-	/** Where exports are written, outside the vault by default. `~` is your home folder. */
+	/** Where the save dialog opens, outside the vault by default. `~` is your home folder. */
 	outputFolder: string;
 	/**
 	 * The `.bib` file in the vault that decides which wikilinks are citations,
