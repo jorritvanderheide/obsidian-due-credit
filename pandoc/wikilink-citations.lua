@@ -190,21 +190,24 @@ end
 --- which is all the sentence needed from it: whether that is the note's name or
 --- a label you wrote, it is what you chose to have on the page.
 local function link(el)
-  local key = key_of(el.target)
+  -- In a table cell Obsidian writes the alias's pipe as `\|`, and pandoc keeps
+  -- the backslash at the end of the target. No note's name ends in one.
+  local target = el.target:gsub('\\$', '')
+  local key = key_of(target)
   if keys[key] then
     -- Without an alias the link's words are its target.
     local alias = pandoc.utils.stringify(el.content)
     local prefix, suffix, suppressed
-    if alias ~= el.target then prefix, suffix, suppressed = spelled(alias, key) end
+    if alias ~= target then prefix, suffix, suppressed = spelled(alias, key) end
     local citation = pandoc.Citation(key, suppressed and 'SuppressAuthor' or 'NormalCitation')
 
     -- What the alias says wins over a page after `#`: it is the one Obsidian
     -- shows. An alias that does not repeat the key can still carry a page.
-    if prefix == nil and alias ~= el.target then
+    if prefix == nil and alias ~= target then
       local page = labelled(alias)
       if page then suffix = ', ' .. page end
     end
-    local locator = locator_of(el.target)
+    local locator = locator_of(target)
     if (suffix == nil or suffix == '') and locator then suffix = ', ' .. locator end
 
     local text = (suppressed and '-@' or '@') .. key
@@ -219,7 +222,7 @@ local function link(el)
     return pandoc.Cite({ pandoc.Str(text) }, { citation })
   end
 
-  if reachable(el.target) then return nil end
+  if reachable(target) then return nil end
   return el.content
 end
 

@@ -18,6 +18,11 @@ describe('linkpathOf', () => {
 	it('drops a heading or block reference', () => {
 		expect(linkpathOf('Literature/key#p. 12')).toBe('Literature/key');
 	});
+
+	it('drops the \\ Obsidian leaves before an escaped pipe in a table cell', () => {
+		expect(['key\\', 'key#p. 12\\'].map(linkpathOf)).toEqual(['key', 'key']);
+		expect(keyOf('Literature/@key.md\\')).toBe('key');
+	});
 });
 
 describe('propertyKey', () => {

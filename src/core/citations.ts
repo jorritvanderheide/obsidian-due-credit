@@ -18,9 +18,13 @@ export function bibKeys(bib: string): Set<string> {
 	return keys;
 }
 
-/** A wikilink target without its heading or block reference. */
+/**
+ * A wikilink target without its heading or block reference, or the `\` that
+ * Obsidian leaves at its end when it escapes the alias's pipe in a table cell,
+ * as the filter's `link` drops it.
+ */
 export function linkpathOf(target: string): string {
-	return target.replace(/[#^].*$/, '');
+	return target.replace(/[#^].*$/, '').replace(/\\$/, '');
 }
 
 /**

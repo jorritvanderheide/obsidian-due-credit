@@ -162,7 +162,7 @@ const EMBED = /!\[\[([^\]|#^]+)(?:[#^][^\]|]*)?(?:\|([^\]]*))?\]\]/g;
 export function imageEmbeds(text: string, resolve: (linkpath: string) => string | null): string {
 	return outsideCode(text, (prose) =>
 		prose.replace(EMBED, (embed: string, target: string, label?: string) => {
-			const linkpath = target.trim();
+			const linkpath = linkpathOf(target.trim());
 			if (!IMAGE.test(linkpath)) return embed;
 			const path = resolve(linkpath);
 			if (path === null) return embed;

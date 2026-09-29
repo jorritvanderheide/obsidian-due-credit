@@ -71,6 +71,18 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 	});
 });
 
+describe.skipIf(!installed())('a table', () => {
+	it('reads a citation whose pipe the cell escaped', () => {
+		const output = join(dir, 'table.md');
+		const args = pandocArgs('md', { filter, bibliography: bib, csl: null, resourcePath: dir, output });
+		const table = '| x | y |\n|---|---|\n| [[a\\|a, p. 4]] | [[a#p. 5\\|a]] |\n| [[b\\|Bob, p. 6]] | [[My idea\\|this idea]] |\n';
+		execFileSync('pandoc', [...args.filter((arg) => !arg.startsWith('--to=')), '--to=plain'], { input: table });
+		const exported = readFileSync(output, 'utf8');
+		for (const cell of ['(A 2024, 4)', '(A 2024, 5)', '(B 2025, 6)', 'this idea']) expect(exported).toContain(cell);
+		expect(exported).not.toContain('\\');
+	});
+});
+
 describe.skipIf(!installed())('a note, end to end', () => {
 	it('exports without comments, titled by its H1, with sections and references at the top level', () => {
 		const note = '---\ntitle: Old title\ntags: [private]\n---\n# On authenticity\n\n## Argument\n\nAs shown [[a]].%%not for you%%\n';

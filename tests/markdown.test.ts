@@ -111,6 +111,10 @@ describe('imageEmbeds', () => {
 		);
 	});
 
+	it('reads an embed whose pipe a table cell escaped', () => {
+		expect(imageEmbeds('| ![[a.png\\|300]] |', resolve)).toBe('| ![](</vault/Attachments/a.png>){width=300px} |');
+	});
+
 	it('leaves notes, unresolved images and code as written', () => {
 		const text = '![[Chapter 1]] ![[missing.png]] `![[a.png]]`';
 		expect(imageEmbeds(text, resolve)).toBe(text);
@@ -133,6 +137,10 @@ describe('citeByKey', () => {
 
 	it('follows a key Better BibTeX changed, keeping the page and the alias', () => {
 		expect(citeByKey('[[oldkey#p. 12|label]] [[oldkey|see oldkey, p. 4]]', keyFor)).toBe('[[newkey#p. 12|label]] [[newkey|see newkey, p. 4]]');
+	});
+
+	it('keeps the pipe a table cell escaped', () => {
+		expect(citeByKey('| [[oldkey\\|see oldkey, p. 4]] | [[oldkey#p. 12\\|x]] |', keyFor)).toBe('| [[newkey\\|see newkey, p. 4]] | [[newkey#p. 12\\|x]] |');
 	});
 
 	it('keeps the author left out when the key changes', () => {
