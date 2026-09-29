@@ -56,7 +56,7 @@ export class SettingsTab extends PluginSettingTab {
 					},
 					{
 						name: 'Output folder',
-						desc: 'Where the save dialog opens until you have exported something; after that it opens where the last export went, until you change this. ~ is your home folder. An export can replace a file you pick, but never one inside the vault.',
+						desc: 'Where the save dialog opens until you have exported something; after that it opens where the last export went, until you change this. ~ is your home folder. An export can replace a file you pick, but is never saved inside the vault.',
 						control: { type: 'text', key: 'outputFolder', placeholder: '~/Documents' },
 					},
 				],

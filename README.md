@@ -116,9 +116,8 @@ None has a hotkey, so pick your own.
 ## Safety
 
 Due Credit reads your notes and writes nothing in the vault. It writes the file
-you choose in the save dialog, and refuses one that is already a file in your
-vault, so a Markdown export cannot replace its own note. It runs pandoc and
-nothing else.
+you choose in the save dialog, and refuses any place inside your vault, so a
+Markdown export cannot replace its own note. It runs pandoc and nothing else.
 
 ## Development
 

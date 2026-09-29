@@ -1,5 +1,5 @@
 // Export a note: read it, make it pandoc's markdown, and run pandoc.
-import { existsSync } from 'fs';
+import { existsSync, realpathSync } from 'fs';
 import { homedir } from 'os';
 import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
@@ -74,10 +74,12 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	});
 	if (answer.canceled || !answer.filePath) return;
 	const output = answer.filePath;
-	// The dialog asks before replacing a file, but not whether that file is a
-	// note, and for a Markdown export saved next to its source it is the note.
-	if (within(vault, output) && existsSync(output)) {
-		throw new ExportError(`${output} is already a file in your vault, and an export never replaces one. Save it somewhere else.`);
+	// Nothing is written in the vault: a Markdown export saved next to its
+	// source would be the note, and the dialog only asks whether to replace a
+	// file. Real paths, so a vault reached through a symlink is still the vault;
+	// the folder's, since the file may not exist yet.
+	if (within(realpathSync(vault), join(realpathSync(dirname(output)), basename(output)))) {
+		throw new ExportError(`${output} is inside your vault, and an export writes nothing there. Save it somewhere else.`);
 	}
 
 	const warnings = await withFiles((files) =>
