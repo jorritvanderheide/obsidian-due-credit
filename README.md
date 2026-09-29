@@ -70,11 +70,18 @@ A paper note does not have to be named for its key. A link to a note whose
 before Better BibTeX changed a key still cites the paper once the note's
 property has the new one.
 
-A link to a paper note whose key the bibliography does not have is listed
-before the export runs, because otherwise it would quietly come out as a name.
-A paper note is one with a citation key property, or one in the papers folder.
-A missing key is almost always one Better BibTeX changed, or an auto-export
-that has not run yet.
+Before the export runs, it lists every link that is about to come out as a
+name instead of a citation, because otherwise that would happen quietly:
+
+- A link to a paper note whose key the bibliography does not have. A paper
+  note is one with a citation key property, or one in the papers folder. The
+  key is almost always one Better BibTeX changed, or the paper is newer than
+  its last auto-export.
+- A link to no note at all whose name is not a key either. Paper Trail links a
+  paper that has no note yet by its key, so a paper cited before its
+  auto-export ran lands here, and so does a note you have not written yet.
+
+A link to a note of your own is never listed.
 
 LaTeX keeps `\cite` commands for the journal's own class to format. The filter
 that does the converting is

@@ -7,7 +7,7 @@ import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from '
 import { bibKeys } from '../core/citations';
 import { FORMATS, pandocArgs, styled, type Format } from '../core/document';
 import { cslPath, expandHome, insideVault } from '../core/paths';
-import { prepare, type Vault } from '../core/prepare';
+import { prepare, type Missing, type Vault } from '../core/prepare';
 import { startFolder } from '../core/settings';
 import { ExportError, run, withFiles } from '../pandoc';
 import { confirm } from '../ui/confirm';
@@ -49,7 +49,8 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		keyProperty: settings.keyProperty,
 		keys: bibliography ? bibKeys(await app.vault.cachedRead(bibliography)) : null,
 	});
-	if (bibliography && missing.length > 0 && !(await confirmMissing(context, missing, bibliography.name))) return;
+	const lost = missing.papers.length + missing.unresolved.length;
+	if (bibliography && lost > 0 && !(await confirmMissing(context, missing, lost, bibliography.name))) return;
 
 	const { name, extension } = FORMATS[format];
 	const answer = await remote.dialog.showSaveDialog({
@@ -86,19 +87,33 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	exported(output, warnings);
 }
 
-function confirmMissing(context: Context, keys: string[], bib: string): Promise<boolean> {
+function confirmMissing(context: Context, missing: Missing, count: number, bib: string): Promise<boolean> {
+	const list = (el: HTMLElement, keys: string[]) => {
+		const ul = el.createEl('ul');
+		for (const key of keys) ul.createEl('li').createEl('code', { text: key });
+	};
 	return confirm(
 		context.app,
-		keys.length === 1 ? 'A citation is not in the bibliography' : `${keys.length} citations are not in the bibliography`,
+		count === 1 ? 'A link is not in the bibliography' : `${count} links are not in the bibliography`,
 		(el) => {
-			el.createEl('p', {
-				text: `These link to papers that ${bib} does not have, so they will export as their plain names instead of as citations:`,
-			});
-			const list = el.createEl('ul');
-			for (const key of keys) list.createEl('li').createEl('code', { text: key });
-			el.createEl('p', {
-				text: 'Usually Better BibTeX changed the key, or its auto-export has not run since the paper was added.',
-			});
+			if (missing.papers.length > 0) {
+				el.createEl('p', {
+					text: `These link to papers that ${bib} does not have, so they will export as their plain names instead of as citations:`,
+				});
+				list(el, missing.papers);
+				el.createEl('p', {
+					text: 'Usually Better BibTeX changed the key, or its auto-export has not run since the paper was added.',
+				});
+			}
+			if (missing.unresolved.length > 0) {
+				el.createEl('p', {
+					text: `These link to no note, and ${bib} has no key by their name either, so they will export as their words:`,
+				});
+				list(el, missing.unresolved);
+				el.createEl('p', {
+					text: 'A paper cited before it has a note lands here when its key is not in the bibliography yet. So does a note you have not written yet, which is fine.',
+				});
+			}
 		},
 		'Export anyway',
 	);

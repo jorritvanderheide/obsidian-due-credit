@@ -85,7 +85,7 @@ export function renameInAlias(alias: string, from: string, to: string): string {
  * an auto-export that has not run yet, and the filter would print its name
  * where the citation should be.
  */
-export function missingKeys(targets: string[], keyFor: (target: string) => string | null, keys: Set<string>): string[] {
+export function missingKeys<T>(targets: T[], keyFor: (target: T) => string | null, keys: Set<string>): string[] {
 	const missing = new Set<string>();
 	for (const target of targets) {
 		const key = keyFor(target);

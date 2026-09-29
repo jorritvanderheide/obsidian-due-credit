@@ -38,8 +38,18 @@ export interface Prepared {
 	markdown: string;
 	/** The document's metadata, for a file of its own. */
 	metadata: Record<string, unknown>;
-	/** Keys of links to papers that the bibliography does not have. */
-	missing: string[];
+	/** Links about to lose their citation, as the keys they name. */
+	missing: Missing;
+}
+
+export interface Missing {
+	/** Links to paper notes whose key the bibliography does not have. */
+	papers: string[];
+	/**
+	 * Links to no note at all whose name is not a key either: a paper cited by
+	 * its key before it has a note, or a note not written yet.
+	 */
+	unresolved: string[];
 }
 
 /**
@@ -55,6 +65,11 @@ export interface Prepared {
  * kind is pointed at its key, since the second is named for it already. A
  * link within the note, `[[#Heading]]`, is never one, though Obsidian resolves
  * it to the note itself.
+ *
+ * The bibliography decides what is a citation, not whether a paper has a note,
+ * so the check lists a link to no note at all as well: Paper Trail links a
+ * paper that has no note by its key. Only a link to a note of your own is
+ * never listed.
  */
 export function prepare(text: string, vault: Vault, options: Options): Prepared {
 	const resolve = (linkpath: string) => (linkpath === '' ? null : vault.resolve(linkpath));
@@ -67,7 +82,13 @@ export function prepare(text: string, vault: Vault, options: Options): Prepared 
 
 	const { yaml, body } = splitFrontmatter(text);
 	const prose = stripBlockIds(stripComments(body));
-	const missing = options.keys ? missingKeys(wikilinkTargets(prose), (target) => keyFor(linkpathOf(target).trim()), options.keys) : [];
+	const targets = wikilinkTargets(prose).map((target) => ({ target, linkpath: linkpathOf(target).trim() }));
+	const check = (named: (link: { target: string; linkpath: string }) => string | null) =>
+		options.keys ? missingKeys(targets, named, options.keys) : [];
+	const missing = {
+		papers: check(({ linkpath }) => keyFor(linkpath)),
+		unresolved: check(({ target, linkpath }) => (linkpath !== '' && vault.resolve(linkpath) === null ? keyOf(target) : null)),
+	};
 
 	const { title, body: lifted } = liftHeadings(citeByKey(prose, propertyOf));
 	// Forward slashes, which pandoc reads on every platform.
