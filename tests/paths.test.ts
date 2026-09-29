@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cslPath, expandHome, inFolder, within } from '../src/core/paths';
+import { cslPath, expandHome, inFolder, insideVault, within } from '../src/core/paths';
 
 describe('expandHome', () => {
 	it('reads ~ as the home folder, and nothing else', () => {
@@ -26,6 +26,44 @@ describe('within', () => {
 		expect(within('/vault', '/vault')).toBe(false);
 		expect(within('/vault', '/vault-2/a.md')).toBe(false);
 		expect(within('/vault', '/home/a/Documents/a.md')).toBe(false);
+	});
+
+	it('reads a name that starts with .. as a name', () => {
+		expect(within('/vault', '/vault/..draft.md')).toBe(true);
+		expect(within('/vault', '/vault/..archive/a.md')).toBe(true);
+		expect(within('/vault', '/vault/../a.md')).toBe(false);
+	});
+});
+
+describe('insideVault', () => {
+	// A stand-in for the disk: what each path resolves to, and nothing else exists.
+	const real: Record<string, string> = {
+		'/data/vault': '/data/vault',
+		'/home/a/vault': '/data/vault',
+		'/data/vault/Drafts': '/elsewhere/drafts',
+		'/home/a/Out': '/home/a/Out',
+		'/home/a/Out/link.md': '/data/vault/Note.md',
+	};
+	const realpath = (path: string) => {
+		const resolved = real[path];
+		if (resolved === undefined) throw new Error(`ENOENT: ${path}`);
+		return resolved;
+	};
+
+	it('finds a vault opened through a symlink', () => {
+		expect(insideVault('/home/a/vault', '/data/vault/new.md', realpath)).toBe(true);
+	});
+
+	it('finds a folder in the vault that is a symlink out of it', () => {
+		expect(insideVault('/data/vault', '/data/vault/Drafts/Chapter.md', realpath)).toBe(true);
+	});
+
+	it('finds a file outside that is a symlink to a note', () => {
+		expect(insideVault('/data/vault', '/home/a/Out/link.md', realpath)).toBe(true);
+	});
+
+	it('lets a new file outside the vault through', () => {
+		expect(insideVault('/data/vault', '/home/a/Out/new.md', realpath)).toBe(false);
 	});
 });
 

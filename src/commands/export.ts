@@ -7,7 +7,7 @@ import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from '
 import { bibKeys, keyOf, linkpathOf, missingKeys, propertyKey } from '../core/citations';
 import { documentMetadata, FORMATS, pandocArgs, styled, type Format } from '../core/document';
 import { citeByKey, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../core/markdown';
-import { cslPath, expandHome, inFolder, within } from '../core/paths';
+import { cslPath, expandHome, inFolder, insideVault } from '../core/paths';
 import { startFolder } from '../core/settings';
 import { ExportError, run, withFiles } from '../pandoc';
 import { confirm } from '../ui/confirm';
@@ -77,9 +77,8 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const output = answer.filePath;
 	// Nothing is written in the vault: a Markdown export saved next to its
 	// source would be the note, and the dialog only asks whether to replace a
-	// file. Real paths, so a vault reached through a symlink is still the vault;
-	// the folder's, since the file may not exist yet.
-	if (within(realpathSync(vault), join(realpathSync(dirname(output)), basename(output)))) {
+	// file.
+	if (insideVault(vault, output, realpathSync)) {
 		throw new ExportError(`${output} is inside your vault, and an export writes nothing there. Save it somewhere else.`);
 	}
 

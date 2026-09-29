@@ -1,5 +1,5 @@
 // Paths, as strings. Nothing here touches the disk.
-import { isAbsolute, join, relative } from 'path';
+import { basename, dirname, isAbsolute, join, relative, sep } from 'path';
 
 /** `~` and `~/…` as the home folder, the way a shell reads them. */
 export function expandHome(path: string, home: string): string {
@@ -19,10 +19,28 @@ export function cslPath(value: string, styles: string): string {
 	return join(styles, `${value.replace(/\.csl$/i, '')}.csl`);
 }
 
-/** Whether `path` is inside `folder`, on disk. */
+/** Whether `path` is inside `folder`, on disk. `..draft.md` is a name, not a way out. */
 export function within(folder: string, path: string): boolean {
 	const rel = relative(folder, path);
-	return rel !== '' && !rel.startsWith('..') && !isAbsolute(rel);
+	return rel !== '' && rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
+}
+
+/**
+ * Whether a file picked in the save dialog is inside the vault, however either
+ * is reached. The path as picked catches a folder in the vault that is a
+ * symlink to somewhere else, and the real path a vault opened through a
+ * symlink, or a file outside it that is a symlink to a note. `realpath` throws
+ * for a path that does not exist, and a new file's folder is resolved instead.
+ */
+export function insideVault(vault: string, output: string, realpath: (path: string) => string): boolean {
+	let real: string;
+	try {
+		real = realpath(output);
+	} catch {
+		real = join(realpath(dirname(output)), basename(output));
+	}
+	const vaults = [vault, realpath(vault)];
+	return [output, real].some((path) => vaults.some((folder) => within(folder, path)));
 }
 
 /** Whether a vault path is inside a vault folder. */
