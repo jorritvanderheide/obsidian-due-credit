@@ -33,8 +33,9 @@
 --- `--citeproc` because pandoc runs them in the order you write them, and
 --- citeproc can only resolve citations that already exist when it runs.
 ---
---- `src/core/citations.ts` repeats `read_bib` and `key_of`, so the plugin can
---- say which citations will be lost before running this. Change one, change both.
+--- `src/core/citations.ts` repeats `read_bib`, `key_of` and `spelled`, so the
+--- plugin can say which citations will be lost before running this. Change one,
+--- change both.
 
 local keys = {}
 

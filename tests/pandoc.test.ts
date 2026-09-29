@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { afterAll, describe, expect, it } from 'vitest';
+import { keyOf, renameInAlias } from '../src/core/citations';
 import { MARKDOWN_TEMPLATE, pandocArgs } from '../src/core/document';
 import { prepare } from '../src/core/prepare';
 
@@ -87,6 +88,48 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 	])('%s exports as %s', (written, exported) => {
 		expect(cite(written)).toBe(exported);
 	});
+});
+
+// The rules `core/citations.ts` repeats from the filter, held to one table.
+type Inline = { t: string; c?: unknown };
+type Citation = { citationId: string; citationPrefix: Inline[]; citationSuffix: Inline[]; citationMode: { t: string } };
+
+/** The first citation the filter alone makes of a paragraph, or null. */
+function filtered(markdown: string): { key: string; prefix: string; suffix: string; mode: string } | null {
+	const args = ['--from=markdown+wikilinks_title_after_pipe', `--lua-filter=${filter}`, `--bibliography=${bib}`, '--to=json'];
+	const json = JSON.parse(execFileSync('pandoc', args, { input: markdown }).toString()) as { blocks: { c: Inline[] }[] };
+	const cite = json.blocks[0]?.c.find((inline) => inline.t === 'Cite');
+	const first = (cite?.c as [Citation[]] | undefined)?.[0][0];
+	if (!first) return null;
+	const words = (inlines: Inline[]) => inlines.map((inline) => (inline.t === 'Str' ? (inline.c as string) : ' ')).join('');
+	return { key: first.citationId, prefix: words(first.citationPrefix), suffix: words(first.citationSuffix), mode: first.citationMode.t };
+}
+
+describe.skipIf(!installed())('one rule, written twice', () => {
+	it.each(['a', 'Literature/a', 'Literature/a.md', 'a#p. 12', 'a#^block', '@a', 'Literature/@a.md#Claim', '@@a', 'a.pdf', 'ab', 'a.md.md', 'Notes/b a'])(
+		'[[%s]] is a citation in the filter exactly when keyOf names the key',
+		(target) => {
+			expect(filtered(`[[${target}]]`)?.key ?? null).toBe(keyOf(target) === 'a' ? 'a' : null);
+		},
+	);
+
+	// Where `renameInAlias` finds the key is where `spelled` splits the alias.
+	it.each(['a', 'see a, p. 4', '-a, p. 4', 'see -a', '@a', 'see @a, p. 4', '-@a', 'about a; b', 'aa a', 're-a', 'me@a', 'ab', 'a.', 'see (a)', 'Smith and Jones', 'see\u00A0a'])(
+		'[[a|%s]] is read around the key where renameInAlias finds it',
+		(alias) => {
+			const renamed = renameInAlias(alias, 'a', 'Z');
+			let at = 0;
+			while (at < alias.length && alias[at] === renamed[at]) at++;
+			let start = alias[at - 1] === '@' ? at - 1 : at;
+			const suppressed = renamed !== alias && alias[start - 1] === '-';
+			if (suppressed) start--;
+			expect(filtered(`[[a|${alias}]]`)).toEqual(
+				renamed === alias
+					? { key: 'a', prefix: '', suffix: '', mode: 'NormalCitation' }
+					: { key: 'a', prefix: alias.slice(0, start).trim(), suffix: alias.slice(at + 1).trimEnd(), mode: suppressed ? 'SuppressAuthor' : 'NormalCitation' },
+			);
+		},
+	);
 });
 
 describe.skipIf(!installed())('a bibliography with a byte order mark', () => {

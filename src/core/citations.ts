@@ -1,9 +1,11 @@
 // Which wikilinks are citations, as the pandoc filter decides it.
 //
 // `pandoc/wikilink-citations.lua` makes a link a citation when the key it names
-// is in the bibliography. These are the same two rules in TypeScript, so the
-// export can say which citations are about to be lost before pandoc loses them.
-// Change one side and the other has to follow.
+// is in the bibliography. These are its rules in TypeScript, `read_bib`,
+// `key_of` and `spelled`, so the export can say which citations are about to
+// be lost before pandoc loses them, and follow a key that changed. Change one
+// side and the other has to follow; `tests/pandoc.test.ts` holds both to one
+// table of cases.
 
 /** `@article{key,` and every other entry type, as the filter's `read_bib` reads it. */
 const ENTRY = /^\s*@\w+\s*[{(]\s*([^,\s]+)\s*,/;
@@ -47,6 +49,10 @@ export function propertyKey(frontmatter: unknown, property: string): string | nu
 	return typeof value === 'string' && value.trim() !== '' ? value.trim() : null;
 }
 
+/** Lua's `%s`, which `spelled` splits words by: not JavaScript's `\s`, which also takes a non-breaking space. */
+const SPACE = /[ \t\n\v\f\r]/;
+const AFTER = /[ \t\n\v\f\r,;]/;
+
 /**
  * The alias with the key it repeats, as a word, swapped for another: the same
  * rule the filter's `spelled` reads it by, so a citation whose target moves
@@ -61,9 +67,9 @@ export function renameInAlias(alias: string, from: string, to: string): string {
 		// with the new key.
 		let start = alias[at - 1] === '@' ? at - 1 : at;
 		if (alias[start - 1] === '-') start--;
-		const before = start === 0 || /\s/.test(alias[start - 1] ?? '');
+		const before = start === 0 || SPACE.test(alias[start - 1] ?? '');
 		const end = at + from.length;
-		const after = end === alias.length || /[\s,;]/.test(alias[end] ?? '');
+		const after = end === alias.length || AFTER.test(alias[end] ?? '');
 		if (before && after) return alias.slice(0, at) + to + alias.slice(end);
 		at = alias.indexOf(from, at + 1);
 	}

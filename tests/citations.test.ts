@@ -61,6 +61,10 @@ describe('renameInAlias', () => {
 		expect(renameInAlias('the summary', '', 'new')).toBe('the summary');
 	});
 
+	it('takes a non-breaking space for part of a word, as the filter does', () => {
+		expect(renameInAlias('see\u00A0old', 'old', 'new')).toBe('see\u00A0old');
+	});
+
 	it('leaves the key inside another word alone', () => {
 		expect(renameInAlias('bold old; x', 'old', 'new')).toBe('bold new; x');
 		expect(renameInAlias('oldest', 'old', 'new')).toBe('oldest');
