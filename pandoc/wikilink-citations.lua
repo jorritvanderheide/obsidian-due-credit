@@ -201,6 +201,9 @@ local function link(el)
   -- In a table cell Obsidian writes the alias's pipe as `\|`, and pandoc keeps
   -- the backslash at the end of the target. No note's name ends in one.
   local target = el.target:gsub('\\$', '')
+  -- What a reader can follow stays a link, even when its last part names a
+  -- paper: `https://github.com/x/smith2020` is a web page.
+  if reachable(el, target) then return nil end
   local key = key_of(target)
   if keys[key] then
     -- Without an alias the link's words are its target.
@@ -230,7 +233,6 @@ local function link(el)
     return pandoc.Cite({ pandoc.Str(text) }, { citation })
   end
 
-  if reachable(el, target) then return nil end
   if pandoc.utils.stringify(el.content) == el.target then
     local name, ref = target:match('^([^#]*)#?(.*)$')
     return pandoc.Inlines(name ~= '' and name or (ref:gsub('^%^', '')))

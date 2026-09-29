@@ -56,6 +56,9 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 		['[[Other note#^abc123]] says', 'Other note says'],
 		['[[Other note#Section|there]] it is', 'there it is'],
 		['[[#Local heading]] above', 'Local heading above'],
+		// A web link stays one, even when its last part is a key.
+		['[the page](https://example.org/a) says', 'the page says'],
+		['<https://example.org/a>', 'https://example.org/a'],
 		// Paper Trail's form for Better BibTeX's dialog: everything around the key, in the alias.
 		['[[a|a, p. 4]]', '(A 2024, 4)'],
 		['[[a|see a, p. 4, emphasis added]]', '(see A 2024, 4, emphasis added)'],
