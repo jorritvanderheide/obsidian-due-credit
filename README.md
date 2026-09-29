@@ -39,27 +39,29 @@ part of the name. Pandoc's own `[@marsh2024, p. 12]` works as well.
 | Written | Exported |
 | --- | --- |
 | `[[marsh2024]]` | (Marsh 2024) |
-| `[[@marsh2024]]` | (Marsh 2024) |
-| `[[marsh2024#p. 12]]` | (Marsh 2024, 12) |
 | `[[marsh2024\|marsh2024, p. 12]]` | (Marsh 2024, 12) |
 | `[[marsh2024\|see marsh2024, p. 12, emphasis added]]` | (see Marsh 2024, 12, emphasis added) |
 | `[[marsh2024\|-marsh2024, p. 12]]` | (2024, 12) |
 | `[[marsh2024\|Marsh, p. 12]]` | (Marsh 2024, 12) |
-| `[[marsh2024#p. 12]]; [[okafor2019]]` | (Marsh 2024, 12; Okafor 2019) |
+| `[[marsh2024\|marsh2024, p. 12]]; [[okafor2019]]` | (Marsh 2024, 12; Okafor 2019) |
+| `[[@marsh2024]]` | (Marsh 2024) |
+| `[[marsh2024#p. 12]]` | (Marsh 2024, 12) |
 | `[[My idea\|this idea]]` | this idea |
 | `[[My idea#Section]]` | My idea |
 
-A page is anything after `#` that starts with a number, `§`, or a locator such
-as `p.`, `pp.`, `ch.`, `sec.` or `fig.`; `[[marsh2024#Claim]]` is the paper.
 An alias that repeats the key is read the way pandoc reads `[see @key, p. 12]`:
 what comes before the key is a prefix, and what comes after it is the page and
 anything else, with an `@` against the key or without. A `-` against the key
 leaves the author out, as in `[-@key, p. 12]`, for a sentence that names them
-already. That is how Paper
-Trail writes a citation from Better BibTeX's dialog. Any other alias is what
-Obsidian shows, apart from a page after its first comma, which is how Paper
-Trail adds a page to a label you wrote.
-Citations next to each other, separated by at most a `;`, share brackets.
+already. That is how Paper Trail writes a citation from Better BibTeX's dialog.
+Any other alias is what Obsidian shows, apart from a page after its first
+comma, which is how Paper Trail adds a page to a label you wrote. Citations next
+to each other, separated by at most a `;`, share brackets.
+
+A page after `#` is read too, when it starts with a number, `§`, or a locator
+such as `p.`, `pp.`, `ch.`, `sec.` or `fig.`; `[[marsh2024#Claim]]` is the
+paper. Paper Trail does not write it that way, because Obsidian takes it for a
+heading the paper's note does not have.
 
 A paper note does not have to be named for its key. A link to a note whose
 `citekey` property holds one cites that key, so
@@ -67,9 +69,11 @@ A paper note does not have to be named for its key. A link to a note whose
 before Better BibTeX changed a key still cites the paper once the note's
 property has the new one.
 
-A link to a paper the bibliography does not have is listed before the export
-runs, because otherwise it would quietly come out as a name. That is almost
-always a key Better BibTeX changed, or an auto-export that has not run yet.
+A link to a paper note whose key the bibliography does not have is listed
+before the export runs, because otherwise it would quietly come out as a name.
+A paper note is one with a citation key property, or one in the papers folder.
+A missing key is almost always one Better BibTeX changed, or an auto-export
+that has not run yet.
 
 LaTeX keeps `\cite` commands for the journal's own class to format. The filter
 that does the converting is
@@ -109,7 +113,7 @@ None has a hotkey, so pick your own.
 | --- | --- | --- |
 | **Pandoc** | `pandoc` | Its name if it is on your PATH, or its full path. |
 | **Output folder** | `~/Documents` | Where the save dialog opens the first time. After that it opens where the last export went, until you change this. |
-| **Bibliography** | `Literature/library.bib` | The `.bib` file that decides which links are citations. Empty exports without citations. |
+| **Bibliography** | `Literature/library.bib` | The `.bib` file in your vault that decides which links are citations. Empty exports without citations. |
 | **Papers folder** | `Literature` | Where your paper notes are, for the check before exporting. |
 | **Citation key property** | `citekey` | The frontmatter property holding a paper note's citation key. |
 | **Citation style** | Chicago author-date | A style Zotero has installed, such as `apa`, or the path to a `.csl` file. |
