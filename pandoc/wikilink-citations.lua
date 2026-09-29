@@ -12,6 +12,8 @@
 --- - Or everything in the alias, around the key, the way Paper Trail writes a
 ---   citation from Better BibTeX's dialog: `[[a|see a, p. 4, emphasis added]]`
 ---   is `[see @a, p. 4, emphasis added]`.
+--- - Or a page after the first comma of an alias that does not repeat the key,
+---   the way Paper Trail adds one to a label you wrote: `[[a|Jacobs, p. 4]]`.
 --- - Neighbouring citations share brackets: `[[a#p. 12]]; [[b#p. 3]]` is
 ---   "(A 2024, 12; B 2025, 3)", as `[@a, p. 12; @b, p. 3]` would be.
 ---
@@ -100,26 +102,50 @@ local function reachable(target)
   return target:match('^%a[%w+.-]*:') ~= nil or target:sub(1, 1) == '#'
 end
 
---- Locator terms, so a heading reference is read as a page only when it is one:
---- `[[key#p. 12]]` cites page 12, `[[key#Claim]]` is just the paper's Claim heading.
-local LOCATOR_TERMS = {
-  ["p."] = true, ["pp."] = true, page = true, pages = true,
-  ["ch."] = true, ["chap."] = true, chapter = true,
-  ["sec."] = true, section = true, ["para."] = true, paragraph = true,
-  ["fig."] = true, figure = true, ["vol."] = true, volume = true,
-  ["n."] = true, note = true, ["l."] = true, ["ll."] = true, line = true,
-}
+--- Locator terms, so a heading or a label is read as a page only when it is
+--- one: `[[key#p. 12]]` cites page 12, `[[key#Claim]]` is just the paper's
+--- Claim heading, and `[[key|Smith, Jones]]` is just a label.
+---
+--- Every abbreviation Better BibTeX writes is here, since Paper Trail writes
+--- them into labels, with the plurals and the full words someone might type.
+--- Paper Trail keeps a copy of this file and a test holding its own list to
+--- this one.
+local LOCATOR_TERMS = {}
+for term in ([[
+  p. pp. page pages
+  ch. chap. chapter subch. subchapter
+  sec. section subsec. subsection
+  para. paragraph subpara. subparagraph
+  fig. figure col. column l. ll. line
+  n. note vol. volume no. issue
+  art. article op. opus pt. part r. rule
+  vrs. verse sv. sch. schedule tit. title
+  book folio
+]]):gmatch('%S+') do LOCATOR_TERMS[term] = true end
+
+--- The text as a locator, trimmed, or nil when it is not one.
+local function as_locator(text)
+  local ref = text:gsub("^%s+", ""):gsub("%s+$", "")
+  if ref:match("^%d") or ref:match("^§") then return ref end
+  local term = ref:match("^(%a+%.?)")
+  if term and LOCATOR_TERMS[term:lower()] then return ref end
+  return nil
+end
 
 --- The page in a link's heading reference, or nil when it names none.
 --- Block references (`#^id`) and real headings are not pages.
 local function locator_of(target)
   local ref = target:match("#([^#^][^#]*)$")
   if not ref then return nil end
-  ref = ref:gsub("^%s+", ""):gsub("%s+$", "")
-  if ref:match("^%d") or ref:match("^§") then return ref end
-  local term = ref:match("^(%a+%.?)")
-  if term and LOCATOR_TERMS[term:lower()] then return ref end
-  return nil
+  return as_locator(ref)
+end
+
+--- The page after the first comma of an alias, or nil when what follows it is
+--- not one. The first comma rather than the last, so `Jacobs, pp. 4, 6` keeps
+--- both pages.
+local function labelled(alias)
+  local rest = alias:match(",(.*)$")
+  return rest and as_locator(rest) or nil
 end
 
 --- The prefix and suffix an alias spells out around the key, or nil when it
@@ -167,7 +193,12 @@ local function link(el)
     local prefix, suffix
     if alias ~= el.target then prefix, suffix = spelled(alias, key) end
 
-    -- The alias's suffix wins over a page after `#`: it is the one Obsidian shows.
+    -- What the alias says wins over a page after `#`: it is the one Obsidian
+    -- shows. An alias that does not repeat the key can still carry a page.
+    if prefix == nil and alias ~= el.target then
+      local page = labelled(alias)
+      if page then suffix = ', ' .. page end
+    end
     local locator = locator_of(el.target)
     if (suffix == nil or suffix == '') and locator then suffix = ', ' .. locator end
 

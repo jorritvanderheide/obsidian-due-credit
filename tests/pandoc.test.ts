@@ -54,6 +54,13 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 		['[[a#p. 12|a]]', '(A 2024, 12)'],
 		['[[a#p. 12|a, p. 4]]', '(A 2024, 4)'],
 		['[[a|Ann’s paper]]', '(A 2024)'],
+		// Paper Trail's Add page to citation on a label you wrote: the page after its first comma.
+		['[[a|Jacobs, p. 4]]', '(A 2024, 4)'],
+		['[[a|Jacobs, pp. 4, 6]]', '(A 2024, 4, 6)'],
+		['[[a|Smith, Jones]]', '(A 2024)'],
+		// Every abbreviation Better BibTeX writes counts as a locator.
+		['[[a|a, col. 2]]', '(A 2024, col. 2)'],
+		['[[a|Jacobs, art. 12]]', '(A 2024, art. 12)'],
 	])('%s exports as %s', (written, exported) => {
 		expect(cite(written)).toBe(exported);
 	});
