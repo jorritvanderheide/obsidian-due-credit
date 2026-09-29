@@ -50,6 +50,11 @@ describe.skipIf(!installed())('wikilink-citations.lua', () => {
 		['[[a|a, p. 4]]', '(A 2024, 4)'],
 		['[[a|see a, p. 4, emphasis added]]', '(see A 2024, 4, emphasis added)'],
 		['[[a|a, p. 4]]; [[b]]', '(A 2024, 4; B 2025)'],
+		// A - against the key leaves the author out, as [-@a] does.
+		['[[a|-a, p. 4]]', '(2024, 4)'],
+		['[[a|see -a, p. 4]]', '(see 2024, 4)'],
+		['[[a|-a]]; [[b]]', '(2024; B 2025)'],
+		['[[a|re-a]]', '(A 2024)'],
 		['[[a|about a, ch. 2]]', '(about A 2024, ch. 2)'],
 		['[[a#p. 12|a]]', '(A 2024, 12)'],
 		['[[a#p. 12|a, p. 4]]', '(A 2024, 4)'],

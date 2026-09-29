@@ -11,7 +11,9 @@
 ---   paper, so it stays in the backlinks.
 --- - Or everything in the alias, around the key, the way Paper Trail writes a
 ---   citation from Better BibTeX's dialog: `[[a|see a, p. 4, emphasis added]]`
----   is `[see @a, p. 4, emphasis added]`.
+---   is `[see @a, p. 4, emphasis added]`. A `-` against the key leaves the
+---   author out, for a sentence that names them already: `[[a|-a, p. 4]]` is
+---   `[-@a, p. 4]`.
 --- - Or a page after the first comma of an alias that does not repeat the key,
 ---   the way Paper Trail adds one to a label you wrote: `[[a|Jacobs, p. 4]]`.
 --- - Neighbouring citations share brackets: `[[a#p. 12]]; [[b#p. 3]]` is
@@ -162,10 +164,13 @@ local function spelled(alias, key)
   while true do
     local s, e = alias:find(key, from, true)
     if not s then return nil end
-    local before = s == 1 or alias:sub(s - 1, s - 1):match('%s')
+    -- A `-` against the key leaves the author out, as it does before `@key`.
+    local start = s
+    if s > 1 and alias:sub(s - 1, s - 1) == '-' then start = s - 1 end
+    local before = start == 1 or alias:sub(start - 1, start - 1):match('%s')
     local after = e == #alias or alias:sub(e + 1, e + 1):match('[%s,;]')
     if before and after then
-      return alias:sub(1, s - 1):gsub('^%s+', ''):gsub('%s+$', ''), (alias:sub(e + 1):gsub('%s+$', ''))
+      return alias:sub(1, start - 1):gsub('^%s+', ''):gsub('%s+$', ''), (alias:sub(e + 1):gsub('%s+$', '')), start < s
     end
     from = s + 1
   end
@@ -187,11 +192,11 @@ end
 local function link(el)
   local key = key_of(el.target)
   if keys[key] then
-    local citation = pandoc.Citation(key, 'NormalCitation')
     -- Without an alias the link's words are its target.
     local alias = pandoc.utils.stringify(el.content)
-    local prefix, suffix
-    if alias ~= el.target then prefix, suffix = spelled(alias, key) end
+    local prefix, suffix, suppressed
+    if alias ~= el.target then prefix, suffix, suppressed = spelled(alias, key) end
+    local citation = pandoc.Citation(key, suppressed and 'SuppressAuthor' or 'NormalCitation')
 
     -- What the alias says wins over a page after `#`: it is the one Obsidian
     -- shows. An alias that does not repeat the key can still carry a page.
@@ -202,7 +207,7 @@ local function link(el)
     local locator = locator_of(el.target)
     if (suffix == nil or suffix == '') and locator then suffix = ', ' .. locator end
 
-    local text = '@' .. key
+    local text = (suppressed and '-@' or '@') .. key
     if prefix and prefix ~= '' then
       citation.prefix = pandoc.Inlines(prefix)
       text = prefix .. ' ' .. text
@@ -219,12 +224,13 @@ local function link(el)
 end
 
 --- Whether an inline is a citation that can share brackets with its neighbour.
---- `NormalCitation` only, so "Jacobs (2024) argues", written as `@key`, is never
---- pulled into the parentheses next to it.
+--- Anything in brackets, with its author or without, but never an in-text
+--- citation, so "Jacobs (2024) argues", written as `@key`, is never pulled
+--- into the parentheses next to it.
 local function groupable(el)
   if el == nil or el.t ~= "Cite" then return false end
   for _, citation in ipairs(el.citations) do
-    if citation.mode ~= "NormalCitation" then return false end
+    if citation.mode == "AuthorInText" then return false end
   end
   return true
 end

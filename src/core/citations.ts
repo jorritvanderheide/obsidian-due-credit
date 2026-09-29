@@ -51,7 +51,9 @@ export function propertyKey(frontmatter: unknown, property: string): string | nu
 export function renameInAlias(alias: string, from: string, to: string): string {
 	let at = alias.indexOf(from);
 	while (at !== -1) {
-		const before = at === 0 || /\s/.test(alias[at - 1] ?? '');
+		// A `-` against the key leaves the author out, and stays with the new key.
+		const start = alias[at - 1] === '-' ? at - 1 : at;
+		const before = start === 0 || /\s/.test(alias[start - 1] ?? '');
 		const end = at + from.length;
 		const after = end === alias.length || /[\s,;]/.test(alias[end] ?? '');
 		if (before && after) return alias.slice(0, at) + to + alias.slice(end);

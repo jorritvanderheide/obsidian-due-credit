@@ -36,6 +36,12 @@ describe('renameInAlias', () => {
 		expect(renameInAlias('old', 'old', 'new')).toBe('new');
 	});
 
+	it('keeps a - that leaves the author out with the new key', () => {
+		expect(renameInAlias('-old, p. 4', 'old', 'new')).toBe('-new, p. 4');
+		expect(renameInAlias('see -old', 'old', 'new')).toBe('see -new');
+		expect(renameInAlias('re-old', 'old', 'new')).toBe('re-old');
+	});
+
 	it('leaves the key inside another word alone', () => {
 		expect(renameInAlias('bold old; x', 'old', 'new')).toBe('bold new; x');
 		expect(renameInAlias('oldest', 'old', 'new')).toBe('oldest');

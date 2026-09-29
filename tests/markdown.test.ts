@@ -135,6 +135,10 @@ describe('citeByKey', () => {
 		expect(citeByKey('[[oldkey#p. 12|label]] [[oldkey|see oldkey, p. 4]]', keyFor)).toBe('[[newkey#p. 12|label]] [[newkey|see newkey, p. 4]]');
 	});
 
+	it('keeps the author left out when the key changes', () => {
+		expect(citeByKey('[[oldkey|-oldkey, p. 4]]', keyFor)).toBe('[[newkey|-newkey, p. 4]]');
+	});
+
 	it('reads the target however Obsidian wrote it', () => {
 		expect(citeByKey('[[@oldkey|@oldkey]] [[Literature/oldkey.md]]', keyFor)).toBe('[[newkey|@oldkey]] [[newkey]]');
 	});
