@@ -174,9 +174,18 @@ describe('imageEmbeds', () => {
 		expect(imageEmbeds('| ![[a.png\\|300]] |', resolve)).toBe('| ![](</vault/Attachments/a.png>){width=300px} |');
 	});
 
-	it('leaves notes, unresolved images and code as written', () => {
-		const text = '![[Chapter 1]] ![[missing.png]] `![[a.png]]`';
+	it('leaves an unresolved image, for pandoc to name, and code as written', () => {
+		const text = '![[missing.png]] `![[a.png]]` `![[Chapter 1]]`';
 		expect(imageEmbeds(text, resolve)).toBe(text);
+	});
+
+	it('drops every other embed: a note, a section, a block, a PDF and a canvas', () => {
+		expect(imageEmbeds('See ![[Chapter 1]], ![[Chapter 1#Method]], ![[Chapter 1#^abc]], ![[paper.pdf#page=3]] and ![[Map.canvas]].', resolve)).toBe('See , , ,  and .');
+	});
+
+	it('takes the line of an embed on a line of its own with it', () => {
+		expect(imageEmbeds('Before.\n\n![[Chapter 1]]\n\n  ![[paper.pdf]]  \r\nAfter.\n![[Chapter 2]]', resolve)).toBe('Before.\n\n\nAfter.\n');
+		expect(imageEmbeds('Before.\n![[a.png]]\n', resolve)).toBe('Before.\n![](</vault/Attachments/a.png>)\n');
 	});
 });
 

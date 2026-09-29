@@ -194,20 +194,30 @@ export function liftHeadings(text: string): { title: string | null; body: string
 
 const IMAGE = /\.(?:avif|bmp|gif|jpe?g|png|svg|webp)$/i;
 const EMBED = /!\[\[([^\]|#^]+)(?:[#^][^\]|]*)?(?:\|([^\]]*))?\]\]/g;
+const EMBED_LINE = new RegExp(`^[ \\t]*${EMBED.source}[ \\t]*(?:\\r?\\n|$)`, 'gm');
+
+const isImage = (target: string) => IMAGE.test(linkpathOf(target.trim()));
 
 /**
- * Every `![[image.png]]` as a markdown image of the file Obsidian would show.
+ * Every `![[image.png]]` as a markdown image of the file Obsidian would show,
+ * and every other embed gone.
  *
  * Which file that is, is Obsidian's to say, so `resolve` asks it: a bare name
- * can live in any folder. An embed it cannot resolve, or one that is not an
- * image, is left as written. `|300` is a width, as in Obsidian; any other text
+ * can live in any folder. An image it cannot resolve is left as written, so
+ * pandoc's warning names it. `|300` is a width, as in Obsidian; any other text
  * after `|` is the image's description.
+ *
+ * An embedded note is for whoever wrote it, like the note linked, and so is a
+ * PDF or a canvas: all of them are dropped, and one on a line of its own takes
+ * its line with it. That pass reads whole lines, past backtick spans, since a
+ * line with only an embed on it has none.
  */
 export function imageEmbeds(text: string, resolve: (linkpath: string) => string | null): string {
-	return outsideCode(text, (prose) =>
+	const lines = outsideCode(text, (prose) => prose.replace(EMBED_LINE, (line: string, target: string) => (isImage(target) ? line : '')), false);
+	return outsideCode(lines, (prose) =>
 		prose.replace(EMBED, (embed: string, target: string, label?: string) => {
+			if (!isImage(target)) return '';
 			const linkpath = linkpathOf(target.trim());
-			if (!IMAGE.test(linkpath)) return embed;
 			const path = resolve(linkpath);
 			if (path === null) return embed;
 

@@ -53,6 +53,10 @@ describe('prepare', () => {
 		expect(prepare('[[okafor2019]] [[new2025]]', vault, { ...options, keys: null }).missing).toEqual({ papers: [], unresolved: [] });
 	});
 
+	it('leaves an embedded note out, and keeps an embedded image', () => {
+		expect(prepare('Intro.\n\n![[My idea]]\n\n![[figure.png]]\n', vault, options).markdown).toBe('Intro.\n\n\n![](<C:/v/Attachments/figure.png>)\n');
+	});
+
 	it('points only a link to a note with a key property at that key', () => {
 		expect(prepare('[[Marsh (2024) The Quiet Archive#p. 4]] [[okafor2019|see okafor2019]]', vault, options).markdown).toBe('[[marsh2024#p. 4]] [[okafor2019|see okafor2019]]');
 	});

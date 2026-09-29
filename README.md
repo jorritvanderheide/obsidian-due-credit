@@ -29,6 +29,8 @@ Obsidian:
   `reference-section-title` to head the references in another language. Word
   would keep every other property inside the file, tags and all.
 - **Images.** `![[figure.png|300]]` is the file Obsidian shows, 300 pixels wide.
+- **Other embeds.** An embedded note, PDF or canvas is left out: it is for
+  you, not your reader.
 
 ## Citations
 
