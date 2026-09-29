@@ -74,7 +74,7 @@ describe('inputFiles', () => {
 });
 
 describe('pandocArgs', () => {
-	const run: Run = { obsidian: '/tmp/o.lua', filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, hardLineBreaks: false, referenceDoc: null, extra: [], resourcePath: '/v', output: '/out/n.docx' };
+	const run: Run = { obsidian: '/tmp/o.lua', filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', fonts: '/tmp/fonts', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, hardLineBreaks: false, referenceDoc: null, extra: [], resourcePath: '/v', output: '/out/n.docx' };
 
 	it('runs the filter before citeproc, which can only cite what the filter made', () => {
 		const args = pandocArgs('docx', run);
@@ -118,6 +118,22 @@ describe('pandocArgs', () => {
 
 	it('makes PDF with xelatex', () => {
 		expect(pandocArgs('pdf', run)).toContain('--pdf-engine=xelatex');
+	});
+
+	it('sets a PDF in Open Sans from the folder it was written to', () => {
+		const args = pandocArgs('pdf', run);
+		expect(args).toContain('--variable=mainfont=OpenSans');
+		expect(args).toContain('--variable=mainfontoptions=Path={\\detokenize{/tmp/fonts/}}');
+		expect(pandocArgs('pdf', { ...run, fonts: 'C:\\Users\\JANEDO~1\\Temp\\fonts' })).toContain('--variable=mainfontoptions=Path={\\detokenize{C:/Users/JANEDO~1/Temp/fonts/}}');
+		expect(pandocArgs('docx', run).some((arg) => arg.startsWith('--variable'))).toBe(false);
+	});
+
+	it('leaves the font to you when you choose one', () => {
+		const set = (extra: string[]) => pandocArgs('pdf', { ...run, extra }).includes('--variable=mainfont=OpenSans');
+		for (const extra of [['-V', 'mainfont=Arial'], ['-Vmainfont=Arial'], ['--variable=mainfont:Arial'], ['--variable', 'mainfont=Arial'], ['-M', 'mainfont=Arial'], ['--metadata=mainfont=Arial']]) {
+			expect(set(extra)).toBe(false);
+		}
+		expect(set(['-V', 'mainfontoptions=Scale=0.9'])).toBe(true);
 	});
 
 	it('keeps pandoc syntax out of a Markdown export', () => {

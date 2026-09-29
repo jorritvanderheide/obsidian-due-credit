@@ -132,7 +132,7 @@ None has a hotkey, so pick your own.
 | Command | |
 | --- | --- |
 | **Export to Word** | A `.docx` with rendered citations and a reference list. |
-| **Export to PDF** | The same, typeset with xelatex. |
+| **Export to PDF** | The same, typeset with xelatex in Open Sans, which comes with the plugin. |
 | **Export to Markdown** | Plain Markdown under its title, with rendered citations, for pasting elsewhere. |
 | **Export to LaTeX** | A body with `\cite` commands, for a journal's or conference's class. |
 
@@ -141,7 +141,7 @@ None has a hotkey, so pick your own.
 | Setting | Default | |
 | --- | --- | --- |
 | **Pandoc** | `pandoc` | Its name if it is on your PATH, or its full path. |
-| **Pandoc arguments** | None | Added to every export, such as `--toc`, `--number-sections`, `-V geometry:margin=2.5cm` or `--filter pandoc-crossref`. A filter runs after Due Credit's and before citations are rendered. Quotes keep a value with spaces together, and a relative path is from the vault. Where the file goes, what is read and the format stay Due Credit's: `-o`, `-f`, `-t` and a defaults file are refused. |
+| **Pandoc arguments** | None | Added to every export, such as `--toc`, `--number-sections`, `-V geometry:margin=2.5cm`, `-V "mainfont=TeX Gyre Pagella"` for a PDF in a font of yours, or `--filter pandoc-crossref`. A filter runs after Due Credit's and before citations are rendered. Quotes keep a value with spaces together, and a relative path is from the vault. Where the file goes, what is read and the format stay Due Credit's: `-o`, `-f`, `-t` and a defaults file are refused. |
 | **Output folder** | `~/Documents` | Where the save dialog opens the first time. After that it opens where the last export went, until you change this. |
 | **Word template** | Pandoc's own | A `.docx` whose styles a Word export takes: fonts, headings and margins, as your university or journal wants them. A path in your vault, or outside it, starting with `/` or `~`. `pandoc -o reference.docx --print-default-data-file reference.docx` writes pandoc's own to start from. |
 | **Bibliography** | `Literature/library.bib` | The `.bib` file that decides which links are citations: a path in your vault, or one outside it, starting with `/` or `~`. Empty exports without citations. |
@@ -188,4 +188,5 @@ the plugin would take for code, where a comment would be kept.
 
 ## License
 
-[EUPL-1.2](LICENSE)
+[EUPL-1.2](LICENSE). Open Sans, in [`fonts/`](fonts), is under the
+[SIL Open Font License 1.1](fonts/OFL.txt).

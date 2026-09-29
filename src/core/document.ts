@@ -71,6 +71,8 @@ export interface Run {
 	afterCiteproc: string;
 	/** `MARKDOWN_TEMPLATE`, on disk. */
 	template: string;
+	/** The folder holding Open Sans, on disk. */
+	fonts: string;
 	/** The document's metadata, as JSON on disk. */
 	metadata: string;
 	/** The bibliography, on disk, or null to export without citations. */
@@ -122,7 +124,13 @@ export function pandocArgs(format: Format, run: Run): string[] {
 	if (format === 'docx' && run.referenceDoc) args.push(`--reference-doc=${run.referenceDoc}`);
 	// xelatex rather than pandoc's default pdflatex, which stops at any Unicode
 	// character its input encoding has not been set up for.
-	if (format === 'pdf') args.push('--pdf-engine=xelatex');
+	if (format === 'pdf') {
+		args.push('--pdf-engine=xelatex');
+		// Open Sans rather than LaTeX's Latin Modern, whose hairline strokes look
+		// grey and soft on a screen. Bundled, because few machines have it and
+		// xelatex stops at a font it cannot find. A font of yours replaces it.
+		if (!choosesFont(run.extra)) args.push(...openSans(run.fonts));
+	}
 	if (format === 'md') {
 		// Text for pasting elsewhere, so none of pandoc's own syntax: no `{=html}`
 		// or `{#id .class}`, no divs or spans. Highlights as Obsidian writes them.
@@ -146,6 +154,28 @@ export function pandocArgs(format: Format, run: Run): string[] {
 
 	args.push(`--output=${run.output}`);
 	return args;
+}
+
+/**
+ * Open Sans from `folder`, through fontspec. The path is written with forward
+ * slashes, which TeX reads on Windows too, and detokenized, so a `~` in it, as
+ * in a Windows short name, stays a character.
+ */
+function openSans(folder: string): string[] {
+	const path = folder.replace(/\\/g, '/').replace(/\/?$/, '/');
+	const options = [`Path={\\detokenize{${path}}}`, 'Extension=.ttf', 'UprightFont=*-Regular', 'ItalicFont=*-Italic', 'BoldFont=*-Bold', 'BoldItalicFont=*-BoldItalic'];
+	return ['--variable=mainfont=OpenSans', ...options.map((option) => `--variable=mainfontoptions=${option}`)];
+}
+
+/**
+ * Whether your own arguments set the main font. Pandoc's variables override
+ * its metadata, so Open Sans would win over your `-M mainfont`, and join your
+ * `-V mainfont` as a list.
+ */
+function choosesFont(extra: string[]): boolean {
+	return extra.some(
+		(arg, i) => /^(-V|-M|--variable=|--metadata=)mainfont[=:]/.test(arg) || (/^mainfont[=:]/.test(arg) && ['-V', '-M', '--variable', '--metadata'].includes(extra[i - 1] ?? '')),
+	);
 }
 
 /**

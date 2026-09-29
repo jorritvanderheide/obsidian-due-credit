@@ -4,6 +4,12 @@ declare module '*.lua' {
 	export default source;
 }
 
+// Bundled as bytes by esbuild, the same way.
+declare module '*.ttf' {
+	const bytes: Uint8Array;
+	export default bytes;
+}
+
 // Provided by Obsidian's Electron at runtime. Only what is used here: the save
 // dialog through `remote`, which is how Obsidian's own PDF export asks.
 declare module 'electron' {
