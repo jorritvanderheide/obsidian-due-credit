@@ -50,6 +50,30 @@ describe('segments', () => {
 		]);
 	});
 
+	it('reads a fence in a list item or a quote', () => {
+		expect(segments('1. Run:\n\n    ```sh\n    npm i %%\n    ```\n\n    Then.\n').filter((segment) => segment.code)).toEqual([
+			{ code: true, text: '    ```sh\n    npm i %%\n    ```\n' },
+		]);
+		expect(segments('> [!example]\n> ```js\n> x %%\n> ```\n> After.\n').filter((segment) => segment.code)).toEqual([
+			{ code: true, text: '> ```js\n> x %%\n> ```\n' },
+		]);
+	});
+
+	it('keeps a fence in its list item past a line of code that looks like a quote', () => {
+		const text = '* `opts` - an option,\nand its lazy line.\n\n  ```\n  > require()\n  ```\n\n  After %%private%%.\n';
+		expect(stripComments(text)).toBe('* `opts` - an option,\nand its lazy line.\n\n  ```\n  > require()\n  ```\n\n  After .\n');
+	});
+
+	it('does not take a fence indented a little for one in a list item', () => {
+		const text = ' - an item\n\n ```jsonc\n// %%kept%%\n{}\n```\n\nText %%private%%.\n';
+		expect(stripComments(text)).toBe(' - an item\n\n ```jsonc\n// %%kept%%\n{}\n```\n\nText .\n');
+	});
+
+	it('ends a fence with the quote or the list item it is in, closed or not', () => {
+		expect(stripComments('> ```js\n> x\n\nOutside %%private%%.\n')).toBe('> ```js\n> x\n\nOutside .\n');
+		expect(stripComments('- a\n\n  ```js\n  x\n\nOutside %%private%%.\n')).toBe('- a\n\n  ```js\n  x\n\nOutside .\n');
+	});
+
 	it('reads a span across a line break, within a paragraph', () => {
 		expect(segments('A `multi\nline` then %% and `x`\n')).toEqual([
 			{ code: false, text: 'A ' },
@@ -144,6 +168,7 @@ describe('dropPluginBlocks', () => {
 		const blocks = ['dataview', 'dataviewjs', 'tasks', 'query', 'base'].map((language) => `\`\`\`${language}\nLIST FROM #x\n\`\`\`\n`).join('\nText.\n');
 		expect(dropPluginBlocks(blocks)).toBe('\nText.\n'.repeat(4));
 		expect(dropPluginBlocks('a\n~~~~ dataview\nTABLE x\n~~~~\nb')).toBe('a\nb');
+		expect(dropPluginBlocks('> [!info]\n> ```dataview\n> LIST\n> ```\n')).toBe('> [!info]\n');
 	});
 
 	it('keeps the block after one it drops, and every other language', () => {

@@ -116,9 +116,13 @@ function segmentCode(text: string): string[] {
 	return segments(text)
 		.filter((segment) => segment.code)
 		.map((segment) => {
-			const lines = segment.text.replace(/\n$/, '').split('\n');
-			if (/^ {0,3}(`{3,}|~{3,})/.test(lines[0] ?? '') && lines.length > 1) {
-				const closed = /^ {0,3}(`{3,}|~{3,})\s*$/.test(lines.at(-1) ?? '');
+			// Without the `>` of the quotes a block is in, which is not its code;
+			// a `>` inside the code is.
+			const depth = (/^(?:[ \t]*>)*/.exec(segment.text)?.[0] ?? '').split('>').length - 1;
+			const quote = new RegExp(`^(?:[ \\t]*>){${depth}}`);
+			const lines = segment.text.replace(/\n$/, '').split('\n').map((line) => line.replace(quote, ''));
+			if (/^[ \t]*(`{3,}|~{3,})/.test(lines[0] ?? '')) {
+				const closed = /^[ \t]*(`{3,}|~{3,})\s*$/.test(lines.at(-1) ?? '');
 				return lines.slice(1, closed ? -1 : undefined).join('\n').trim();
 			}
 			// In a table cell, CommonMark takes `\|` in code for `|`.

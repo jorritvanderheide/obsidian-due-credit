@@ -13,10 +13,19 @@ export interface Segment {
 	text: string;
 }
 
-// A backtick fence's info string holds no backtick, so a line such as
+// A fence, after the `>` of the quotes it is in and its indentation in a list
+// item. A backtick fence's info string holds no backtick, so a line such as
 // ```` ```npm i``` installs it ```` opens with inline code, as in CommonMark and
-// pandoc.
-const FENCE = /^ {0,3}(`{3,}(?=[^`]*$)|~{3,})/;
+// pandoc. Indented four spaces or more at the top level, a fence is inside an
+// indented code block, and code either way.
+const FENCE = /^((?:[ \t]*>)*)([ \t]*)(`{3,}(?=[^`]*$)|~{3,})/;
+
+/** How many quotes a line is in. */
+const quotes = (line: string) => (/^(?:[ \t]*>)*/.exec(line)?.[0] ?? '').split('>').length - 1;
+/** How far a line is indented, a tab as four spaces. */
+const indent = (line: string) => (/^[ \t]*/.exec(line)?.[0] ?? '').replace(/\t/g, '    ').length;
+// A list item's marker, and the spaces up to its content.
+const ITEM = /^([ \t]*)([-*+]|\d{1,9}[.)])([ \t]+)\S/;
 // A line that starts a block of its own, which a code span cannot cross into.
 const BLOCK_START = /^ {0,3}(?:#{1,6}(?:[ \t]|$)|>|[-*+][ \t]|\d{1,9}[.)][ \t]|\|)/;
 
@@ -34,6 +43,14 @@ const BLOCK_START = /^ {0,3}(?:#{1,6}(?:[ \t]|$)|>|[-*+][ \t]|\d{1,9}[.)][ \t]|\
  * of its own: a heading, a quote, a list item or a table row. An indented code
  * block is not code here, since telling it from an indented paragraph in a
  * list needs the list; read as text, it only loses what text loses.
+ *
+ * A fence in a quote or a list item ends with it, closed or not, as in
+ * CommonMark: at a line in fewer quotes, or at one indented less than the
+ * content of the list item the fence is indented into. Read on as code, the
+ * rest of the note would keep its comments. Which item that is takes the list
+ * items read so far, with their lazy lines: a fence merely indented a little is
+ * not in one, and a guess from its indentation alone ends it too early, after
+ * which its closing fence opens one, and the text after it is taken for code.
  */
 export function segments(text: string, inline = true): Segment[] {
 	const out: Segment[] = [];
@@ -44,7 +61,13 @@ export function segments(text: string, inline = true): Segment[] {
 		else out.push({ code, text: part });
 	};
 
-	let fence: string | null = null;
+	// The fence being read: its marker, the quotes it is in, and the content
+	// column of the list item it is in, or null at the top level.
+	let fence: { marker: string; quotes: number; item: number | null } | null = null;
+	// The content columns of the list items open around the line, innermost
+	// last, and whether a line may still continue the last one's paragraph.
+	const items: number[] = [];
+	let lazy = false;
 	// The lines of the paragraph being read, for spans that cross a line break.
 	let paragraph = '';
 	const flush = () => {
@@ -52,18 +75,37 @@ export function segments(text: string, inline = true): Segment[] {
 		paragraph = '';
 	};
 	for (const line of text.split(/(?<=\n)/)) {
-		const marker = FENCE.exec(line)?.[1];
+		const blank = line.trim() === '';
+		if (fence !== null && !blank) {
+			// The quote or the list item the block was in has ended.
+			if (quotes(line) < fence.quotes || (fence.item !== null && indent(line) < fence.item)) fence = null;
+		}
+		const marker = FENCE.exec(line)?.[3];
 		if (fence !== null) {
 			push(true, line);
-			if (marker && marker[0] === fence[0] && marker.length >= fence.length && line.trim() === marker) fence = null;
-		} else if (marker) {
+			const closing = line.replace(/^(?:[ \t]*>)*/, '').trim();
+			if (marker && marker[0] === fence.marker[0] && marker.length >= fence.marker.length && closing === marker) fence = null;
+			continue;
+		}
+
+		const item = ITEM.exec(line);
+		if (blank) lazy = false;
+		else if (item) {
+			while (items.length > 0 && items[items.length - 1]! > indent(line)) items.pop();
+			items.push((item[1]! + item[2]! + item[3]!).replace(/\t/g, '    ').length);
+			lazy = !marker;
+		} else if (!lazy || marker) {
+			while (items.length > 0 && items[items.length - 1]! > indent(line)) items.pop();
+			lazy = !marker && items.length > 0;
+		}
+
+		if (marker) {
 			flush();
-			fence = marker;
+			fence = { marker, quotes: quotes(line), item: items[items.length - 1] ?? null };
 			// A segment of its own, even right after another block, so that a
 			// block can be told by its opening line.
 			out.push({ code: true, text: line });
 		} else if (inline) {
-			const blank = line.trim() === '';
 			if (blank || BLOCK_START.test(line)) flush();
 			paragraph += line;
 			if (blank) flush();
@@ -176,7 +218,7 @@ export function stripComments(text: string): string {
 	return out;
 }
 
-const PLUGIN_BLOCK = /^ {0,3}(?:`{3,}|~{3,})[ \t]*(?:dataview|dataviewjs|tasks|query|base)(?![\w-])/;
+const PLUGIN_BLOCK = /^(?:[ \t]*>)*[ \t]*(?:`{3,}|~{3,})[ \t]*(?:dataview|dataviewjs|tasks|query|base)(?![\w-])/;
 
 /**
  * The note without the code blocks that plugins draw: Dataview, Tasks, search
