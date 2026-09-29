@@ -95,7 +95,7 @@ export interface Run {
  */
 export function pandocArgs(format: Format, run: Run): string[] {
 	const args = [
-		'--from=markdown+wikilinks_title_after_pipe-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote',
+		'--from=markdown+wikilinks_title_after_pipe+mark-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote',
 		`--metadata-file=${run.metadata}`,
 		`--lua-filter=${run.obsidian}`,
 		`--lua-filter=${run.filter}`,
@@ -116,8 +116,8 @@ export function pandocArgs(format: Format, run: Run): string[] {
 	if (format === 'pdf') args.push('--pdf-engine=xelatex');
 	if (format === 'md') {
 		// Text for pasting elsewhere, so none of pandoc's own syntax: no `{=html}`
-		// or `{#id .class}`, no divs or spans.
-		args.push('--to=markdown-bracketed_spans-fenced_divs-native_divs-native_spans-raw_html-raw_attribute-header_attributes');
+		// or `{#id .class}`, no divs or spans. Highlights as Obsidian writes them.
+		args.push('--to=markdown+mark-bracketed_spans-fenced_divs-native_divs-native_spans-raw_html-raw_attribute-header_attributes');
 		args.push('--standalone', `--template=${run.template}`, '--shift-heading-level-by=1');
 	}
 

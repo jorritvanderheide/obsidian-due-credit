@@ -31,7 +31,7 @@ describe('pandocArgs', () => {
 	it('runs the filter before citeproc, which can only cite what the filter made', () => {
 		const args = pandocArgs('docx', run);
 		expect(args.indexOf('--lua-filter=/tmp/f.lua')).toBeLessThan(args.indexOf('--citeproc'));
-		expect(args[0]).toBe('--from=markdown+wikilinks_title_after_pipe-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote');
+		expect(args[0]).toBe('--from=markdown+wikilinks_title_after_pipe+mark-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote');
 		expect(args.indexOf('--lua-filter=/tmp/o.lua')).toBeLessThan(args.indexOf('--lua-filter=/tmp/f.lua'));
 		expect(args).toContain('--metadata-file=/tmp/m.json');
 		expect(args.at(-1)).toBe('--output=/out/n.docx');
@@ -52,7 +52,7 @@ describe('pandocArgs', () => {
 	});
 
 	it('keeps pandoc syntax out of a Markdown export', () => {
-		expect(pandocArgs('md', run).find((arg) => arg.startsWith('--to='))).toMatch(/-raw_html-raw_attribute-header_attributes$/);
+		expect(pandocArgs('md', run).find((arg) => arg.startsWith('--to='))).toMatch(/^--to=markdown\+mark-.*-raw_html-raw_attribute-header_attributes$/);
 	});
 
 	it('puts a Markdown export under its title, References too', () => {

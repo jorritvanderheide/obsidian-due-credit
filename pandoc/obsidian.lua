@@ -40,3 +40,14 @@ function BlockQuote(quote)
   quote.content = blocks
   return quote
 end
+
+--- A highlight, `==text==`, which pandoc's `mark` extension reads as a span.
+--- A LaTeX body is pasted into a journal's class, which does not load the
+--- `soul` package its `\hl` needs, so there it is plain text. A PDF, which is
+--- `latex` to a filter too, keeps it: pandoc's own template loads `soul`.
+function Span(span)
+  if not span.classes:includes('mark') or FORMAT ~= 'latex' then return nil end
+  local output = (PANDOC_STATE.output_file or ''):lower()
+  if output:match('%.pdf$') then return nil end
+  return span.content
+end

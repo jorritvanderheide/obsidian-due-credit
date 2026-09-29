@@ -35,6 +35,9 @@ Obsidian:
   code block is left out. Exported, it would only be its query.
 - **Callouts.** `> [!note] Title` is a quote with its title in bold on the
   first line; a callout without a title is a plain quote.
+- **Highlights.** `==text==` is highlighted in Word, PDF and Markdown. A LaTeX
+  body has it as plain text, since a journal's class does not load what `\hl`
+  needs.
 - **Tags.** A line of `#tags` is left out, and a tag in a sentence stays as its
   word: `#project/alpha` is "project/alpha".
 

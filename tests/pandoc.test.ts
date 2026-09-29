@@ -166,6 +166,22 @@ describe.skipIf(!installed())('obsidian.lua', () => {
 	});
 });
 
+describe.skipIf(!installed())('a highlight', () => {
+	const exported = (format: 'md' | 'tex') => {
+		const output = join(dir, `marked.${format}`);
+		execFileSync('pandoc', pandocArgs(format, { obsidian, filter, afterCiteproc, template, metadata, bibliography: bib, csl: null, resourcePath: dir, output }), { input: 'Some ==marked== text.\n' });
+		return readFileSync(output, 'utf8');
+	};
+
+	it('stays one in Markdown', () => {
+		expect(exported('md')).toBe('Some ==marked== text.\n');
+	});
+
+	it('is plain text in a LaTeX body, whose class need not load soul', () => {
+		expect(exported('tex')).toBe('Some marked text.\n');
+	});
+});
+
 describe.skipIf(!installed())('a markdown link', () => {
 	it('to a heading by its pandoc ID stays a link', () => {
 		const output = join(dir, 'anchor.md');
