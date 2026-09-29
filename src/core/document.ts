@@ -83,6 +83,8 @@ export interface Run {
 	hardLineBreaks: boolean;
 	/** The Word template, on disk, or null for pandoc's own styles. */
 	referenceDoc: string | null;
+	/** Pandoc arguments of your own, from `splitArgs`, none of them `refused`. */
+	extra: string[];
 	output: string;
 }
 
@@ -117,15 +119,6 @@ export function pandocArgs(format: Format, run: Run): string[] {
 	];
 	if (run.bibliography) args.push(`--bibliography=${run.bibliography}`);
 	args.push(`--resource-path=${run.resourcePath}`);
-
-	if (styled(format)) {
-		// Citeproc needs the paths, and the file never does: the Word writer
-		// would keep them as properties, user name and all.
-		args.push('--citeproc', `--lua-filter=${run.afterCiteproc}`);
-		if (run.csl) args.push(`--csl=${run.csl}`);
-	} else {
-		args.push('--natbib', '--to=latex');
-	}
 	if (format === 'docx' && run.referenceDoc) args.push(`--reference-doc=${run.referenceDoc}`);
 	// xelatex rather than pandoc's default pdflatex, which stops at any Unicode
 	// character its input encoding has not been set up for.
@@ -137,6 +130,87 @@ export function pandocArgs(format: Format, run: Run): string[] {
 		args.push('--standalone', `--template=${run.template}`, '--shift-heading-level-by=1');
 	}
 
+	// Yours after these, so an option of yours wins over its default here, and
+	// before citeproc, so a filter of yours, such as pandoc-crossref, runs where
+	// it has to: after these filters and before citations are rendered.
+	args.push(...run.extra);
+
+	if (styled(format)) {
+		// Citeproc needs the paths, and the file never does: the Word writer
+		// would keep them as properties, user name and all.
+		args.push('--citeproc', `--lua-filter=${run.afterCiteproc}`);
+		if (run.csl) args.push(`--csl=${run.csl}`);
+	} else {
+		args.push('--natbib', '--to=latex');
+	}
+
 	args.push(`--output=${run.output}`);
 	return args;
+}
+
+/**
+ * The Pandoc arguments setting, as arguments: split at spaces, with quotes,
+ * single or double, holding a value with spaces together, and `~` at the start
+ * of a path as the home folder. A backslash is only a backslash, so a Windows
+ * path is written as it is.
+ */
+export function splitArgs(value: string, home: string): string[] {
+	const args: string[] = [];
+	let arg: string | null = null;
+	let quote: string | null = null;
+	for (const char of value) {
+		if (quote !== null) {
+			if (char === quote) quote = null;
+			else arg += char;
+		} else if (char === '"' || char === "'") {
+			quote = char;
+			arg ??= '';
+		} else if (/\s/.test(char)) {
+			if (arg !== null) args.push(arg);
+			arg = null;
+		} else {
+			arg = (arg ?? '') + char;
+		}
+	}
+	if (arg !== null) args.push(arg);
+	return args.map((each) => each.replace(/^~(?=\/|$)/, home).replace(/^(--[\w-]+=)~(?=\/)/, `$1${home}`));
+}
+
+// What Due Credit decides itself, or what would break a promise it makes, and
+// why, by the options that do it: long ones by name, short ones with or
+// without their value attached.
+const REFUSED: [string[], string][] = [
+	[['-o', '--output'], 'the save dialog decides where the export goes, and that it is not in the vault'],
+	[['-f', '-r', '--from', '--read'], 'the note is read the way Obsidian writes it'],
+	[['-t', '-w', '--to', '--write'], 'the export command decides the format'],
+	[['-d', '--defaults'], 'a defaults file can set any of what Due Credit decides'],
+	[['--extract-media', '--log'], 'it writes a file of its own, which could be in the vault'],
+	[['-h', '--help', '-v', '--version', '-D', '--print-default-template', '--print-default-data-file', '--print-highlight-style', '--list-input-formats', '--list-output-formats', '--list-extensions', '--list-highlight-languages', '--list-highlight-styles', '--dump-args', '--bash-completion'], 'it prints something and exports nothing'],
+];
+
+/** The first argument Due Credit will not pass on, and why, or null. */
+export function refused(args: string[]): { arg: string; why: string } | null {
+	for (const arg of args) {
+		for (const [options, why] of REFUSED) {
+			const hit = options.some((option) =>
+				option.startsWith('--') ? arg === option || arg.startsWith(`${option}=`) : !arg.startsWith('--') && arg.startsWith(option),
+			);
+			if (hit) return { arg, why };
+		}
+	}
+	return null;
+}
+
+/**
+ * The files pandoc would read instead of the note, from `pandoc --dump-args`
+ * with the extra arguments: the output on its first line, then the inputs, `-`
+ * for standard input. A word pandoc does not take as an option's value is a
+ * file to read, and the export would be of that file.
+ */
+export function inputFiles(dump: string): string[] {
+	return dump
+		.split(/\r?\n/)
+		.slice(1)
+		.map((line) => line.trim())
+		.filter((line) => line !== '' && line !== '-');
 }

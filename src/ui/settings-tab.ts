@@ -2,6 +2,7 @@ import { existsSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import { FileSystemAdapter, PluginSettingTab, type App, type SettingDefinitionItem } from 'obsidian';
+import { refused, splitArgs } from '../core/document';
 import { loadSettings, type Settings } from '../core/settings';
 import { settingPath, cslPath, expandHome } from '../core/paths';
 import type DueCredit from '../main';
@@ -36,6 +37,11 @@ export class SettingsTab extends PluginSettingTab {
 		return existsSync(path) ? '' : ` ⚠ There is no file at ${path}, so ${stops} until it is fixed or cleared.`;
 	}
 
+	private argsStatus(): string {
+		const refusal = refused(splitArgs(this.plugin.settings.extraArgs, homedir()));
+		return refusal ? ` ⚠ ${refusal.arg} is not passed on, so exports stop until it is removed: ${refusal.why}.` : '';
+	}
+
 	private cslStatus(): string {
 		const value = this.plugin.settings.csl;
 		if (value === '') return '';
@@ -54,6 +60,13 @@ export class SettingsTab extends PluginSettingTab {
 						name: 'Pandoc',
 						desc: 'The pandoc program: its name if it is on your PATH, or its full path. PDF export also needs xelatex, which comes with any TeX distribution.',
 						control: { type: 'text', key: 'pandocPath', placeholder: 'pandoc' },
+					},
+					{
+						name: 'Pandoc arguments',
+						desc:
+							'Added to every export, such as --toc, --number-sections, -V geometry:margin=2.5cm or --filter pandoc-crossref. A filter runs after Due Credit’s and before citations are rendered. Quotes keep a value with spaces together, ~ is your home folder, and a relative path is from the vault. What Due Credit decides stays its own: where the file goes, what it reads, and the format.' +
+							this.argsStatus(),
+						control: { type: 'text', key: 'extraArgs', placeholder: '--toc --number-sections' },
 					},
 					{
 						name: 'Output folder',

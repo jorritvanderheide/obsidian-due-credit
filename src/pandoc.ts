@@ -1,5 +1,5 @@
 // Running pandoc: the one program this plugin talks to.
-import { spawn } from 'child_process';
+import { execFile, spawn } from 'child_process';
 import { mkdtemp, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -41,6 +41,17 @@ export async function withFiles<T>(
 	} finally {
 		await rm(dir, { recursive: true, force: true });
 	}
+}
+
+/** What pandoc makes of arguments: where it would write, then what it would read, from `--dump-args`. */
+export function dumpArgs(executable: string, args: string[], cwd: string): Promise<string> {
+	return new Promise((resolve, reject) => {
+		execFile(executable, ['--dump-args', ...args], { cwd }, (error: (Error & { code?: unknown }) | null, stdout: string, stderr: string) => {
+			if (error === null) resolve(stdout);
+			else if (error.code === 'ENOENT') reject(new ExportError(`Pandoc was not found at "${executable}". Install it, or set its path in the Due Credit settings.`));
+			else reject(new ExportError(`Pandoc does not take the Pandoc arguments setting: ${stderr.trim() || error.message}`));
+		});
+	});
 }
 
 /** Run pandoc with `input` on stdin. Resolves to what it warned about, if anything. */

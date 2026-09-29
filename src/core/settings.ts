@@ -52,6 +52,11 @@ export interface Settings {
 	 * a path the way the bibliography's is. Empty is pandoc's own styles.
 	 */
 	referenceDoc: string;
+	/**
+	 * Pandoc arguments of your own, added to every export, as `splitArgs` reads
+	 * them. Empty adds none.
+	 */
+	extraArgs: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -64,6 +69,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	keyProperty: 'citekey',
 	csl: '',
 	referenceDoc: '',
+	extraArgs: '',
 };
 
 function text(value: unknown): string | undefined {
@@ -77,12 +83,12 @@ function text(value: unknown): string | undefined {
  * Trimmed, because a stray space in a path is a silent miss. A blanked address
  * falls back to its default rather than pointing at nothing, except where
  * empty is an answer: no bibliography, the built-in style, pandoc's own Word
- * styles, and no export yet.
+ * styles, no arguments of your own, and no export yet.
  */
 export function loadSettings(data: unknown): Settings {
 	const saved = (data ?? {}) as Record<string, unknown>;
 	const address = (key: 'pandocPath' | 'outputFolder' | 'literatureFolder' | 'keyProperty') => text(saved[key]) || DEFAULT_SETTINGS[key];
-	const optional = (key: 'lastFolder' | 'bibliography' | 'csl' | 'referenceDoc') => text(saved[key]) ?? DEFAULT_SETTINGS[key];
+	const optional = (key: 'lastFolder' | 'bibliography' | 'csl' | 'referenceDoc' | 'extraArgs') => text(saved[key]) ?? DEFAULT_SETTINGS[key];
 
 	return {
 		version: SETTINGS_VERSION,
@@ -94,6 +100,7 @@ export function loadSettings(data: unknown): Settings {
 		keyProperty: address('keyProperty'),
 		csl: optional('csl'),
 		referenceDoc: optional('referenceDoc'),
+		extraArgs: optional('extraArgs'),
 	};
 }
 

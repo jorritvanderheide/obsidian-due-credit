@@ -6,11 +6,11 @@ import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
 import { bibKeys } from '../core/citations';
-import { FORMATS, lineBreaks, pandocArgs, styled, type Format } from '../core/document';
+import { FORMATS, inputFiles, lineBreaks, pandocArgs, refused, splitArgs, styled, type Format } from '../core/document';
 import { settingPath, cslPath, expandHome, insideVault, withExtension } from '../core/paths';
 import { prepare, type Missing, type Vault } from '../core/prepare';
 import { startFolder } from '../core/settings';
-import { ExportError, run, withFiles } from '../pandoc';
+import { dumpArgs, ExportError, run, withFiles } from '../pandoc';
 import { confirm } from '../ui/confirm';
 import type { Context } from '../context';
 
@@ -34,6 +34,16 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const csl = settings.csl && styled(format) ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;
 	if (csl && !existsSync(csl)) {
 		throw new ExportError(`There is no citation style at ${csl}. Use the name of a style Zotero has installed, such as apa, or the path to a .csl file.`);
+	}
+
+	// Arguments of your own, except what Due Credit decides, and no file of
+	// yours that pandoc would read in place of the note.
+	const extra = splitArgs(settings.extraArgs, home);
+	const refusal = refused(extra);
+	if (refusal) throw new ExportError(`The Pandoc arguments setting has ${refusal.arg}, which Due Credit does not pass on: ${refusal.why}.`);
+	const inputs = extra.length > 0 ? inputFiles(await dumpArgs(settings.pandocPath, extra, vault)) : [];
+	if (inputs.length > 0) {
+		throw new ExportError(`The Pandoc arguments setting has ${inputs.join(', ')}, which pandoc would export in place of the note. Give it as an option's value, or leave it out.`);
 	}
 
 	// The editor rather than the file when the note is open, since the file
@@ -102,6 +112,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 					resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),
 					hardLineBreaks: lineBreaks(appConfig),
 					referenceDoc,
+					extra,
 					output,
 				}),
 				markdown,

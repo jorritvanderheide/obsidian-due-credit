@@ -141,6 +141,7 @@ None has a hotkey, so pick your own.
 | Setting | Default | |
 | --- | --- | --- |
 | **Pandoc** | `pandoc` | Its name if it is on your PATH, or its full path. |
+| **Pandoc arguments** | None | Added to every export, such as `--toc`, `--number-sections`, `-V geometry:margin=2.5cm` or `--filter pandoc-crossref`. A filter runs after Due Credit's and before citations are rendered. Quotes keep a value with spaces together, and a relative path is from the vault. Where the file goes, what is read and the format stay Due Credit's: `-o`, `-f`, `-t` and a defaults file are refused. |
 | **Output folder** | `~/Documents` | Where the save dialog opens the first time. After that it opens where the last export went, until you change this. |
 | **Word template** | Pandoc's own | A `.docx` whose styles a Word export takes: fonts, headings and margins, as your university or journal wants them. A path in your vault, or outside it, starting with `/` or `~`. `pandoc -o reference.docx --print-default-data-file reference.docx` writes pandoc's own to start from. |
 | **Bibliography** | `Literature/library.bib` | The `.bib` file that decides which links are citations: a path in your vault, or one outside it, starting with `/` or `~`. Empty exports without citations. |
@@ -153,6 +154,11 @@ None has a hotkey, so pick your own.
 Due Credit reads your notes and writes nothing in the vault. It writes the file
 you choose in the save dialog, and refuses any place inside your vault, so a
 Markdown export cannot replace its own note. It runs pandoc and nothing else.
+
+What you add in **Pandoc arguments** is yours: a filter of your own can do
+anything with the note, and `-M` puts a value of your own in the file. Due
+Credit refuses only an argument that would change where the file goes, what is
+read, or the format.
 
 ## Development
 

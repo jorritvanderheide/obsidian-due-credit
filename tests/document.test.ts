@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { documentMetadata, lineBreaks, pandocArgs, styled, type Run } from '../src/core/document';
+import { documentMetadata, inputFiles, lineBreaks, pandocArgs, refused, splitArgs, styled, type Run } from '../src/core/document';
 
 describe('documentMetadata', () => {
 	it('takes the title from the heading first, then the property, then the name', () => {
@@ -32,8 +32,49 @@ describe('lineBreaks', () => {
 	});
 });
 
+describe('splitArgs', () => {
+	it('splits at spaces, keeping a quoted value together', () => {
+		expect(splitArgs(' --toc  -V "geometry:margin=2.5cm" -M \'title=A B\' ', '/home/a')).toEqual(['--toc', '-V', 'geometry:margin=2.5cm', '-M', 'title=A B']);
+		expect(splitArgs('', '/home/a')).toEqual([]);
+		expect(splitArgs('-M title=""', '/home/a')).toEqual(['-M', 'title=']);
+	});
+
+	it('reads ~ at the start of a path as the home folder, and a backslash as itself', () => {
+		expect(splitArgs('--lua-filter=~/f.lua --filter ~/bin/x --csl=C:\\s\\apa.csl a~b', '/home/a')).toEqual([
+			'--lua-filter=/home/a/f.lua',
+			'--filter',
+			'/home/a/bin/x',
+			'--csl=C:\\s\\apa.csl',
+			'a~b',
+		]);
+	});
+});
+
+describe('refused', () => {
+	it('refuses what Due Credit decides, with or without a value attached', () => {
+		for (const arg of ['-o', '-oout.docx', '--output=x.docx', '-f', '-fmarkdown', '--from=gfm', '--read', '-t', '-tdocx', '--to=html', '-w', '-d', '--defaults=x.yaml', '--extract-media=m', '--log=l.json', '--help', '-v', '--list-extensions=markdown', '--dump-args', '-D']) {
+			expect(refused(['--toc', arg])?.arg).toBe(arg);
+		}
+	});
+
+	it('passes on everything else, including options that only look alike', () => {
+		expect(refused(['--toc', '--toc-depth=2', '-V', 'x=1', '-N', '--number-sections', '--filter', 'pandoc-crossref', '--pdf-engine=lualatex', '--top-level-division=chapter', '-M', 'lang=nl'])).toBeNull();
+	});
+
+	it('says why', () => {
+		expect(refused(['-o', 'x'])?.why).toContain('save dialog');
+	});
+});
+
+describe('inputFiles', () => {
+	it('reads the files after the output, and not standard input', () => {
+		expect(inputFiles('-\n-\n')).toEqual([]);
+		expect(inputFiles('-\nnotes.md\n')).toEqual(['notes.md']);
+	});
+});
+
 describe('pandocArgs', () => {
-	const run: Run = { obsidian: '/tmp/o.lua', filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, hardLineBreaks: false, referenceDoc: null, resourcePath: '/v', output: '/out/n.docx' };
+	const run: Run = { obsidian: '/tmp/o.lua', filter: '/tmp/f.lua', afterCiteproc: '/tmp/a.lua', template: '/tmp/t.md', metadata: '/tmp/m.json', bibliography: '/v/lib.bib', csl: null, hardLineBreaks: false, referenceDoc: null, extra: [], resourcePath: '/v', output: '/out/n.docx' };
 
 	it('runs the filter before citeproc, which can only cite what the filter made', () => {
 		const args = pandocArgs('docx', run);
@@ -59,6 +100,16 @@ describe('pandocArgs', () => {
 		expect(pandocArgs('docx', { ...run, referenceDoc: '/t/uni.docx' })).toContain('--reference-doc=/t/uni.docx');
 		expect(pandocArgs('pdf', { ...run, referenceDoc: '/t/uni.docx' }).some((arg) => arg.startsWith('--reference-doc'))).toBe(false);
 		expect(pandocArgs('docx', run).some((arg) => arg.startsWith('--reference-doc'))).toBe(false);
+	});
+
+	it('puts your arguments after its own options and before citeproc', () => {
+		const args = pandocArgs('pdf', { ...run, extra: ['--pdf-engine=lualatex', '--filter', 'pandoc-crossref'] });
+		expect(args.indexOf('--pdf-engine=lualatex')).toBeGreaterThan(args.indexOf('--pdf-engine=xelatex'));
+		expect(args.indexOf('--filter')).toBeGreaterThan(args.indexOf('--lua-filter=/tmp/f.lua'));
+		expect(args.indexOf('--filter')).toBeLessThan(args.indexOf('--citeproc'));
+		expect(args.at(-1)).toBe('--output=/out/n.docx');
+		const tex = pandocArgs('tex', { ...run, extra: ['--toc'] });
+		expect(tex.indexOf('--toc')).toBeLessThan(tex.indexOf('--natbib'));
 	});
 
 	it('passes a style when there is one', () => {

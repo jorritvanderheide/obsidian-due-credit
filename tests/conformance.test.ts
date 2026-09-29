@@ -38,7 +38,7 @@ function parse(from: string, text: string): Node[] {
 }
 
 /** The export's reader, from `pandocArgs`, so the two cannot drift apart. */
-const OURS = pandocArgs('md', { obsidian: '', filter: '', afterCiteproc: '', template: '', metadata: '', bibliography: null, csl: null, resourcePath: '', hardLineBreaks: false, referenceDoc: null, output: '' })[0]!.slice('--from='.length);
+const OURS = pandocArgs('md', { obsidian: '', filter: '', afterCiteproc: '', template: '', metadata: '', bibliography: null, csl: null, resourcePath: '', hardLineBreaks: false, referenceDoc: null, extra: [], output: '' })[0]!.slice('--from='.length);
 const COMMONMARK = 'commonmark_x+wikilinks_title_after_pipe';
 
 /** Words, roughly, for saying where a difference is. */
