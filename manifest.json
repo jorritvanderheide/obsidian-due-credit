@@ -1,0 +1,11 @@
+{
+	"id": "exporter",
+	"name": "Exporter",
+	"version": "0.1.0",
+	"minAppVersion": "1.13.0",
+	"description": "Export notes with [[citekey]] links as citations.",
+	"author": "Jorrit van der Heide",
+	"authorUrl": "https://github.com/jorritvanderheide",
+	"fundingUrl": "https://liberapay.com/BW20",
+	"isDesktopOnly": true
+}
