@@ -4,12 +4,12 @@ import { join } from 'path';
 import { PluginSettingTab, type App, type SettingDefinitionItem } from 'obsidian';
 import { loadSettings, type Settings } from '../core/settings';
 import { cslPath, expandHome } from '../core/paths';
-import type SignOff from '../main';
+import type DueCredit from '../main';
 
 export class SettingsTab extends PluginSettingTab {
 	constructor(
 		app: App,
-		private readonly plugin: SignOff,
+		private readonly plugin: DueCredit,
 	) {
 		super(app, plugin);
 	}

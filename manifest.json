@@ -1,6 +1,6 @@
 {
-	"id": "sign-off",
-	"name": "Sign Off",
+	"id": "due-credit",
+	"name": "Due Credit",
 	"version": "0.1.0",
 	"minAppVersion": "1.13.0",
 	"description": "Export notes with [[citekey]] links as citations.",

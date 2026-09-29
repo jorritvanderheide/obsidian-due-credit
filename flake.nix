@@ -1,5 +1,5 @@
 {
-  description = "Sign Off Obsidian plugin";
+  description = "Due Credit Obsidian plugin";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -21,7 +21,7 @@
           inherit (package) version;
           src = ./.;
           # Update with: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
-          npmDepsHash = "sha256-NGwxa9aVn/JpyrL5jzIFSw4uya9HRc7oTqkGFf1JlQM=";
+          npmDepsHash = "sha256-U4LihMfjMxs1niG3rqTQfWKMrFowtLAm8hkKG7axwaU=";
           nodejs = pkgs.nodejs_24;
           installPhase = ''
             mkdir -p $out

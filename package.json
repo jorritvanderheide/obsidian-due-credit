@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-sign-off",
+	"name": "obsidian-due-credit",
 	"version": "0.1.0",
 	"description": "Export notes with [[citekey]] links as citations.",
 	"main": "main.js",

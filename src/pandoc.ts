@@ -15,7 +15,7 @@ export class ExportError extends Error {}
  * filter is bundled into it as text and written out for each export.
  */
 export async function withFilter<T>(use: (filter: string) => Promise<T>): Promise<T> {
-	const dir = await mkdtemp(join(tmpdir(), 'obsidian-sign-off-'));
+	const dir = await mkdtemp(join(tmpdir(), 'obsidian-due-credit-'));
 	try {
 		const filter = join(dir, 'wikilink-citations.lua');
 		await writeFile(filter, citations);
@@ -37,7 +37,7 @@ export function run(executable: string, args: string[], input: string, cwd: stri
 		child.on('error', (error: NodeJS.ErrnoException) => {
 			reject(
 				error.code === 'ENOENT'
-					? new ExportError(`Pandoc was not found at "${executable}". Install it, or set its path in the Sign Off settings.`)
+					? new ExportError(`Pandoc was not found at "${executable}". Install it, or set its path in the Due Credit settings.`)
 					: error,
 			);
 		});

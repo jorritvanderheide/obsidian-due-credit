@@ -1,4 +1,4 @@
-# Sign Off
+# Due Credit
 
 [![Donate](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/BW20)
 
@@ -6,7 +6,7 @@
 
 In the vault a citation is a link, `[[citekey]]`: it opens the paper, previews
 on hover and puts every use of a source in its backlinks. Outside the vault it
-is a dead link to a file on your laptop. Sign Off runs pandoc on the note you
+is a dead link to a file on your laptop. Due Credit runs pandoc on the note you
 have open and turns those links into real citations with a reference list, in
 the style you choose, in a file you can send.
 
@@ -82,7 +82,7 @@ without the plugin too.
 ## Installation
 
 Download `main.js` and `manifest.json` from the latest release into
-`.obsidian/plugins/sign-off/` in your vault, then enable **Sign Off** under
+`.obsidian/plugins/due-credit/` in your vault, then enable **Due Credit** under
 Settings → Community plugins.
 
 ## Commands
@@ -109,7 +109,7 @@ None has a hotkey, so pick your own.
 
 ## Safety
 
-Sign Off reads your notes and writes nothing in the vault. It writes the file
+Due Credit reads your notes and writes nothing in the vault. It writes the file
 you choose in the save dialog, and refuses one that is already a file in your
 vault, so a Markdown export cannot replace its own note. It runs pandoc and
 nothing else.

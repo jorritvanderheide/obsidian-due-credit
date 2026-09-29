@@ -16,7 +16,7 @@ function installed(): boolean {
 	}
 }
 
-const dir = mkdtempSync(join(tmpdir(), 'sign-off-test-'));
+const dir = mkdtempSync(join(tmpdir(), 'due-credit-test-'));
 const filter = join(process.cwd(), 'pandoc', 'wikilink-citations.lua');
 const bib = join(dir, 'library.bib');
 writeFileSync(bib, '@article{a,\n  author = {A, Ann},\n  title = {First},\n  year = {2024}\n}\n@article{b,\n  author = {B, Bob},\n  title = {Second},\n  year = {2025}\n}\n');

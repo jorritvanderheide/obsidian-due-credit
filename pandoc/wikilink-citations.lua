@@ -17,7 +17,7 @@
 --- - Neighbouring citations share brackets: `[[a#p. 12]]; [[b#p. 3]]` is
 ---   "(A 2024, 12; B 2025, 3)", as `[@a, p. 12; @b, p. 3]` would be.
 ---
---- The Sign Off plugin bundles this and runs it. By hand, the order matters:
+--- The Due Credit plugin bundles this and runs it. By hand, the order matters:
 ---
 ---   pandoc chapter.md \
 ---     --from=markdown+wikilinks_title_after_pipe \
