@@ -128,6 +128,12 @@ describe('pandocArgs', () => {
 		expect(pandocArgs('docx', run).some((arg) => arg.startsWith('--variable'))).toBe(false);
 	});
 
+	it('sets a PDF left-aligned, with one space after a full stop', () => {
+		const args = pandocArgs('pdf', { ...run, extra: ['-V', 'mainfont=Arial'] });
+		expect(args).toEqual(expect.arrayContaining(['--variable=header-includes=\\frenchspacing', '--variable=header-includes=\\raggedright']));
+		expect(pandocArgs('docx', run).some((arg) => arg.includes('header-includes'))).toBe(false);
+	});
+
 	it('leaves the font to you when you choose one', () => {
 		const set = (extra: string[]) => pandocArgs('pdf', { ...run, extra }).includes('--variable=mainfont=OpenSans');
 		for (const extra of [['-V', 'mainfont=Arial'], ['-Vmainfont=Arial'], ['--variable=mainfont:Arial'], ['--variable', 'mainfont=Arial'], ['-M', 'mainfont=Arial'], ['--metadata=mainfont=Arial']]) {

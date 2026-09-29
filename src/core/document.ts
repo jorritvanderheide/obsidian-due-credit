@@ -130,6 +130,9 @@ export function pandocArgs(format: Format, run: Run): string[] {
 		// grey and soft on a screen. Bundled, because few machines have it and
 		// xelatex stops at a font it cannot find. A font of yours replaces it.
 		if (!choosesFont(run.extra)) args.push(...openSans(run.fonts));
+		// Left-aligned, where justifying stretches the spaces and hyphenates, and
+		// one space after a full stop or colon, where LaTeX puts a wider one.
+		args.push('--variable=header-includes=\\frenchspacing', '--variable=header-includes=\\raggedright');
 	}
 	if (format === 'md') {
 		// Text for pasting elsewhere, so none of pandoc's own syntax: no `{=html}`
