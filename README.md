@@ -31,6 +31,8 @@ Obsidian:
 - **Images.** `![[figure.png|300]]` is the file Obsidian shows, 300 pixels wide.
 - **Other embeds.** An embedded note, PDF or canvas is left out: it is for
   you, not your reader.
+- **Plugin blocks.** A `dataview`, `dataviewjs`, `tasks`, `query` or `base`
+  code block is left out. Exported, it would only be its query.
 
 ## Citations
 

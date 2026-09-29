@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { citeByKey, imageEmbeds, liftHeadings, segments, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../src/core/markdown';
+import { citeByKey, dropPluginBlocks, imageEmbeds, liftHeadings, segments, splitFrontmatter, stripBlockIds, stripComments, wikilinkTargets } from '../src/core/markdown';
 
 describe('segments', () => {
 	it('concatenates back to the note', () => {
@@ -40,6 +40,13 @@ describe('segments', () => {
 		expect(segments('\\\\`code`')).toEqual([
 			{ code: false, text: '\\\\' },
 			{ code: true, text: '`code`' },
+		]);
+	});
+
+	it('keeps each fenced block a segment of its own, even right after another', () => {
+		expect(segments('```a\nx\n```\n~~~b\ny\n~~~\n')).toEqual([
+			{ code: true, text: '```a\nx\n```\n' },
+			{ code: true, text: '~~~b\ny\n~~~\n' },
 		]);
 	});
 
@@ -109,6 +116,20 @@ describe('stripComments', () => {
 
 	it('hides code inside a comment', () => {
 		expect(stripComments('a %% `code` %% b')).toBe('a  b');
+	});
+});
+
+describe('dropPluginBlocks', () => {
+	it('drops a block in each plugin language, by either fence', () => {
+		const blocks = ['dataview', 'dataviewjs', 'tasks', 'query', 'base'].map((language) => `\`\`\`${language}\nLIST FROM #x\n\`\`\`\n`).join('\nText.\n');
+		expect(dropPluginBlocks(blocks)).toBe('\nText.\n'.repeat(4));
+		expect(dropPluginBlocks('a\n~~~~ dataview\nTABLE x\n~~~~\nb')).toBe('a\nb');
+	});
+
+	it('keeps the block after one it drops, and every other language', () => {
+		expect(dropPluginBlocks('```tasks\nnot done\n```\n```js\nx()\n```\n')).toBe('```js\nx()\n```\n');
+		const kept = '```dataviews\nx\n```\n```python\nquery = 1\n```\nA `dataview` query in prose.\n';
+		expect(dropPluginBlocks(kept)).toBe(kept);
 	});
 });
 

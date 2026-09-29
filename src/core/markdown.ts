@@ -23,6 +23,7 @@ const FENCE = /^ {0,3}(`{3,}(?=[^`]*$)|~{3,})/;
  *
  * Code is a fenced block, and with `inline` also a backtick span within a line.
  * Headings want fences only, so that what is not code is always whole lines.
+ * Each fenced block is a segment of its own, opening line first.
  */
 export function segments(text: string, inline = true): Segment[] {
 	const out: Segment[] = [];
@@ -41,7 +42,9 @@ export function segments(text: string, inline = true): Segment[] {
 			if (marker && marker[0] === fence[0] && marker.length >= fence.length && line.trim() === marker) fence = null;
 		} else if (marker) {
 			fence = marker;
-			push(true, line);
+			// A segment of its own, even right after another block, so that a
+			// block can be told by its opening line.
+			out.push({ code: true, text: line });
 		} else if (inline) {
 			spans(line, push);
 		} else {
@@ -150,6 +153,21 @@ export function stripComments(text: string): string {
 		}
 	}
 	return out;
+}
+
+const PLUGIN_BLOCK = /^ {0,3}(?:`{3,}|~{3,})[ \t]*(?:dataview|dataviewjs|tasks|query|base)(?![\w-])/;
+
+/**
+ * The note without the code blocks that plugins draw: Dataview, Tasks, search
+ * and Bases. Each is a view of the vault, and exported it is only its query.
+ * The whole block goes, told by the language on its opening line, and nothing
+ * inside it is read.
+ */
+export function dropPluginBlocks(text: string): string {
+	return segments(text, false)
+		.filter((segment) => !(segment.code && PLUGIN_BLOCK.test(segment.text)))
+		.map((segment) => segment.text)
+		.join('');
 }
 
 const BLOCK_ID = /(?:^|[ \t]+)\^[A-Za-z0-9-]+[ \t]*(?=\r?$)/gm;
