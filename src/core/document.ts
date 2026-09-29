@@ -55,6 +55,8 @@ export const MARKDOWN_TEMPLATE = '$if(title)$# $title$\n\n$endif$$body$\n';
 export interface Run {
 	/** The citation filter, on disk. */
 	filter: string;
+	/** The filter that clears the bibliography's and the style's paths after citeproc, on disk. */
+	afterCiteproc: string;
 	/** `MARKDOWN_TEMPLATE`, on disk. */
 	template: string;
 	/** The document's metadata, as JSON on disk. */
@@ -97,7 +99,9 @@ export function pandocArgs(format: Format, run: Run): string[] {
 	args.push(`--resource-path=${run.resourcePath}`);
 
 	if (styled(format)) {
-		args.push('--citeproc');
+		// Citeproc needs the paths, and the file never does: the Word writer
+		// would keep them as properties, user name and all.
+		args.push('--citeproc', `--lua-filter=${run.afterCiteproc}`);
 		if (run.csl) args.push(`--csl=${run.csl}`);
 	} else {
 		args.push('--natbib', '--to=latex');

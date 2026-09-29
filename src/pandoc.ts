@@ -3,6 +3,7 @@ import { spawn } from 'child_process';
 import { mkdtemp, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import afterCiteproc from '../pandoc/after-citeproc.lua';
 import citations from '../pandoc/wikilink-citations.lua';
 import { MARKDOWN_TEMPLATE } from './core/document';
 
@@ -10,25 +11,27 @@ import { MARKDOWN_TEMPLATE } from './core/document';
 export class ExportError extends Error {}
 
 /**
- * Call `use` with the citation filter, the Markdown template and the
- * document's metadata on disk, and clean up afterwards.
+ * Call `use` with the filters, the Markdown template and the document's
+ * metadata on disk, and clean up afterwards.
  *
- * Pandoc takes all three as paths. A plugin ships as one `main.js`, so the
- * filter and the template are bundled into it as text and written out for each
- * export. The metadata is JSON, which pandoc reads as the YAML it is.
+ * Pandoc takes all of them as paths. A plugin ships as one `main.js`, so the
+ * filters and the template are bundled into it as text and written out for
+ * each export. The metadata is JSON, which pandoc reads as the YAML it is.
  */
 export async function withFiles<T>(
 	metadata: Record<string, unknown>,
-	use: (files: { filter: string; template: string; metadata: string }) => Promise<T>,
+	use: (files: { filter: string; afterCiteproc: string; template: string; metadata: string }) => Promise<T>,
 ): Promise<T> {
 	const dir = await mkdtemp(join(tmpdir(), 'obsidian-due-credit-'));
 	try {
 		const files = {
 			filter: join(dir, 'wikilink-citations.lua'),
+			afterCiteproc: join(dir, 'after-citeproc.lua'),
 			template: join(dir, 'markdown.template'),
 			metadata: join(dir, 'metadata.json'),
 		};
 		await writeFile(files.filter, citations);
+		await writeFile(files.afterCiteproc, afterCiteproc);
 		await writeFile(files.template, MARKDOWN_TEMPLATE);
 		await writeFile(files.metadata, JSON.stringify(metadata));
 		return await use(files);
