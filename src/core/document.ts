@@ -89,9 +89,9 @@ export interface Run {
  * metadata in a file of its own: pandoc reads a block between `---` lines as
  * metadata wherever it is, and in the note that is text Obsidian shows, whose
  * keys would travel inside a Word file. The two table syntaxes Obsidian does
- * not have go too, since they read the same block as a table, and so does the
- * blank line pandoc wants before a quote, which Obsidian does not: a callout
- * inside a callout is a quote right after a line.
+ * not have go too, since they read the same block as a table, and so do the
+ * blank lines pandoc wants before a quote and a heading, which Obsidian does
+ * not: a callout inside a callout is a quote right after a line.
  *
  * The order matters: pandoc runs filters and citeproc in the order they are
  * given, and citeproc can only resolve citations the filter has already made.
@@ -108,7 +108,7 @@ export interface Run {
 export function pandocArgs(format: Format, run: Run): string[] {
 	const breaks = run.hardLineBreaks ? '+hard_line_breaks' : '';
 	const args = [
-		`--from=markdown+wikilinks_title_after_pipe+mark${breaks}-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote`,
+		`--from=markdown+wikilinks_title_after_pipe+mark${breaks}-yaml_metadata_block-simple_tables-multiline_tables-blank_before_blockquote-blank_before_header`,
 		`--metadata-file=${run.metadata}`,
 		`--lua-filter=${run.obsidian}`,
 		`--lua-filter=${run.filter}`,

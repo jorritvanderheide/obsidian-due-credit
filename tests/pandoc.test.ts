@@ -166,6 +166,12 @@ describe.skipIf(!installed())('obsidian.lua', () => {
 	});
 });
 
+describe.skipIf(!installed())('a heading', () => {
+	it('is one right after a line of text, as in Obsidian', () => {
+		expect(markdown('Text right before\n## Heading\n')).toMatch(/^Text right before\n\n#+ Heading\n$/);
+	});
+});
+
 describe.skipIf(!installed())('a line break', () => {
 	it('is kept where Obsidian shows one, in a paragraph and a list item', () => {
 		const output = join(dir, 'breaks.md');
