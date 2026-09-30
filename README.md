@@ -90,6 +90,13 @@ A paper note does not have to be named for its key. A link to a note whose
 before Better BibTeX changed a key still cites the paper once the note's
 property has the new one.
 
+A style that cites in footnotes, such as `chicago-notes-bibliography` or
+`mhra-notes`, makes each citation a footnote, after the punctuation that
+follows it. A citation in a footnote of your own is part of its sentence, "see
+Marsh, *The Quiet Archive*, 12", as Zotero writes it. A citation next to a
+footnote of yours shares it, citation first when it comes first:
+`A claim [[marsh2024]].[^1]` has one note, not two marks side by side.
+
 Before the export runs, it lists every link that is about to come out as a
 name instead of a citation, because otherwise that would happen quietly:
 

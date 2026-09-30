@@ -268,6 +268,50 @@ describe.skipIf(!installed())('a table', () => {
 	});
 });
 
+describe.skipIf(!installed())('footnotes', () => {
+	// A style that cites in footnotes, as Chicago's notes and MHRA do, with only what the tests read.
+	const notes = join(dir, 'notes.csl');
+	writeFileSync(
+		notes,
+		'<?xml version="1.0" encoding="utf-8"?>\n<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0">\n' +
+			'  <info><title>Notes</title><id>notes</id><updated>2026-09-30T00:00:00+00:00</updated></info>\n' +
+			'  <citation><layout suffix="." delimiter="; "><names variable="author"><name form="short"/></names><text variable="title" prefix=", "/><text variable="locator" prefix=", "/></layout></citation>\n' +
+			'</style>\n',
+	);
+
+	/** A note with its footnotes, under a style or pandoc's author-date, as plain text. */
+	const noted = (input: string, csl: string | null) => {
+		const output = join(dir, 'noted.txt');
+		const args = pandocArgs('md', { obsidian, filter, afterCiteproc, template, fonts, metadata, bibliography: bib, csl, hardLineBreaks: false, referenceDoc: null, extra: [], resourcePath: dir, output });
+		execFileSync('pandoc', [...args.filter((arg) => !arg.startsWith('--to=')), '--to=plain', '--wrap=none'], { input });
+		return readFileSync(output, 'utf8').trim();
+	};
+
+	it('cite in one of yours without parentheses, under a style that cites in footnotes', () => {
+		expect(noted('Text.[^1]\n\n[^1]: Compare [[a|a, p. 4]]; [[b]], and [[b|see b]].\n', notes)).toBe('Text.[1]\n\n[1] Compare A, First, 4; B, Second, and see B, Second.');
+		expect(noted('Text.[^1]\n\n[^1]: [[a]].\n', notes)).toBe('Text.[1]\n\n[1] A, First.');
+	});
+
+	it('are one with the footnote a citation next to them becomes, in the order written', () => {
+		expect(noted('A claim [[a]].[^1]\n\n[^1]: My aside.\n', notes)).toBe('A claim.[1]\n\n[1] A, First. My aside.');
+		expect(noted('A claim [[a]][^1]. Next.\n\n[^1]: My aside.\n', notes)).toBe('A claim.[1] Next.\n\n[1] A, First. My aside.');
+		expect(noted('A claim [[a]][^1][^2].\n\n[^1]: One.\n\n[^2]: Two.\n', notes)).toBe('A claim.[1]\n\n[1] A, First. One. Two.');
+		expect(noted('A claim.[^1][[a]]\n\n[^1]: My aside.\n', notes)).toBe('A claim.[1]\n\n[1] My aside. A, First.');
+		expect(noted('A claim [[a]].[^1]\n\n[^1]: My aside.\n\n    More.\n', notes)).toBe('A claim.[1]\n\n[1] A, First. My aside.\n\nMore.');
+	});
+
+	it('stay apart when you put two together, or apart from the citation', () => {
+		expect(noted('A claim.[^1][^2]\n\n[^1]: One.\n\n[^2]: Two.\n', notes)).toBe('A claim.[1][2]\n\n[1] One.\n\n[2] Two.');
+		expect(noted('A claim[^1] [[a]].\n\n[^1]: Mine.\n', notes)).toBe('A claim[1].[2]\n\n[1] Mine.\n\n[2] A, First.');
+	});
+
+	it('keep their citations in parentheses, apart from the text, under an author-date style', () => {
+		const exported = noted('A claim [[a]].[^1]\n\n[^1]: Compare [[b]].\n', null);
+		expect(exported).toMatch(/^A claim \(A 2024\)\.\[1\]\n/);
+		expect(exported).toMatch(/\n\[1\] Compare \(B 2025\)\.$/);
+	});
+});
+
 describe.skipIf(!installed())('a note, end to end', () => {
 	it('exports without comments, titled by its H1, with sections and references under it', () => {
 		const note = '---\ntitle: Old title\ntags: [private]\n---\n# On archives\n\n## Argument\n\nAs shown [[a]] and [[First paper]].%%not for you%%\n\n---\nTODO: ask supervisor\n---\n';

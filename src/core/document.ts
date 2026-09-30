@@ -49,7 +49,8 @@ export function documentMetadata(frontmatter: unknown, heading: string | null, n
 
 /**
  * Whether a `.csl` style puts its citations in footnotes: its `class` is
- * `note` rather than `in-text`.
+ * `note` rather than `in-text`. `pandoc/after-citeproc.lua` reads a style the
+ * same way.
  */
 export function noteStyle(csl: string): boolean {
 	return /<style\b[^>]*\sclass\s*=\s*["']note["']/.test(csl);
