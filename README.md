@@ -42,6 +42,10 @@ Obsidian:
 - **Highlights.** `==text==` is highlighted in Word, PDF and Markdown. A LaTeX
   body has it as plain text, since a journal's class does not load what `\hl`
   needs.
+- **Footnotes.** `[^1]` and `^[inline]` are footnotes, read as Obsidian reads
+  them: a definition right after a line of text, a label with spaces, and
+  `[^X]` for the note `[^x]` defines. A label defined twice is its first
+  definition, and the export's warnings name the second.
 - **Tags.** A line of `#tags` is left out, and a tag in a sentence stays as its
   word: `#project/alpha` is "project/alpha".
 

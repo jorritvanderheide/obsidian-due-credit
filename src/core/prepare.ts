@@ -2,7 +2,7 @@
 import { inFolder } from './paths';
 import { keyOf, linkpathOf, missingKeys, propertyKey } from './citations';
 import { documentMetadata } from './document';
-import { citeByKey, dropPluginBlocks, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, stripTags, wikilinkTargets } from './markdown';
+import { citeByKey, dropPluginBlocks, footnotes, imageEmbeds, liftHeadings, splitFrontmatter, stripBlockIds, stripComments, stripTags, wikilinkTargets } from './markdown';
 
 /** What a link resolves to, from the note being exported. */
 export interface Linked {
@@ -59,9 +59,9 @@ export interface Missing {
  *
  * First what never leaves: comments, then block IDs, plugins' code blocks and
  * tags, which mean nothing outside the vault. The check reads the note
- * then, before any link has been rewritten. Then links to paper notes are
- * pointed at their keys, the title is lifted, and images are resolved on what
- * is left.
+ * then, before any link has been rewritten. Then footnotes are written the
+ * way pandoc reads them, links to paper notes are pointed at their keys, the
+ * title is lifted, and images are resolved on what is left.
  *
  * A link is a paper when the note it resolves to has a key property, whatever
  * the note is called, or is in the papers folder, by its name; only the first
@@ -93,7 +93,7 @@ export function prepare(text: string, vault: Vault, options: Options): Prepared 
 		unresolved: check(({ target, linkpath }) => (linkpath !== '' && vault.resolve(linkpath) === null ? keyOf(target) : null)),
 	};
 
-	const { title, body: lifted } = liftHeadings(citeByKey(prose, propertyOf));
+	const { title, body: lifted } = liftHeadings(citeByKey(footnotes(prose), propertyOf));
 	// Forward slashes, which pandoc reads on every platform.
 	const markdown = imageEmbeds(lifted, (linkpath) => vault.resolve(linkpath)?.file.replace(/\\/g, '/') ?? null);
 	const metadata = documentMetadata(yaml === null ? null : vault.parseYaml(yaml), title, options.name, options.noteStyle);

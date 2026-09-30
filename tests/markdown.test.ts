@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { citeByKey, dropPluginBlocks, imageEmbeds, liftHeadings, segments, splitFrontmatter, stripBlockIds, stripComments, stripTags, wikilinkTargets } from '../src/core/markdown';
+import { citeByKey, dropPluginBlocks, footnotes, imageEmbeds, liftHeadings, segments, splitFrontmatter, stripBlockIds, stripComments, stripTags, wikilinkTargets } from '../src/core/markdown';
 
 describe('segments', () => {
 	it('concatenates back to the note', () => {
@@ -205,6 +205,33 @@ describe('stripBlockIds', () => {
 	it('leaves footnotes, IDs in links, mid-line carets and code alone', () => {
 		const text = 'a[^1] and [[note#^abc]]\n2 ^ 3 is x^2^\n`code ^x`\n```\nline ^id\n```\n';
 		expect(stripBlockIds(text)).toBe(text);
+	});
+});
+
+describe('footnotes', () => {
+	it('puts a blank line before a definition right after a line of text', () => {
+		expect(footnotes('Text.[^1]\n[^1]: Below.\n[^2]: Next.\n')).toBe('Text.[^1]\n\n[^1]: Below.\n\n[^2]: Next.\n');
+		expect(footnotes('Text.[^1]\r\n[^1]: Below.\r\n')).toBe('Text.[^1]\r\n\n[^1]: Below.\r\n');
+		expect(footnotes('Text.[^1]\n\n[^1]: Below.\n')).toBe('Text.[^1]\n\n[^1]: Below.\n');
+	});
+
+	it('matches a reference to its definition without regard to case or spacing', () => {
+		expect(footnotes('A[^my note] B[^X] C[^My  Note].\n\n[^my note]: Spaced.\n[^x]: Lower.\n')).toBe('A[^my-note] B[^x] C[^my-note].\n\n[^my-note]: Spaced.\n\n[^x]: Lower.\n');
+	});
+
+	it('keeps a label from taking the name of another', () => {
+		expect(footnotes('A[^a b] B[^a-b].\n\n[^a b]: One.\n\n[^a-b]: Two.\n')).toBe('A[^a-b] B[^a-b-2].\n\n[^a-b]: One.\n\n[^a-b-2]: Two.\n');
+	});
+
+	it('keeps the first definition of a label, and gives the second a name no reference has', () => {
+		expect(footnotes('C[^d].\n\n[^d]: First.\n[^D]: Second.\n')).toBe('C[^d].\n\n[^d]: First.\n\n[^d-duplicate]: Second.\n');
+	});
+
+	it('leaves a reference to no definition, a colon after a reference, and code alone', () => {
+		expect(footnotes('A[^gone] and[^1]: said.\n\n[^1]: One.\n')).toBe('A[^gone] and[^1]: said.\n\n[^1]: One.\n');
+		const code = 'Text `[^a b]`\n```\n[^a b]: x\n```\n\n[^a b]: Def.\n';
+		expect(footnotes(code)).toBe('Text `[^a b]`\n```\n[^a b]: x\n```\n\n[^a-b]: Def.\n');
+		expect(footnotes('No notes here.\n')).toBe('No notes here.\n');
 	});
 });
 

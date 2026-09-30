@@ -265,6 +265,61 @@ export function stripBlockIds(text: string): string {
 	return outsideCode(text, (prose) => prose.replace(BLOCK_ID, ''), false);
 }
 
+// A footnote's label, as in `[^label]`, and a line that defines one.
+const FOOTNOTE = /\[\^([^[\]\n]+)\]/g;
+const DEFINITION = /^ {0,3}\[\^([^[\]\n]+)\]:/;
+// A label as CommonMark matches it: without regard to case or spacing.
+const normal = (label: string) => label.trim().replace(/\s+/g, ' ').toLowerCase();
+
+/**
+ * The footnotes as pandoc reads them, which is not always as Obsidian does.
+ *
+ * Obsidian follows CommonMark, where a definition can come right after a line
+ * of text, a label can have spaces, `[^X]` is the note `[^x]` defines, and a
+ * label defined twice is the first definition. Pandoc takes the first two for
+ * text, the third for another note, and the fourth for the last definition.
+ * So a definition gets a blank line before it, every reference the spelling
+ * of the definition it points at, with a `-` for each run of spaces, and a
+ * second definition of a label a name no reference has, which pandoc leaves
+ * out, and names in a warning. A label pandoc reads already is kept, and a
+ * reference to no definition is left as written.
+ */
+export function footnotes(text: string): string {
+	// Every definition on a line of its own, after a blank line.
+	const spaced = outsideCode(text, (prose) => prose.replace(/(?<=^[ \t]*\S[^\n]*\n)(?= {0,3}\[\^[^[\]\n]+\]:)/gm, '\n'), false);
+
+	// The name each label goes by, from its first definition.
+	const names = new Map<string, string>();
+	const taken = new Set<string>();
+	const unique = (base: string) => {
+		let name = base;
+		for (let n = 2; taken.has(name); n++) name = `${base}-${n}`;
+		taken.add(name);
+		return name;
+	};
+	for (const segment of segments(spaced, false)) {
+		if (segment.code) continue;
+		for (const line of segment.text.split('\n')) {
+			const label = DEFINITION.exec(line)?.[1];
+			if (label !== undefined && !names.has(normal(label))) names.set(normal(label), unique(label.trim().replace(/\s+/g, '-').replace(/\^/g, '-')));
+		}
+	}
+	if (names.size === 0) return spaced;
+
+	const defined = new Set<string>();
+	return outsideCode(spaced, (prose) =>
+		prose.replace(FOOTNOTE, (footnote: string, label: string, at: number, whole: string) => {
+			const name = names.get(normal(label));
+			if (name === undefined) return footnote;
+			const start = whole.lastIndexOf('\n', at - 1) + 1;
+			const definition = whole[at + footnote.length] === ':' && /^ {0,3}$/.test(whole.slice(start, at));
+			if (definition && defined.has(name)) return `[^${unique(`${name}-duplicate`)}]`;
+			if (definition) defined.add(name);
+			return `[^${name}]`;
+		}),
+	);
+}
+
 const LEADING_H1 =/^(?:[ \t]*\r?\n)*# +(.+?)(?:[ \t]+#+)?[ \t]*(?:\r?\n|$)/;
 
 /**

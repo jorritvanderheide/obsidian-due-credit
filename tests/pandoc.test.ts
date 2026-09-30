@@ -6,6 +6,7 @@ import { join } from 'path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { keyOf, renameInAlias } from '../src/core/citations';
 import { inputFiles, MARKDOWN_TEMPLATE, pandocArgs } from '../src/core/document';
+import { footnotes } from '../src/core/markdown';
 import { prepare } from '../src/core/prepare';
 
 function installed(program = 'pandoc'): boolean {
@@ -303,6 +304,13 @@ describe.skipIf(!installed())('footnotes', () => {
 	it('stay apart when you put two together, or apart from the citation', () => {
 		expect(noted('A claim.[^1][^2]\n\n[^1]: One.\n\n[^2]: Two.\n', notes)).toBe('A claim.[1][2]\n\n[1] One.\n\n[2] Two.');
 		expect(noted('A claim[^1] [[a]].\n\n[^1]: Mine.\n', notes)).toBe('A claim[1].[2]\n\n[1] Mine.\n\n[2] A, First.');
+	});
+
+	it('read as CommonMark reads them, once written the way pandoc does', () => {
+		const note = 'Text.[^1] More[^my note], [^X] and [^d].\n[^1]: Right below.\ncontinued.\n[^my note]: Spaced.\n\n[^x]: Lower.\n\n[^d]: First.\n\n[^d]: Second.\n';
+		const plain = (from: string, input: string) => execFileSync('pandoc', [`--from=${from}`, '--to=plain', '--wrap=none'], { input, stdio: ['pipe', 'pipe', 'ignore'] }).toString();
+		expect(plain('markdown', footnotes(note))).toBe(plain('commonmark+footnotes', note));
+		expect(plain('markdown', footnotes(note))).toContain('[4] First.');
 	});
 
 	it('keep their citations in parentheses, apart from the text, under an author-date style', () => {
