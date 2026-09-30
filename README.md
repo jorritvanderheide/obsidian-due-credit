@@ -101,6 +101,15 @@ Marsh, *The Quiet Archive*, 12", as Zotero writes it. A citation next to a
 footnote of yours shares it, citation first when it comes first:
 `A claim [[marsh2024]].[^1]` has one note, not two marks side by side.
 
+Leaving the author out leaves them out of the note too, since the sentence
+names them: `As Marsh [[marsh2024|-marsh2024, p. 12]] argues` has a note that
+starts at the title, "*The Quiet Archive* (…), 12", and so does
+`As @marsh2024 [p. 12] argues`, which puts the name in the sentence. That is
+pandoc's reading, and there is no one way to write it that suits both kinds of
+style. For a note that names the author, drop the `-`. A draft written for an
+author-date style keeps its `-` when you switch it to a note style, so read
+those citations again.
+
 Before the export runs, it lists every link that is about to come out as a
 name instead of a citation, because otherwise that would happen quietly:
 
