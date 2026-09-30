@@ -109,7 +109,9 @@ export interface Run {
  *   `liftHeadings`, because citeproc adds References after the note is read.
  * - LaTeX is a body to paste into a journal's or conference's class, with the
  *   `\cite` commands intact so its own bibliography style formats them. No
- *   style is applied, because the class decides.
+ *   style is applied, because the class decides. Natbib's commands, unless
+ *   your arguments ask for biblatex's, whose `\autocite` is a footnote in a
+ *   class with a footnote style.
  */
 export function pandocArgs(format: Format, run: Run): string[] {
 	const breaks = run.hardLineBreaks ? '+hard_line_breaks' : '';
@@ -143,8 +145,10 @@ export function pandocArgs(format: Format, run: Run): string[] {
 
 	// Yours after these, so an option of yours wins over its default here, and
 	// before citeproc, so a filter of yours, such as pandoc-crossref, runs where
-	// it has to: after these filters and before citations are rendered.
-	args.push(...run.extra);
+	// it has to: after these filters and before citations are rendered. LaTeX's
+	// citation commands only for LaTeX: the other formats render citations with
+	// citeproc, and a PDF would stop at a bibliography its LaTeX never had.
+	args.push(...(styled(format) ? run.extra.filter((arg) => !CITATION_COMMANDS.includes(arg)) : run.extra));
 
 	if (styled(format)) {
 		// Citeproc needs the paths, and the file never does: the Word writer
@@ -152,12 +156,16 @@ export function pandocArgs(format: Format, run: Run): string[] {
 		args.push('--citeproc', `--lua-filter=${run.afterCiteproc}`);
 		if (run.csl) args.push(`--csl=${run.csl}`);
 	} else {
-		args.push('--natbib', '--to=latex');
+		if (!run.extra.some((arg) => CITATION_COMMANDS.includes(arg))) args.push('--natbib');
+		args.push('--to=latex');
 	}
 
 	args.push(`--output=${run.output}`);
 	return args;
 }
+
+/** The options that choose LaTeX's citation commands. */
+const CITATION_COMMANDS = ['--natbib', '--biblatex'];
 
 /**
  * Open Sans from `folder`, through fontspec. The path is written with forward

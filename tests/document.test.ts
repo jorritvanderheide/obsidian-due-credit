@@ -159,6 +159,21 @@ describe('pandocArgs', () => {
 		expect(args.some((arg) => arg.startsWith('--csl'))).toBe(false);
 	});
 
+	it('writes biblatex commands in LaTeX when your arguments ask for them', () => {
+		const args = pandocArgs('tex', { ...run, extra: ['--biblatex'] });
+		expect(args).toContain('--biblatex');
+		expect(args).not.toContain('--natbib');
+		expect(pandocArgs('tex', { ...run, extra: ['--natbib'] }).filter((arg) => arg === '--natbib')).toHaveLength(1);
+	});
+
+	it('keeps LaTeX citation commands out of the formats citeproc renders', () => {
+		for (const format of ['docx', 'pdf', 'md'] as const) {
+			const args = pandocArgs(format, { ...run, extra: ['--biblatex', '--toc', '--natbib'] });
+			expect(args).toContain('--toc');
+			expect(args.some((arg) => arg === '--biblatex' || arg === '--natbib')).toBe(false);
+		}
+	});
+
 	it('exports without a bibliography when there is none', () => {
 		expect(pandocArgs('md', { ...run, bibliography: null }).some((arg) => arg.startsWith('--bibliography'))).toBe(false);
 	});
