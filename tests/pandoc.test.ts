@@ -246,6 +246,16 @@ describe.skipIf(!installed() || !installed('xelatex'))('a PDF', () => {
 	it('is set in a font of yours instead', () => {
 		expect(embedded(['-V', 'mainfont=lmroman10-regular.otf'])).toEqual(['LMRoman10-Regular']);
 	});
+
+	// Pandoc loads footnotehyper for a table, which reads how footnotes are set.
+	it('has left-aligned footnotes, in a table too, under any class', () => {
+		const output = join(dir, 'footnotes.pdf');
+		for (const documentclass of ['article', 'scrartcl']) {
+			const args = pandocArgs('pdf', { obsidian, filter, afterCiteproc, template, fonts, metadata, bibliography: bib, csl: null, hardLineBreaks: false, referenceDoc: null, extra: ['-V', `documentclass=${documentclass}`], resourcePath: dir, output });
+			execFileSync('pandoc', args, { input: 'Text.[^1]\n\n| a | b |\n|---|---|\n| cell[^2] | x |\n\n[^1]: A note.\n\n[^2]: In a table.\n', stdio: ['pipe', 'pipe', 'ignore'] });
+			expect(readFileSync(output).subarray(0, 4).toString()).toBe('%PDF');
+		}
+	}, 60000);
 });
 
 describe.skipIf(!installed())('a markdown link', () => {

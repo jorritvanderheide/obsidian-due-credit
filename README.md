@@ -147,7 +147,7 @@ None has a hotkey, so pick your own.
 | Command | |
 | --- | --- |
 | **Export to Word** | A `.docx` with rendered citations and a reference list. |
-| **Export to PDF** | The same, typeset with xelatex, left-aligned in Open Sans, which comes with the plugin. |
+| **Export to PDF** | The same, typeset with xelatex, left-aligned in Open Sans, which comes with the plugin, footnotes too. |
 | **Export to Markdown** | Plain Markdown under its title, with rendered citations, for pasting elsewhere. |
 | **Export to LaTeX** | A body with natbib's `\cite` commands, or biblatex's with `--biblatex` in **Pandoc arguments**, for a journal's or conference's class. |
 

@@ -145,6 +145,7 @@ describe('pandocArgs', () => {
 	it('sets a PDF left-aligned, with one space after a full stop', () => {
 		const args = pandocArgs('pdf', { ...run, extra: ['-V', 'mainfont=Arial'] });
 		expect(args).toEqual(expect.arrayContaining(['--variable=header-includes=\\frenchspacing', '--variable=header-includes=\\raggedright']));
+		expect(args.some((arg) => arg.startsWith('--variable=header-includes=') && arg.includes('\\@makefntext[1]{\\dc@makefntext{\\raggedright#1}}'))).toBe(true);
 		expect(pandocArgs('docx', run).some((arg) => arg.includes('header-includes'))).toBe(false);
 	});
 

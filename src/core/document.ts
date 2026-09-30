@@ -145,7 +145,11 @@ export function pandocArgs(format: Format, run: Run): string[] {
 		if (!choosesFont(run.extra)) args.push(...openSans(run.fonts));
 		// Left-aligned, where justifying stretches the spaces and hyphenates, and
 		// one space after a full stop or colon, where LaTeX puts a wider one.
-		args.push('--variable=header-includes=\\frenchspacing', '--variable=header-includes=\\raggedright');
+		// Footnotes too, which LaTeX resets to justified: in the command that sets
+		// each one, and only once the document begins, since footnotehyper, which
+		// pandoc loads for a table, reads that command then and stops at any
+		// other than its class's.
+		args.push('--variable=header-includes=\\frenchspacing', '--variable=header-includes=\\raggedright', `--variable=header-includes=${RAGGED_FOOTNOTES}`);
 	}
 	if (format === 'md') {
 		// Text for pasting elsewhere, so none of pandoc's own syntax: no `{=html}`
@@ -174,6 +178,8 @@ export function pandocArgs(format: Format, run: Run): string[] {
 	args.push(`--output=${run.output}`);
 	return args;
 }
+
+const RAGGED_FOOTNOTES = '\\makeatletter\\AtBeginDocument{\\let\\dc@makefntext\\@makefntext\\renewcommand\\@makefntext[1]{\\dc@makefntext{\\raggedright#1}}}\\makeatother';
 
 /** The options that choose LaTeX's citation commands. */
 const CITATION_COMMANDS = ['--natbib', '--biblatex'];
