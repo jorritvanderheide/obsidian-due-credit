@@ -157,6 +157,14 @@ describe('pandocArgs', () => {
 		expect(set(['-V', 'mainfontoptions=Scale=0.9'])).toBe(true);
 	});
 
+	it('sets a PDF on A4 paper, unless you choose a size', () => {
+		const a4 = (extra: string[]) => pandocArgs('pdf', { ...run, extra }).includes('--variable=papersize=a4');
+		expect(a4([])).toBe(true);
+		for (const extra of [['-V', 'papersize=letter'], ['-Vpapersize=letter'], ['--variable=papersize:letter'], ['--variable', 'papersize=letter'], ['-M', 'papersize=letter']]) {
+			expect(a4(extra)).toBe(false);
+		}
+	});
+
 	it('keeps pandoc syntax out of a Markdown export', () => {
 		expect(pandocArgs('md', run).find((arg) => arg.startsWith('--to='))).toMatch(/^--to=markdown\+mark-.*-raw_html-raw_attribute-header_attributes$/);
 	});

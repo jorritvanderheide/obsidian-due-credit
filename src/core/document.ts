@@ -142,7 +142,10 @@ export function pandocArgs(format: Format, run: Run): string[] {
 		// Open Sans rather than LaTeX's Latin Modern, whose hairline strokes look
 		// grey and soft on a screen. Bundled, because few machines have it and
 		// xelatex stops at a font it cannot find. A font of yours replaces it.
-		if (!choosesFont(run.extra)) args.push(...openSans(run.fonts));
+		if (!setsVariable(run.extra, 'mainfont')) args.push(...openSans(run.fonts));
+		// A4, the paper nearly everywhere but North America, where pandoc's
+		// LaTeX leaves it at the class's letter. A size of yours replaces it.
+		if (!setsVariable(run.extra, 'papersize')) args.push('--variable=papersize=a4');
 		// Left-aligned, where justifying stretches the spaces and hyphenates, and
 		// one space after a full stop or colon, where LaTeX puts a wider one.
 		// Footnotes too, which LaTeX resets to justified: in the command that sets
@@ -196,14 +199,14 @@ function openSans(folder: string): string[] {
 }
 
 /**
- * Whether your own arguments set the main font. Pandoc's variables override
- * its metadata, so Open Sans would win over your `-M mainfont`, and join your
- * `-V mainfont` as a list.
+ * Whether your own arguments set a template variable, such as the main font.
+ * Pandoc's variables override its metadata, so a default here would win over
+ * your `-M mainfont`, and join your `-V mainfont` as a list.
  */
-function choosesFont(extra: string[]): boolean {
-	return extra.some(
-		(arg, i) => /^(-V|-M|--variable=|--metadata=)mainfont[=:]/.test(arg) || (/^mainfont[=:]/.test(arg) && ['-V', '-M', '--variable', '--metadata'].includes(extra[i - 1] ?? '')),
-	);
+function setsVariable(extra: string[], name: string): boolean {
+	const value = new RegExp(`^${name}[=:]`);
+	const option = new RegExp(`^(-V|-M|--variable=|--metadata=)${name}[=:]`);
+	return extra.some((arg, i) => option.test(arg) || (value.test(arg) && ['-V', '-M', '--variable', '--metadata'].includes(extra[i - 1] ?? '')));
 }
 
 /**
