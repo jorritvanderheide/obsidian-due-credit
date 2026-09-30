@@ -151,7 +151,7 @@ Settings → Community plugins.
 
 ## Commands
 
-None has a hotkey, so pick your own.
+None has a hotkey, so pick your own. Each is in a note's menu too, in the file explorer or on its tab, to export a note without opening it.
 
 | Command | |
 | --- | --- |
