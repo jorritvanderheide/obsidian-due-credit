@@ -31,6 +31,8 @@ export interface Options {
 	keyProperty: string;
 	/** The bibliography's keys, or null when there is none to check against. */
 	keys: Set<string> | null;
+	/** Whether the citation style puts citations in footnotes, from `noteStyle`. */
+	noteStyle: boolean;
 }
 
 export interface Prepared {
@@ -94,6 +96,6 @@ export function prepare(text: string, vault: Vault, options: Options): Prepared 
 	const { title, body: lifted } = liftHeadings(citeByKey(prose, propertyOf));
 	// Forward slashes, which pandoc reads on every platform.
 	const markdown = imageEmbeds(lifted, (linkpath) => vault.resolve(linkpath)?.file.replace(/\\/g, '/') ?? null);
-	const metadata = documentMetadata(yaml === null ? null : vault.parseYaml(yaml), title, options.name);
+	const metadata = documentMetadata(yaml === null ? null : vault.parseYaml(yaml), title, options.name, options.noteStyle);
 	return { markdown, metadata, missing };
 }

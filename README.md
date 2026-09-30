@@ -26,8 +26,10 @@ Obsidian:
   uses H1 for its own sections further down.
 - **Frontmatter.** Only what pandoc makes something of goes along: `author`,
   `date`, `lang`, `abstract`, `keywords`, `subtitle`, and
-  `reference-section-title` to head the references in another language. Word
-  would keep every other property inside the file, tags and all.
+  `reference-section-title` to head the references in another language. They
+  are headed References, or Bibliography under a style that cites in
+  footnotes. Word would keep every other property inside the file, tags and
+  all.
 - **Images.** `![[figure.png|300]]` is the file Obsidian shows, 300 pixels wide.
 - **Other embeds.** An embedded note, PDF or canvas is left out: it is for
   you, not your reader.

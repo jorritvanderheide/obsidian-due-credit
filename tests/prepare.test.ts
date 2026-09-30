@@ -14,7 +14,7 @@ const vault: Vault = {
 	resolve: (linkpath) => notes[linkpath] ?? null,
 	parseYaml: (yaml) => (yaml.includes('title: Old') ? { title: 'Old', tags: ['private'], author: 'Ann' } : {}),
 };
-const options = { name: 'note', papersFolder: 'Literature', keyProperty: 'citekey', keys: new Set(['marsh2024']) };
+const options = { name: 'note', papersFolder: 'Literature', keyProperty: 'citekey', keys: new Set(['marsh2024']), noteStyle: false };
 
 describe('prepare', () => {
 	it('makes the note pandoc input, every step in its order', () => {

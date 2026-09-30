@@ -1,21 +1,35 @@
 import { describe, expect, it } from 'vitest';
-import { documentMetadata, inputFiles, lineBreaks, pandocArgs, refused, splitArgs, styled, type Run } from '../src/core/document';
+import { documentMetadata, inputFiles, lineBreaks, noteStyle, pandocArgs, refused, splitArgs, styled, type Run } from '../src/core/document';
 
 describe('documentMetadata', () => {
 	it('takes the title from the heading first, then the property, then the name', () => {
-		expect(documentMetadata({ title: 'Property' }, 'Heading', 'name').title).toBe('Heading');
-		expect(documentMetadata({ title: 'Property' }, null, 'name').title).toBe('Property');
-		expect(documentMetadata({ title: ' ' }, null, 'name').title).toBe('name');
-		expect(documentMetadata(null, null, 'name').title).toBe('name');
+		expect(documentMetadata({ title: 'Property' }, 'Heading', 'name', false).title).toBe('Heading');
+		expect(documentMetadata({ title: 'Property' }, null, 'name', false).title).toBe('Property');
+		expect(documentMetadata({ title: ' ' }, null, 'name', false).title).toBe('name');
+		expect(documentMetadata(null, null, 'name', false).title).toBe('name');
 	});
 
 	it('passes on only the keys pandoc uses, so vault metadata stays out of the file', () => {
-		const metadata = documentMetadata({ tags: ['secret'], reading: 'queued', lang: 'nl', author: ['A', 'B'] }, 'T', 'n');
+		const metadata = documentMetadata({ tags: ['secret'], reading: 'queued', lang: 'nl', author: ['A', 'B'] }, 'T', 'n', false);
 		expect(metadata).toEqual({ title: 'T', 'reference-section-title': 'References', lang: 'nl', author: ['A', 'B'] });
 	});
 
 	it('lets a note head its references in its own language', () => {
-		expect(documentMetadata({ 'reference-section-title': 'Bronnen' }, null, 'n')['reference-section-title']).toBe('Bronnen');
+		expect(documentMetadata({ 'reference-section-title': 'Bronnen' }, null, 'n', false)['reference-section-title']).toBe('Bronnen');
+	});
+
+	it('heads the list Bibliography under a style that cites in footnotes', () => {
+		expect(documentMetadata(null, null, 'n', true)['reference-section-title']).toBe('Bibliography');
+		expect(documentMetadata({ 'reference-section-title': 'Bronnen' }, null, 'n', true)['reference-section-title']).toBe('Bronnen');
+	});
+});
+
+describe('noteStyle', () => {
+	it('reads the class of the style element', () => {
+		expect(noteStyle('<?xml version="1.0"?>\n<style xmlns="http://purl.org/net/xbiblio/csl"\n  class="note" version="1.0">')).toBe(true);
+		expect(noteStyle("<style class='note'>")).toBe(true);
+		expect(noteStyle('<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0">')).toBe(false);
+		expect(noteStyle('<style class="in-text"><info><title>Notes and more</title></info><citation><layout class="note">')).toBe(false);
 	});
 });
 

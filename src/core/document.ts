@@ -28,21 +28,31 @@ const DOCUMENT_KEYS = ['subtitle', 'author', 'date', 'abstract', 'keywords', 'la
  *
  * The title is the note's leading H1 when it has one, because that is the title
  * the note shows; then a `title` property; then the file name, which is what
- * Obsidian shows when there is neither. A reference list is headed References
- * unless the note says otherwise, for a note in another language.
+ * Obsidian shows when there is neither. A reference list is headed References,
+ * or Bibliography under a style that cites in footnotes, as Chicago's notes
+ * and MHRA call it, unless the note says otherwise, for a note in another
+ * language.
  */
-export function documentMetadata(frontmatter: unknown, heading: string | null, name: string): Record<string, unknown> {
+export function documentMetadata(frontmatter: unknown, heading: string | null, name: string, noteStyle: boolean): Record<string, unknown> {
 	const properties = frontmatter !== null && typeof frontmatter === 'object' ? (frontmatter as Record<string, unknown>) : {};
 	const property = typeof properties.title === 'string' ? properties.title.trim() : '';
 
 	const metadata: Record<string, unknown> = {
 		title: heading ?? (property || name),
-		'reference-section-title': 'References',
+		'reference-section-title': noteStyle ? 'Bibliography' : 'References',
 	};
 	for (const key of DOCUMENT_KEYS) {
 		if (properties[key] !== undefined && properties[key] !== null) metadata[key] = properties[key];
 	}
 	return metadata;
+}
+
+/**
+ * Whether a `.csl` style puts its citations in footnotes: its `class` is
+ * `note` rather than `in-text`.
+ */
+export function noteStyle(csl: string): boolean {
+	return /<style\b[^>]*\sclass\s*=\s*["']note["']/.test(csl);
 }
 
 /**

@@ -6,7 +6,7 @@ import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
 import { bibKeys } from '../core/citations';
-import { FORMATS, inputFiles, lineBreaks, pandocArgs, refused, splitArgs, styled, type Format } from '../core/document';
+import { FORMATS, inputFiles, lineBreaks, noteStyle, pandocArgs, refused, splitArgs, styled, type Format } from '../core/document';
 import { settingPath, cslPath, expandHome, insideVault, withExtension } from '../core/paths';
 import { prepare, type Missing, type Vault } from '../core/prepare';
 import { startFolder } from '../core/settings';
@@ -70,6 +70,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		papersFolder: settings.literatureFolder,
 		keyProperty: settings.keyProperty,
 		keys: bibliography ? bibKeys(await readFile(bibliography, 'utf8')) : null,
+		noteStyle: csl !== null && noteStyle(await readFile(csl, 'utf8')),
 	});
 	const lost = missing.papers.length + missing.unresolved.length;
 	if (bibliography && lost > 0 && !(await confirmMissing(context, missing, lost, basename(bibliography)))) return;

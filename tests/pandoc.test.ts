@@ -276,7 +276,7 @@ describe.skipIf(!installed())('a note, end to end', () => {
 			resolve: (linkpath: string) => (linkpath === 'First paper' ? { path: 'Literature/First paper.md', file: join(dir, 'First paper.md'), frontmatter: { citekey: 'a' } } : null),
 			parseYaml: () => ({ title: 'Old title', tags: ['private'] }),
 		};
-		const { markdown: input, metadata } = prepare(note, vault, { name: 'note', papersFolder: 'Literature', keyProperty: 'citekey', keys: null });
+		const { markdown: input, metadata } = prepare(note, vault, { name: 'note', papersFolder: 'Literature', keyProperty: 'citekey', keys: null, noteStyle: false });
 		const files = { obsidian, filter, afterCiteproc, template, fonts, metadata: join(dir, 'note.json'), bibliography: bib, csl: null, hardLineBreaks: false, referenceDoc: null, extra: [], resourcePath: dir, output: join(dir, 'note.md') };
 		writeFileSync(files.metadata, JSON.stringify(metadata));
 
