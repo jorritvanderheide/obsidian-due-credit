@@ -14,7 +14,7 @@ which writes those links for you from your Zotero library. See
 [![Checks](https://github.com/jorritvanderheide/obsidian-due-credit/actions/workflows/lint.yml/badge.svg)](https://github.com/jorritvanderheide/obsidian-due-credit/actions/workflows/lint.yml)
 [![License: EUPL-1.2](https://img.shields.io/badge/license-EUPL--1.2-blue?style=flat-square)](LICENSE)
 
-![A chapter in Obsidian with citation links, next to its PDF export with the citations and a reference list](https://raw.githubusercontent.com/jorritvanderheide/obsidian-due-credit/main/images/hero.png)
+![A chapter in Obsidian with citation links, next to its PDF export opened in Obsidian, with the citations and the full reference list](https://raw.githubusercontent.com/jorritvanderheide/obsidian-due-credit/main/images/hero.png)
 
 In your vault, a citation can simply be a link: `[[marsh2024]]`. It opens the
 paper, shows a preview when you hover over it, and the paper's backlinks show
