@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-due-credit",
 	"version": "1.2.0",
-	"description": "Export notes with [[citekey]] links as citations.",
+	"description": "Export a note to Word, PDF or LaTeX, with its links turned into real citations.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
