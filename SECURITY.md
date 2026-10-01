@@ -20,10 +20,11 @@ is made public.
 
 Due Credit runs the pandoc you installed on the note you export. It reads that
 note, your bibliography and your citation style, and writes only the file you
-pick in the save dialog, never inside your vault. See the
-[Safety section of the README](README.md#safety). Anything that makes it run a
-program other than pandoc, write somewhere you didn't choose, or lets the text
-of a note change what pandoc reads, writes or runs is a security problem.
+pick in the save dialog, never inside your vault. See
+[section 11 of the README](README.md#11-network-and-file-disclosure). Anything
+that makes it run a program other than pandoc, write somewhere you didn't
+choose, or lets the text of a note change what pandoc reads, writes or runs is a
+security problem.
 
 What you add yourself under **Pandoc arguments**, such as your own filter, runs
 with your permission and isn't covered. Neither are problems in pandoc itself:
