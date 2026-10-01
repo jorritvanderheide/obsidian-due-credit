@@ -1,6 +1,6 @@
 # Due Credit
 
-**Export a note to Word, PDF or LaTeX, with its links turned into real citations.**
+**Export a note to Word, PDF or LaTeX through pandoc, with its links turned into real citations.**
 
 Works well with [Paper Trail](https://community.obsidian.md/plugins/paper-trail),
 which writes those links for you from your Zotero library. See

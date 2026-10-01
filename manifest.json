@@ -3,7 +3,7 @@
 	"name": "Due Credit",
 	"version": "1.3.0",
 	"minAppVersion": "1.13.0",
-	"description": "Export a note to Word, PDF or LaTeX, with its links turned into real citations.",
+	"description": "Export a note to Word, PDF or LaTeX through pandoc, with its links turned into real citations.",
 	"author": "Jorrit van der Heide",
 	"authorUrl": "https://github.com/jorritvanderheide",
 	"isDesktopOnly": true
