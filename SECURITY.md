@@ -26,6 +26,10 @@ that makes it run a program other than pandoc, write somewhere you didn't
 choose, or lets the text of a note change what pandoc reads, writes or runs is a
 security problem.
 
+The plugin directory's health report warns that Due Credit executes programs
+and uses the filesystem directly. Those are pandoc and the files above, as
+[section 3 of the README](README.md#3-safety-and-quality) explains.
+
 What you add yourself under **Pandoc arguments**, such as your own filter, runs
 with your permission and isn't covered. Neither are problems in pandoc itself:
 please report those to [pandoc](https://github.com/jgm/pandoc).

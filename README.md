@@ -80,6 +80,15 @@ exactly what it reads and writes.
 It doesn't connect to the internet itself, and the only program it runs is
 pandoc.
 
+The health report in Obsidian's plugin directory warns about two things, and
+both are how the export works. *Shell Execution* is pandoc: Due Credit starts
+it directly, without a shell in between, and starts nothing else. *Direct
+Filesystem Access* is for what the Obsidian API can't reach: reading your
+bibliography and citation style wherever you keep them, checking that the
+files in your settings exist, putting pandoc's filters, the PDF font and the
+note's properties in a temporary folder, and making sure an export doesn't land
+in your vault.
+
 Every push is built, linted with [ESLint](https://eslint.org/) and the official
 [Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), and
 tested with [Vitest](https://vitest.dev/) on Node 20, 22 and 24. The citation
