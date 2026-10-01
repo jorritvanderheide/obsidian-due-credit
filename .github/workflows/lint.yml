@@ -6,6 +6,10 @@ on:
     pull_request:
         branches: ['**']
 
+# Read-only unless a job asks for more.
+permissions:
+    contents: read
+
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -16,9 +20,9 @@ jobs:
                 # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
             - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'npm'
@@ -26,8 +30,10 @@ jobs:
             - run: npm run build --if-present
             - run: npm run lint
             # The filter tests run a real pandoc, pinned so citeproc's output does not drift under them.
+            # The checksum pins the file too, so a replaced download fails here instead of being installed.
             - name: Install pandoc
               run: |
                   curl -fsSLo pandoc.deb https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-1-amd64.deb
+                  echo "4db8bad3d9f8451a3d52171664f3c58b08af6450fbd54a28dd05f6b00b0bbb04  pandoc.deb" | sha256sum -c -
                   sudo dpkg -i pandoc.deb
             - run: npm test
