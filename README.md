@@ -14,8 +14,7 @@ which writes those links for you from your Zotero library. See
 [![Checks](https://github.com/jorritvanderheide/obsidian-due-credit/actions/workflows/lint.yml/badge.svg)](https://github.com/jorritvanderheide/obsidian-due-credit/actions/workflows/lint.yml)
 [![License: EUPL-1.2](https://img.shields.io/badge/license-EUPL--1.2-blue?style=flat-square)](LICENSE)
 
-<!-- SCREENSHOT images/hero.png: a note with [[citekey]] links on the left, and the exported Word document on the right with "(Marsh 2024, 12)" in the text and a References list at the end. -->
-![Due Credit](https://placehold.co/1200x675/png?text=A+note+and+its+Word+export)
+![A chapter in Obsidian with citation links, next to its PDF export with the citations and a reference list](https://raw.githubusercontent.com/jorritvanderheide/obsidian-due-credit/main/images/hero.png)
 
 In your vault, a citation can simply be a link: `[[marsh2024]]`. It opens the
 paper, shows a preview when you hover over it, and the paper's backlinks show
@@ -65,8 +64,7 @@ Due Credit needs Obsidian 1.13 or later, on desktop.
 If a link is about to come out as plain text instead of a citation, Due Credit
 tells you before it exports. See [Before the export](#74-before-the-export).
 
-<!-- SCREENSHOT images/export.gif: right-click a note, choose Export to Word, the save dialog, then the notice "Exported Chapter 2.docx" with Open and Show in folder. -->
-![Exporting a note](https://placehold.co/900x500/png?text=Export+to+Word)
+![The menu of a note, with Export to Word, Export to PDF, Export to Markdown and Export to LaTeX](https://raw.githubusercontent.com/jorritvanderheide/obsidian-due-credit/main/images/export.png)
 
 <br/>
 
@@ -261,9 +259,6 @@ plain text instead of a citation:
 
 You can export anyway, or go and fix them first. A link to a note of your own
 is never listed.
-
-<!-- SCREENSHOT images/check.png: the "2 links aren't in the bibliography" dialog, listing two keys, with "Export anyway". -->
-![The check before exporting](https://placehold.co/900x500/png?text=Links+not+in+the+bibliography)
 
 For more, like footnote styles, LaTeX, and using the filter with pandoc on its
 own, see [Citations](docs/citations.md) in the docs and the [FAQ](FAQ.md).
