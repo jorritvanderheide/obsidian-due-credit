@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+    - name: Read the FAQ
+      url: https://github.com/jorritvanderheide/obsidian-due-credit/blob/main/FAQ.md
+      about: Answers to the most common questions, such as a citation that comes out as plain text.
+    - name: Report a security problem
+      url: https://github.com/jorritvanderheide/obsidian-due-credit/security/advisories/new
+      about: Please report security problems privately, not in a public issue.

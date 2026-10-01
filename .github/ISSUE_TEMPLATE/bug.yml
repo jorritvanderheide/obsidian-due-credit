@@ -1,0 +1,104 @@
+name: Bug report
+description: Something in Due Credit doesn't work the way the README says it should.
+labels: ['bug']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for taking the time to report this. Before you start, have a quick look at the [FAQ](https://github.com/jorritvanderheide/obsidian-due-credit/blob/main/FAQ.md): the most common surprises, like a citation that comes out as plain text, are explained there.
+
+              Found a security problem? Please don't report it here. Use [private reporting](https://github.com/jorritvanderheide/obsidian-due-credit/security/advisories/new) instead.
+
+    - type: textarea
+      id: what
+      attributes:
+          label: What happened?
+          description: And what did you expect to happen instead? If Due Credit showed an error, please paste it.
+      validations:
+          required: true
+
+    - type: textarea
+      id: steps
+      attributes:
+          label: Steps to reproduce
+          description: The smallest note that shows the problem helps most, with the bibliography entry it cites. A screenshot of the export helps too.
+          placeholder: |
+              1. A note containing: As [[marsh2024|-marsh2024, p. 12]] argues.
+              2. Export to Word
+              3. ...
+      validations:
+          required: true
+
+    - type: dropdown
+      id: format
+      attributes:
+          label: Export format
+          options:
+              - Word
+              - PDF
+              - Markdown
+              - LaTeX
+      validations:
+          required: true
+
+    - type: input
+      id: version
+      attributes:
+          label: Due Credit version
+          description: Settings → Community plugins, next to Due Credit.
+      validations:
+          required: true
+
+    - type: input
+      id: obsidian
+      attributes:
+          label: Obsidian version
+          description: Settings → General.
+      validations:
+          required: true
+
+    - type: input
+      id: os
+      attributes:
+          label: Operating system
+          placeholder: macOS 15, Windows 11, Ubuntu 24.04, ...
+      validations:
+          required: true
+
+    - type: input
+      id: pandoc
+      attributes:
+          label: Pandoc version
+          description: The first line of `pandoc --version`.
+      validations:
+          required: true
+
+    - type: input
+      id: style
+      attributes:
+          label: Citation style
+          description: As in Settings → Due Credit → Citation style. Empty means Chicago author-date.
+          placeholder: apa
+
+    - type: input
+      id: tex
+      attributes:
+          label: TeX distribution, for a PDF
+          placeholder: TeX Live 2025, MiKTeX, MacTeX, ...
+
+    - type: dropdown
+      id: bib
+      attributes:
+          label: Where does your bibliography come from?
+          options:
+              - Better BibTeX auto-export
+              - Another tool, or by hand
+              - I don't use one
+      validations:
+          required: true
+
+    - type: textarea
+      id: extra
+      attributes:
+          label: Anything else?
+          description: Your Pandoc arguments setting, a Word template if you use one, an error from the developer console (Ctrl+Shift+I, or Cmd+Option+I on a Mac), or anything else that seems related.
