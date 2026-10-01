@@ -6,6 +6,5 @@
 	"description": "Export a note to Word, PDF or LaTeX, with its links turned into real citations.",
 	"author": "Jorrit van der Heide",
 	"authorUrl": "https://github.com/jorritvanderheide",
-	"fundingUrl": "https://liberapay.com/BW20",
 	"isDesktopOnly": true
 }
