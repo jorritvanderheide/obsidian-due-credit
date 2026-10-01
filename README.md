@@ -262,7 +262,7 @@ plain text instead of a citation:
 You can export anyway, or go and fix them first. A link to a note of your own
 is never listed.
 
-<!-- SCREENSHOT images/check.png: the "2 links are not in the bibliography" dialog, listing two keys, with "Export anyway". -->
+<!-- SCREENSHOT images/check.png: the "2 links aren't in the bibliography" dialog, listing two keys, with "Export anyway". -->
 ![The check before exporting](https://placehold.co/900x500/png?text=Links+not+in+the+bibliography)
 
 For more, like footnote styles, LaTeX, and using the filter with pandoc on its

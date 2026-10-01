@@ -59,8 +59,8 @@ export function dumpArgs(executable: string, args: string[], cwd: string): Promi
 	return new Promise((resolve, reject) => {
 		execFile(executable, ['--dump-args', ...args], { cwd }, (error: (Error & { code?: unknown }) | null, stdout: string, stderr: string) => {
 			if (error === null) resolve(stdout);
-			else if (error.code === 'ENOENT') reject(new ExportError(`Pandoc was not found at "${executable}". Install it, or set its path in the Due Credit settings.`));
-			else reject(new ExportError(`Pandoc does not take the Pandoc arguments setting: ${stderr.trim() || error.message}`));
+			else if (error.code === 'ENOENT') reject(new ExportError(`Couldn't find pandoc at "${executable}". Install it, or set its full path in the Due Credit settings.`));
+			else reject(new ExportError(`Pandoc doesn't accept your Pandoc arguments: ${stderr.trim() || error.message}`));
 		});
 	});
 }
@@ -77,7 +77,7 @@ export function run(executable: string, args: string[], input: string, cwd: stri
 		child.on('error', (error: NodeJS.ErrnoException) => {
 			reject(
 				error.code === 'ENOENT'
-					? new ExportError(`Pandoc was not found at "${executable}". Install it, or set its path in the Due Credit settings.`)
+					? new ExportError(`Couldn't find pandoc at "${executable}". Install it, or set its full path in the Due Credit settings.`)
 					: error,
 			);
 		});

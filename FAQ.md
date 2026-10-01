@@ -11,7 +11,7 @@ Can't find your answer here? Please
 
 ## Getting it to run
 
-### "Pandoc was not found at …"
+### "Couldn't find pandoc at …"
 
 Due Credit runs pandoc, which you install separately from
 [pandoc.org](https://pandoc.org/installing.html). If it's installed but not
@@ -25,31 +25,31 @@ A PDF needs xelatex, which comes with a TeX distribution such as
 [TeX Live](https://tug.org/texlive/) or [MiKTeX](https://miktex.org/). Install
 one, and restart Obsidian so it sees the new PATH.
 
-### "There is no bibliography at …"
+### "There's no bibliography at …"
 
 **Bibliography** points at a file that isn't there. Point it at the `.bib` file
 Better BibTeX exports, or clear it to export without citations.
 
-### "There is no citation style at …"
+### "There's no citation style at …"
 
 A style name like `apa` is looked up in Zotero's styles folder,
 `~/Zotero/styles`. Install the style in Zotero (Settings → Cite), or give the
 full path to a `.csl` file.
 
-### "The Pandoc arguments setting has …, which Due Credit does not pass on"
+### "Your Pandoc arguments include …, which Due Credit doesn't pass on"
 
 Some arguments would change what Due Credit decides: where the file goes, how
 the note is read, or the format. `-o`, `-f`, `-t` and a defaults file are among
 them. The message says why. [Settings](docs/settings.md#pandoc-arguments) in the
 docs has the full list.
 
-### "… which pandoc would export in place of the note"
+### "… which pandoc would export instead of the note"
 
 Pandoc reads a word that isn't an option's value as a file to export. Usually
 it's a value whose option is missing, or a value with spaces that needs quotes:
 `-V "mainfont=TeX Gyre Pagella"`.
 
-### "The properties of … are not valid YAML"
+### "The properties of … aren't valid YAML"
 
 The note's properties have a mistake in them. Open the note in source mode,
 where Obsidian shows what's wrong, and fix it. Due Credit doesn't export without

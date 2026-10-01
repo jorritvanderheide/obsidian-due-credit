@@ -24,26 +24,26 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const bibliography = settings.bibliography ? settingPath(settings.bibliography, vault, home) : null;
 	if (bibliography && !existsSync(bibliography)) {
 		throw new ExportError(
-			`There is no bibliography at ${bibliography}. Point the Due Credit setting at your Better BibTeX export, or clear it to export without citations.`,
+			`There's no bibliography at ${bibliography}. Point the Bibliography setting at your Better BibTeX export, or clear it to export without citations.`,
 		);
 	}
 	const referenceDoc = settings.referenceDoc && format === 'docx' ? settingPath(settings.referenceDoc, vault, home) : null;
 	if (referenceDoc && !existsSync(referenceDoc)) {
-		throw new ExportError(`There is no Word template at ${referenceDoc}. Point the Due Credit setting at a .docx, or clear it to use pandoc's own styles.`);
+		throw new ExportError(`There's no Word template at ${referenceDoc}. Point the Word template setting at a .docx file, or clear it to use pandoc's own styles.`);
 	}
 	const csl = settings.csl && styled(format) ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;
 	if (csl && !existsSync(csl)) {
-		throw new ExportError(`There is no citation style at ${csl}. Use the name of a style Zotero has installed, such as apa, or the path to a .csl file.`);
+		throw new ExportError(`There's no citation style at ${csl}. Use the name of a style Zotero has installed, such as apa, or the path to a .csl file.`);
 	}
 
 	// Arguments of your own, except what Due Credit decides, and no file of
 	// yours that pandoc would read in place of the note.
 	const extra = splitArgs(settings.extraArgs, home);
 	const refusal = refused(extra);
-	if (refusal) throw new ExportError(`The Pandoc arguments setting has ${refusal.arg}, which Due Credit does not pass on: ${refusal.why}.`);
+	if (refusal) throw new ExportError(`Your Pandoc arguments include ${refusal.arg}, which Due Credit doesn't pass on: ${refusal.why}.`);
 	const inputs = extra.length > 0 ? inputFiles(await dumpArgs(settings.pandocPath, extra, vault)) : [];
 	if (inputs.length > 0) {
-		throw new ExportError(`The Pandoc arguments setting has ${inputs.join(', ')}, which pandoc would export in place of the note. Give it as an option's value, or leave it out.`);
+		throw new ExportError(`Your Pandoc arguments include ${inputs.join(', ')}, which pandoc would export instead of the note. Make it an option's value, or leave it out.`);
 	}
 
 	// The editor rather than the file when the note is open, since the file
@@ -61,7 +61,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 			try {
 				return parseYaml(yaml) as unknown;
 			} catch {
-				throw new ExportError(`The properties of ${file.basename} are not valid YAML, so it cannot be exported. Fix them in source mode, where Obsidian shows what is wrong.`);
+				throw new ExportError(`The properties of ${file.basename} aren't valid YAML, so it can't be exported. Fix them in source mode, where Obsidian shows what's wrong.`);
 			}
 		},
 	};
@@ -89,7 +89,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	// source would be the note, and the dialog only asks whether to replace a
 	// file.
 	if (insideVault(vault, output, realpathSync)) {
-		throw new ExportError(`${output} is inside your vault, and an export writes nothing there. Save it somewhere else.`);
+		throw new ExportError(`${output} is inside your vault, and Due Credit never writes there. Save it somewhere else.`);
 	}
 
 	let appConfig: unknown = null;
@@ -133,7 +133,7 @@ function confirmReplace(context: Context, output: string): Promise<boolean> {
 	return confirm(
 		context.app,
 		`Replace ${basename(output)}?`,
-		(el) => el.createEl('p', { text: `${dirname(output)} already has a file by that name, and the export would replace it.` }),
+		(el) => el.createEl('p', { text: `There's already a file with that name in ${dirname(output)}, and the export would replace it.` }),
 		'Replace',
 	);
 }
@@ -145,24 +145,24 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 	};
 	return confirm(
 		context.app,
-		count === 1 ? 'A link is not in the bibliography' : `${count} links are not in the bibliography`,
+		count === 1 ? "A link isn't in the bibliography" : `${count} links aren't in the bibliography`,
 		(el) => {
 			if (missing.papers.length > 0) {
 				el.createEl('p', {
-					text: `These link to papers that ${bib} does not have, so they will export as their plain names instead of as citations:`,
+					text: `These link to papers that ${bib} doesn't have, so they'll export as plain names instead of citations:`,
 				});
 				list(el, missing.papers);
 				el.createEl('p', {
-					text: 'Usually Better BibTeX changed the key, or its auto-export has not run since the paper was added.',
+					text: "Usually Better BibTeX changed the key, or its auto-export hasn't run since you added the paper.",
 				});
 			}
 			if (missing.unresolved.length > 0) {
 				el.createEl('p', {
-					text: `These link to no note, and ${bib} has no key by their name either, so they will export as their words:`,
+					text: `These don't link to a note, and ${bib} has no key with their name either, so they'll export as plain text:`,
 				});
 				list(el, missing.unresolved);
 				el.createEl('p', {
-					text: 'A paper cited before it has a note lands here when its key is not in the bibliography yet. So does a note you have not written yet, which is fine.',
+					text: "A paper you cited before it had a note ends up here if its key isn't in the bibliography yet. So does a note you haven't written yet, which is fine.",
 				});
 			}
 		},

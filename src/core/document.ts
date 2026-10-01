@@ -241,10 +241,10 @@ export function splitArgs(value: string, home: string): string[] {
 // why, by the options that do it: long ones by name, short ones with or
 // without their value attached.
 const REFUSED: [string[], string][] = [
-	[['-o', '--output'], 'the save dialog decides where the export goes, and that it is not in the vault'],
+	[['-o', '--output'], 'the save dialog decides where the export goes, and keeps it out of the vault'],
 	[['-f', '-r', '--from', '--read'], 'the note is read the way Obsidian writes it'],
 	[['-t', '-w', '--to', '--write'], 'the export command decides the format'],
-	[['-d', '--defaults'], 'a defaults file can set any of what Due Credit decides'],
+	[['-d', '--defaults'], 'a defaults file can change anything Due Credit decides'],
 	[['--extract-media', '--log'], 'it writes a file of its own, which could be in the vault'],
 	[['-h', '--help', '-v', '--version', '-D', '--print-default-template', '--print-default-data-file', '--print-highlight-style', '--list-input-formats', '--list-output-formats', '--list-extensions', '--list-highlight-languages', '--list-highlight-styles', '--dump-args', '--bash-completion'], 'it prints something and exports nothing'],
 ];
