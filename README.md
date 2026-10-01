@@ -89,18 +89,9 @@ files in your settings exist, putting pandoc's filters, the PDF font and the
 note's properties in a temporary folder, and making sure an export doesn't land
 in your vault.
 
-Every push is built, linted with [ESLint](https://eslint.org/) and the official
-[Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), and
-tested with [Vitest](https://vitest.dev/) on Node 20, 22 and 24. The citation
-tests run through a real, pinned version of pandoc, so its output can't drift
-unnoticed. Releases are built by GitHub Actions from the tagged source, with
-every action pinned to an exact version, and come with a signed build
-provenance attestation, so you can check that the file you installed is the one
-that was built:
-
-```sh
-gh attestation verify main.js --repo jorritvanderheide/obsidian-due-credit
-```
+Every push is tested, and every release is built in the open with a signed
+attestation, so you can check that the file you installed is the one that was
+built. [Section 11.5](#115-how-releases-are-built) says how.
 
 <br/>
 
@@ -368,6 +359,21 @@ Nothing in your notes, and nothing anywhere else in your vault.
 Pandoc itself downloads an image your note links to on the web, like
 `![](https://…/figure.png)`, to put it in the file. That's pandoc's own
 behaviour, and it only happens for images that are on the web.
+
+### 11.5 How releases are built
+
+Every push is built, linted with [ESLint](https://eslint.org/) and the official
+[Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), and
+tested with [Vitest](https://vitest.dev/) on Node 20, 22 and 24. The citation
+tests run through a real, pinned version of pandoc, so its output can't drift
+unnoticed. Releases are built by GitHub Actions from the tagged source, with
+every action pinned to an exact version, and come with a signed build
+provenance attestation, so you can check that the file you installed is the one
+that was built:
+
+```sh
+gh attestation verify main.js --repo jorritvanderheide/obsidian-due-credit
+```
 
 <br/>
 
