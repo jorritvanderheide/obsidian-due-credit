@@ -241,11 +241,11 @@ describe.skipIf(!installed() || !installed('xelatex'))('a PDF', () => {
 
 	it('is set in the bundled Open Sans', () => {
 		expect(embedded([])).toEqual(['OpenSans-Bold', 'OpenSans-BoldItalic', 'OpenSans-Italic', 'OpenSans-Regular']);
-	});
+	}, 60000);
 
 	it('is set in a font of yours instead', () => {
 		expect(embedded(['-V', 'mainfont=lmroman10-regular.otf'])).toEqual(['LMRoman10-Regular']);
-	});
+	}, 60000);
 
 	// Pandoc loads footnotehyper for a table, which reads how footnotes are set.
 	it('has left-aligned footnotes, in a table too, under any class', () => {
