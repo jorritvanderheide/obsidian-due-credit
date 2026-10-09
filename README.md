@@ -11,7 +11,7 @@ which writes those links for you from your Zotero library. See
 ![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=Downloads&query=%24%5B%22due-credit%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)
 ![Obsidian Compatibility](https://img.shields.io/badge/Obsidian-v1.13.0+-483699?logo=obsidian&style=flat-square)
 ![Desktop only](https://img.shields.io/badge/platform-desktop-483699?style=flat-square)
-[![Checks](https://github.com/jorritvanderheide/obsidian-due-credit/actions/workflows/lint.yml/badge.svg)](https://github.com/jorritvanderheide/obsidian-due-credit/actions/workflows/lint.yml)
+[![Checks](https://github.com/jorritvanderheide/obsidian-due-credit/actions/workflows/ci.yml/badge.svg)](https://github.com/jorritvanderheide/obsidian-due-credit/actions/workflows/ci.yml)
 [![License: EUPL-1.2](https://img.shields.io/badge/license-EUPL--1.2-blue?style=flat-square)](LICENSE)
 
 ![A chapter in Obsidian with citation links, next to its PDF export opened in Obsidian, with the citations and the full reference list](https://raw.githubusercontent.com/jorritvanderheide/obsidian-due-credit/main/images/hero.png)
@@ -363,11 +363,12 @@ behaviour, and it only happens for images that are on the web.
 ### 11.5 How releases are built
 
 Every push is built, linted with [ESLint](https://eslint.org/) and the official
-[Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), and
-tested with [Vitest](https://vitest.dev/) on Node 20, 22 and 24. The citation
+[Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), tested
+with [Vitest](https://vitest.dev/), and built with Nix as well. The citation
 tests run through a real, pinned version of pandoc, so its output can't drift
-unnoticed. Releases are built by GitHub Actions from the tagged source, with
-every action pinned to an exact version, and come with a signed build
+unnoticed. Releases are built by GitHub Actions from the tagged source, after
+the same checks and a check that the tag is the version in `manifest.json`,
+with every action pinned to an exact version, and come with a signed build
 provenance attestation, so you can check that the file you installed is the one
 that was built:
 
