@@ -125,6 +125,8 @@ If you want to work on the plugin, or use its pandoc filter on its own:
   arguments are refused and why.
 - [**Development**](docs/development.md) - Setup, tests, the conformance
   check, and releases.
+- [**Compatibility**](docs/compatibility.md) - What a release may and may not
+  change, so your settings, hotkeys and notes keep working.
 
 <br/>
 

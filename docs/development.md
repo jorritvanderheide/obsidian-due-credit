@@ -79,7 +79,8 @@ the normal test run, because it needs notes.
 5. **Publish the draft.** Obsidian's community directory installs from GitHub
    releases, and a tag alone is not one.
 
-Before releasing anything that renames a setting, see
+Before releasing a change, read [Compatibility](compatibility.md) for what a
+release may break. Before releasing anything that renames a setting, see
 [Settings](settings.md#changing-the-shape). Before changing a citation form or
 a locator word, see [Citations](citations.md#the-agreement-with-paper-trail).
 

@@ -37,6 +37,69 @@ describe('loadSettings', () => {
 	});
 });
 
+// `data.json` as each released version saved it: every key, written whole by
+// `saveData(this.settings)` after a change in the tab or an export. Whenever
+// the stored shape changes, add a fixture named after the last version that
+// wrote the old one, and keep the older fixtures.
+const SAVED = {
+	'1.0.0': {
+		version: 1,
+		pandocPath: '/usr/local/bin/pandoc',
+		outputFolder: '~/Thesis',
+		lastFolder: '/home/a/Supervisor',
+		bibliography: '~/Zotero/library.bib',
+		literatureFolder: 'Papers',
+		keyProperty: 'citationKey',
+		csl: 'apa',
+		referenceDoc: 'Templates/university.docx',
+		extraArgs: '--toc --number-sections',
+	},
+	'1.3.1': {
+		version: 1,
+		pandocPath: 'pandoc',
+		outputFolder: '~/Documents',
+		lastFolder: '',
+		bibliography: '',
+		literatureFolder: 'Literature',
+		keyProperty: 'citekey',
+		csl: '',
+		referenceDoc: '',
+		extraArgs: '-V papersize=letter',
+	},
+};
+
+describe('settings saved by a released version', () => {
+	it('1.0.0 loads with every choice kept', () => {
+		expect(loadSettings(SAVED['1.0.0'])).toEqual({
+			version: SETTINGS_VERSION,
+			pandocPath: '/usr/local/bin/pandoc',
+			outputFolder: '~/Thesis',
+			lastFolder: '/home/a/Supervisor',
+			bibliography: '~/Zotero/library.bib',
+			literatureFolder: 'Papers',
+			keyProperty: 'citationKey',
+			csl: 'apa',
+			referenceDoc: 'Templates/university.docx',
+			extraArgs: '--toc --number-sections',
+		});
+	});
+
+	it('1.3.1 loads with every choice kept, empty ones too', () => {
+		expect(loadSettings(SAVED['1.3.1'])).toEqual({
+			...DEFAULT_SETTINGS,
+			bibliography: '',
+			extraArgs: '-V papersize=letter',
+		});
+	});
+
+	it('saves again as it loaded', () => {
+		for (const saved of Object.values(SAVED)) {
+			const loaded = loadSettings(saved);
+			expect(loadSettings(JSON.parse(JSON.stringify(loaded)))).toEqual(loaded);
+		}
+	});
+});
+
 describe('startFolder', () => {
 	const settings = loadSettings({ lastFolder: '/home/a/Supervisor' });
 
