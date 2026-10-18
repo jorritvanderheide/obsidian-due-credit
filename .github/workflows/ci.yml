@@ -24,19 +24,21 @@ jobs:
               with:
                   node-version: 24
                   cache: 'npm'
-            # The filter tests run a real pandoc, pinned so citeproc's output does not drift under them.
-            # The checksum pins the file too, so a replaced download fails here instead of being installed.
-            - name: Install pandoc
+            # The core, where `file:../obsidian-citation-core` in package.json
+            # looks, at the commit flake.lock pins.
+            - name: Check out the core
               run: |
-                  curl -fsSLo pandoc.deb https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-1-amd64.deb
-                  echo "4db8bad3d9f8451a3d52171664f3c58b08af6450fbd54a28dd05f6b00b0bbb04  pandoc.deb" | sha256sum -c -
-                  sudo dpkg -i pandoc.deb
+                  url=$(jq -r '.nodes."citation-core".locked.url' flake.lock)
+                  rev=$(jq -r '.nodes."citation-core".locked.rev' flake.lock)
+                  git clone --quiet "$url" ../obsidian-citation-core
+                  git -C ../obsidian-citation-core checkout --quiet "$rev"
             - run: npm ci
             - run: npm run build
             - run: npm run lint
             - run: npm test
 
-    # The flake's package, so its npmDepsHash can't fall behind package-lock.json.
+    # The flake's package, so its npmDepsHash can't fall behind package-lock.json,
+    # and the core's checks, its filter tests among them, with the pandoc they expect.
     nix:
         runs-on: ubuntu-latest
         timeout-minutes: 30

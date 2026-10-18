@@ -2,7 +2,9 @@
 
 Everything about how a link becomes a citation, including the cases the README
 leaves out. The rules are in `pandoc/wikilink-citations.lua`, and repeated in
-`src/core/citations.ts` for the check before an export.
+`src/core/citations.ts` for the check before an export, both in
+[obsidian-citation-core](https://codeberg.org/BW20/obsidian-citation-core), the
+core Due Credit shares with its sibling plugins.
 
 ## What becomes a citation
 
@@ -55,7 +57,7 @@ have, and its hover preview says so.
 
 A link to a note whose **Citation key property** (`citekey` by default) holds a
 key cites that key, whatever the note is called. `citeByKey` in
-`core/markdown.ts` rewrites such links to the key before pandoc runs, because
+the core's `core/markdown.ts` rewrites such links to the key before pandoc runs, because
 the filter only knows a link's name, and also works by hand without a vault. A
 key that the label repeats changes with it, so the label still spells the
 citation out.
@@ -82,7 +84,7 @@ References.
   switch it to a footnote style, so read those citations again.
 
 Whether a style cites in footnotes is read twice: by `noteStyle` in
-`core/document.ts`, and by `note_style` in `after-citeproc.lua`. Change one and
+the core's `core/document.ts`, and by `note_style` in `after-citeproc.lua`. Change one and
 the other follows.
 
 ## LaTeX
@@ -95,7 +97,7 @@ citation style is applied, because the class decides.
 ## The check before an export
 
 Before running pandoc, the export lists every link that's about to come out as
-words instead of a citation (`missing` in `core/prepare.ts`):
+words instead of a citation (`missing` in the core's `core/prepare.ts`):
 
 - **A link to a paper note whose key the bibliography doesn't have.** A paper
   note is one with a citation key property, or one in the papers folder. The
@@ -110,10 +112,10 @@ any link is rewritten.
 
 ## One rule, written twice
 
-The filter decides what is a citation, and `core/citations.ts` repeats its
+The filter decides what is a citation, and the core's `core/citations.ts` repeats its
 `read_bib`, `key_of` and `spelled`, so the check can list the citations about to
 be lost before pandoc loses them. Change one and the other follows. One table of
-cases in `tests/pandoc.test.ts` ("one rule, written twice") runs through both.
+cases in `tests/pandoc.test.ts` ("one rule, written twice") runs through both. All three are in the core.
 
 The filter runs before `--citeproc`, because citeproc can only cite what the
 filter has already made.
@@ -134,8 +136,9 @@ citations; Due Credit reads them. Its side is in Paper Trail's
 
 ## Using the filter on its own
 
-`pandoc/wikilink-citations.lua` works with pandoc without the plugin, for
-citations and nothing else. The order matters:
+The core's [`pandoc/wikilink-citations.lua`](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/pandoc/wikilink-citations.lua)
+works with pandoc without the plugin, for citations and nothing else. The order
+matters:
 
 ```sh
 pandoc chapter.md \

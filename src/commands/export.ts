@@ -5,12 +5,31 @@ import { homedir } from 'os';
 import { basename, delimiter, dirname, join } from 'path';
 import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
-import { bibKeys } from '../core/citations';
-import { FORMATS, inputFiles, lineBreaks, noteStyle, pandocArgs, refused, splitArgs, styled, type Format } from '../core/document';
-import { settingPath, cslPath, expandHome, insideVault, withExtension } from '../core/paths';
-import { prepare, type Missing, type Vault } from '../core/prepare';
+import {
+	bibKeys,
+	cslPath,
+	dumpArgs,
+	expandHome,
+	ExportError,
+	FORMATS,
+	inputFiles,
+	insideVault,
+	lineBreaks,
+	noteStyle,
+	pandocArgs,
+	prepare,
+	refused,
+	run,
+	settingPath,
+	splitArgs,
+	styled,
+	withExtension,
+	withFiles,
+	type Format,
+	type Missing,
+	type Vault,
+} from 'obsidian-citation-core';
 import { startFolder } from '../core/settings';
-import { dumpArgs, ExportError, run, withFiles } from '../pandoc';
 import { confirm } from '../ui/confirm';
 import type { Context } from '../context';
 

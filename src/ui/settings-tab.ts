@@ -2,9 +2,8 @@ import { existsSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import { FileSystemAdapter, PluginSettingTab, type App, type SettingDefinitionItem } from 'obsidian';
-import { refused, splitArgs } from '../core/document';
+import { cslPath, expandHome, refused, settingPath, splitArgs } from 'obsidian-citation-core';
 import { loadSettings, type Settings } from '../core/settings';
-import { settingPath, cslPath, expandHome } from '../core/paths';
 import type DueCredit from '../main';
 
 export class SettingsTab extends PluginSettingTab {

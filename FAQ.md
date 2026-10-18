@@ -155,7 +155,7 @@ would be the note. Save it anywhere outside the vault.
 
 ### Can I use the citation filter without Obsidian?
 
-Yes. `pandoc/wikilink-citations.lua` works with pandoc on its own, for
+Yes. The filter, [`pandoc/wikilink-citations.lua`](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/pandoc/wikilink-citations.lua), works with pandoc on its own, for
 citations. [Citations](docs/citations.md#using-the-filter-on-its-own) in the
 docs shows the command.
 

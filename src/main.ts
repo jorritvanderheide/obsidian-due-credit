@@ -1,8 +1,7 @@
 import { Notice, Plugin, TFile } from 'obsidian';
+import { ExportError, FORMATS, type Format } from 'obsidian-citation-core';
 import { exportNote } from './commands/export';
-import { FORMATS, type Format } from './core/document';
 import { loadSettings, type Settings } from './core/settings';
-import { ExportError } from './pandoc';
 import { SettingsTab } from './ui/settings-tab';
 
 export default class DueCredit extends Plugin {

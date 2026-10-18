@@ -5,28 +5,34 @@ you chose. It writes nothing in the vault and talks to nothing but pandoc.
 
 ## Layers
 
+Every decision about a note, its citations and pandoc's command line is in
+[obsidian-citation-core](https://codeberg.org/BW20/obsidian-citation-core), a
+library Due Credit shares with its sibling plugins and bundles into `main.js`.
+What is left here is Due Credit's own: its settings, and wiring the core to
+Obsidian.
+
 | Path | What it holds |
 | --- | --- |
-| `src/core/` | Every decision. Pure: no Obsidian imports except type-only ones, no filesystem. Every file has a test named after it. |
+| `src/core/settings.ts` | The settings shape, defaults and loading. Pure, with a test named after it. |
 | `src/commands/export.ts` | The export: checks the settings, reads the note, asks where to save, runs pandoc, reports back. |
-| `src/pandoc.ts` | Running pandoc, and writing its files to a temporary folder. |
 | `src/ui/` | The confirmation dialog and the settings tab. |
 | `src/main.ts` | Registers the four commands and the file menu items. |
-| `pandoc/` | The Lua filters, bundled into `main.js` as text. |
-| `fonts/` | Open Sans, bundled into `main.js` as bytes, for PDF. |
+| `src/modules.d.ts` | What esbuild bundles from the core, and the part of Electron used here. |
 
-### Core
+### The core
 
 | File | What it decides |
 | --- | --- |
-| `prepare.ts` | Every step from a note to pandoc's input, in order. See [Pipeline](pipeline.md). |
-| `markdown.ts` | The individual rewrites: comments, tags, block IDs, footnotes, headings, images, links to paper notes. |
-| `citations.ts` | Reading a `.bib`, a link's key, and which links are about to lose their citation. |
-| `document.ts` | The document's metadata, pandoc's arguments for each format, and which arguments of yours are refused. |
-| `paths.ts` | Settings paths, `~`, and whether a path is inside the vault. |
-| `settings.ts` | The settings shape, defaults and loading. |
+| `src/core/prepare.ts` | Every step from a note to pandoc's input, in order. See [Pipeline](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/docs/pipeline.md). |
+| `src/core/markdown.ts` | The individual rewrites: comments, tags, block IDs, footnotes, headings, images, links to paper notes. |
+| `src/core/citations.ts` | Reading a `.bib`, a link's key, and which links are about to lose their citation. |
+| `src/core/document.ts` | The document's metadata, pandoc's arguments for each format, and which arguments of yours are refused. |
+| `src/core/paths.ts` | Settings paths, `~`, and whether a path is inside the vault. |
+| `src/pandoc.ts` | Running pandoc, and writing its files to a temporary folder. |
+| `pandoc/` | The Lua filters. |
+| `fonts/` | Open Sans, for PDF. |
 
-**Every decision belongs in `core/`.** `commands/` and `ui/` wire it to
+**Every decision belongs in the core.** `commands/` and `ui/` wire it to
 Obsidian and decide nothing.
 
 ## An export, from start to finish
@@ -82,9 +88,10 @@ LaTeX skips citeproc and keeps `\cite` commands instead.
 ## Bundled files
 
 A plugin ships as one `main.js`, and pandoc takes filters, templates and fonts
-as paths. So esbuild bundles the `.lua` files as text and the `.ttf` files as
-bytes, and `withFiles` in `src/pandoc.ts` writes them to a fresh temporary
-folder for each export.
+as paths. So esbuild bundles the core's `.lua` files as text and its `.ttf`
+files as bytes (the `loader` in `esbuild.config.mjs`), and `withFiles` in the
+core's `src/pandoc.ts` writes them to a fresh temporary folder for each
+export.
 
 Open Sans is bundled because few machines have it, and xelatex stops at a font
 it can't find. A `mainfont` of your own replaces it.
@@ -97,4 +104,4 @@ it can't find. A `mainfont` of your own replaces it.
 - **Whether a style uses footnotes:** `noteStyle` in `core/document.ts`, and
   `note_style` in `after-citeproc.lua`.
 
-Change one side and the other follows.
+Both are in the core. Change one side and the other follows.

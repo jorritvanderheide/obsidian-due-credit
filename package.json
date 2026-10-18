@@ -20,6 +20,7 @@
 	"author": "Jorrit van der Heide",
 	"license": "EUPL-1.2",
 	"devDependencies": {
+		"obsidian-citation-core": "file:../obsidian-citation-core",
 		"@codemirror/state": "6.5.0",
 		"@codemirror/view": "6.38.6",
 		"@eslint/js": "^9.39.4",

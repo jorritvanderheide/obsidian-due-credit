@@ -2,11 +2,20 @@
 
 ## Setup
 
+Due Credit's core is a library of its own,
+[obsidian-citation-core](https://codeberg.org/BW20/obsidian-citation-core),
+which npm takes from the folder next to this one. Check it out there first:
+
 ```sh
+git clone https://codeberg.org/BW20/obsidian-citation-core ../obsidian-citation-core
 nix develop     # or any Node.js 20+
 npm install
 npm run dev     # rebuild on change
 ```
+
+A change in the core shows up in the next build here, with nothing to link or
+publish. Its own checks, and what to run before a change there is done, are in
+its README.
 
 To try it in a vault, copy or link `main.js` and `manifest.json` into
 `<vault>/.obsidian/plugins/due-credit/` and reload Obsidian, or turn the plugin
@@ -15,52 +24,45 @@ off and on again.
 ## Checks
 
 ```sh
-npm test        # vitest; the filter tests need pandoc on the PATH
+npm test        # vitest
 npm run lint    # eslint, with the Obsidian plugin's rules
 npm run build   # type check and production build
 ```
 
 CI runs all three, on Node 24, for every push to `main` and every pull
 request, and again before every release (`.github/workflows/ci.yml`). It also
-runs `nix flake check`, which builds the plugin with Nix: after a change to
-`package-lock.json`, update `npmDepsHash` in `flake.nix`, as its comment says.
+runs `nix flake check`, which builds the plugin with Nix and runs the core's
+checks: after a change to `package-lock.json`, update `npmDepsHash` in
+`flake.nix`, as its comment says.
+
+## The core's version
+
+npm builds against whatever is checked out next to this folder. A release is
+built against the commit `flake.lock` pins: CI checks that commit out before
+`npm ci`, and Nix copies it next to the source before building. To move to a
+newer core:
+
+```sh
+nix flake update citation-core
+```
+
+Then build and test here, with the core checked out at the same commit.
 
 ## Tests
 
-Tests are in `tests/`, one per file in `src/core/`, named after it.
-
-`tests/pandoc.test.ts` runs the filters and the pipeline through a real pandoc,
-and skips what it can't run: everything without pandoc, and the PDF tests
-without xelatex. CI installs a pinned pandoc, so citeproc's output can't drift
-under the expected results.
+Tests are in `tests/`, one per file in `src/core/`, named after it. The core's
+tests, the filters through a real pandoc among them, are in the core.
 
 ### Moving to a newer pandoc
 
-The pandoc version and the checksum of its `.deb` are pinned in
-`.github/workflows/ci.yml`. To move to a newer one:
-
-1. Change the version in the download URL.
-2. Download the new `.deb`, and replace the checksum with its
-   `sha256sum`. Pandoc's older releases have no published checksum on GitHub,
-   so this pins the file as it is when you download it.
-3. Run the tests locally with the same pandoc, and update the expected output
-   where citeproc changed it.
-4. Update "Tested with" in the README.
+The core's tests expect the pandoc in its flake's nixpkgs, 3.7.0.2. To move to
+a newer one, update nixpkgs in the core, update the expected output where
+citeproc changed it, and update "tested with pandoc" in the README here.
 
 ## The conformance check
 
-Pandoc reads its own markdown, which isn't Obsidian's, and has to: its
-CommonMark reader has no `[@key]` citations. To find where the two read your
-notes differently, run the conformance check on a vault, or any folder of
-markdown:
-
-```sh
-VAULT=~/path/to/vault npx vitest run tests/conformance.test.ts
-```
-
-It lists every note whose blocks pandoc reads unlike CommonMark, and any text
-the plugin would take for code, where a comment would be kept. It isn't part of
-the normal test run, because it needs notes.
+It's in the core: see
+[its README](https://codeberg.org/BW20/obsidian-citation-core#the-conformance-check).
 
 ## Releasing
 
@@ -70,7 +72,8 @@ the normal test run, because it needs notes.
    `versions.json`. A version like `1.2.0-beta.1` becomes a pre-release, for
    beta testers.
 3. **Push** the commit and a tag named for the version, without a `v`, to
-   Codeberg. That is the only remote: GitHub mirrors it.
+   Codeberg. That is the only remote: GitHub mirrors it. The core's commit that
+   `flake.lock` pins has to be on Codeberg first, since CI clones it from there.
 4. When the tag reaches GitHub, `.github/workflows/release.yml` runs the CI
    checks, makes sure the tag is the version in `manifest.json`, `package.json`
    and `versions.json`, builds it, attests `main.js`, and creates a **draft**

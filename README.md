@@ -117,7 +117,7 @@ If you want to work on the plugin, or use its pandoc filter on its own:
 
 - [**Architecture**](docs/architecture.md) - How the code is layered, how
   pandoc is run, and the order its filters run in.
-- [**Pipeline**](docs/pipeline.md) - Every step from a note to pandoc's input,
+- [**Pipeline**](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/docs/pipeline.md) - Every step from a note to pandoc's input,
   in order.
 - [**Citations**](docs/citations.md) - Every link form that becomes a
   citation, footnote styles, LaTeX, and the agreement with Paper Trail.
@@ -406,5 +406,5 @@ Liberapay:
 ## 14 License
 
 Copyright © 2026 Jorrit van der Heide. Licensed under the [EUPL-1.2](LICENSE).
-Open Sans, in [`fonts/`](fonts), is under the
-[SIL Open Font License 1.1](fonts/OFL.txt).
+Open Sans, from [`fonts/`](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/fonts) in obsidian-citation-core, is under the
+[SIL Open Font License 1.1](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/fonts/OFL.txt).

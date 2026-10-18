@@ -43,7 +43,7 @@ folder.
 The arguments go after Due Credit's own, so yours win, and before citeproc, so a
 filter of yours runs before citations are rendered.
 
-Some are refused (`refused` in `core/document.ts`), because they'd change what
+Some are refused (`refused` in the core's `core/document.ts`), because they'd change what
 Due Credit decides or break a promise it makes:
 
 | Refused | Why |

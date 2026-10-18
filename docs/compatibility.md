@@ -27,7 +27,7 @@ so `version` is still 1.
   everyone, treat it as a change of meaning.
 - **A value of the wrong type** reads as its default.
 - **Refusing a pandoc argument** that wasn't refused before (`refused` in
-  `core/document.ts`) is breaking: exports stop for anyone who has it in
+  the core's `core/document.ts`) is breaking: exports stop for anyone who has it in
   **Pandoc arguments**. So is moving those arguments to another place among
   Due Credit's own.
 - **A test loads each release's `data.json`** (`tests/settings.test.ts`). When
@@ -43,13 +43,13 @@ drops the rest the next time it saves.
   the file you pick, which can't be in the vault. A change to that goes in the
   README's disclosure and `SECURITY.md` in the same release.
 - **What's read from a note:** the title (its leading H1, then the `title`
-  property), the properties in `DOCUMENT_KEYS` (`core/document.ts`), every
+  property), the properties in `DOCUMENT_KEYS` (the core's `core/document.ts`), every
   citation form in [Citations](citations.md#what-becomes-a-citation), and the
   **Citation key property** of the notes it links to. No longer reading one of
   these, or reading it differently, is breaking: a note written for it would
   export differently without a word. Reading something new isn't.
 - **Obsidian's own syntax** is read the way Obsidian shows it
-  ([Pipeline](pipeline.md)). Reading it more like Obsidian does is a fix, not a
+  ([Pipeline](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/docs/pipeline.md)). Reading it more like Obsidian does is a fix, not a
   break.
 - **What stays behind:** `%%comments%%`, `<!-- comments -->` and every property
   not in `DOCUMENT_KEYS` never reach pandoc. Letting more of a note out,
@@ -61,7 +61,7 @@ drops the rest the next time it saves.
 These keep being read the way they are now:
 
 - **The bibliography**, a `.bib` file from Better BibTeX: a key is read from a
-  line that starts an entry, `@article{key,` (`bibKeys` in `core/citations.ts`
+  line that starts an entry, `@article{key,` (`bibKeys` in the core's `core/citations.ts`
   and `read_bib` in the filter).
 - **Citation styles:** a name rather than a path is
   `~/Zotero/styles/<name>.csl`.
@@ -72,7 +72,7 @@ These keep being read the way they are now:
 - **The plugin ID** `due-credit` never changes. It's the plugin's folder, where
   `data.json` lives, and the start of every command ID.
 - **Command IDs** are `due-credit:export-docx`, `export-pdf`, `export-md` and
-  `export-tex`, made from the keys of `FORMATS` in `core/document.ts`. People
+  `export-tex`, made from the keys of `FORMATS` in the core's `core/document.ts`. People
   bind hotkeys to them, so renaming or removing one is breaking. A command's
   name may change.
 - There are no views or `obsidian://` URIs to keep.
