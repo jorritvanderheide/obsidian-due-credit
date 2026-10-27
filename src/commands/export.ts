@@ -33,6 +33,9 @@ import { startFolder } from '../core/settings';
 import { confirm } from '../ui/confirm';
 import type { Context } from '../context';
 
+/** Where pandoc's path is set, for the core's message when pandoc isn't there. */
+const SETTINGS = 'the Due Credit settings';
+
 export async function exportNote(context: Context, file: TFile, format: Format): Promise<void> {
 	const { app, settings } = context;
 	const adapter = app.vault.adapter;
@@ -60,7 +63,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const extra = splitArgs(settings.extraArgs, home);
 	const refusal = refused(extra);
 	if (refusal) throw new ExportError(`Your Pandoc arguments include ${refusal.arg}, which Due Credit doesn't pass on: ${refusal.why}.`);
-	const inputs = extra.length > 0 ? inputFiles(await dumpArgs(settings.pandocPath, extra, vault)) : [];
+	const inputs = extra.length > 0 ? inputFiles(await dumpArgs(settings.pandocPath, extra, vault, SETTINGS)) : [];
 	if (inputs.length > 0) {
 		throw new ExportError(`Your Pandoc arguments include ${inputs.join(', ')}, which pandoc would export instead of the note. Make it an option's value, or leave it out.`);
 	}
@@ -137,6 +140,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 				}),
 				markdown,
 				vault,
+				SETTINGS,
 			),
 		);
 	} finally {
