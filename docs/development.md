@@ -68,12 +68,16 @@ It's in the core: see
 
 1. **Write the notes.** Rename `## Unreleased` in `CHANGELOG.md` to the new
    version.
-2. **Bump the version:** `npm version <x.y.z>` updates `manifest.json` and
-   `versions.json`. A version like `1.2.0-beta.1` becomes a pre-release, for
-   beta testers.
-3. **Push** the commit and a tag named for the version, without a `v`, to
-   Codeberg. That is the only remote: GitHub mirrors it. The core's commit that
-   `flake.lock` pins has to be on Codeberg first, since CI clones it from there.
+2. **Bump the version:** `npm version <x.y.z> --no-git-tag-version` updates
+   `manifest.json` and `versions.json`, and leaves the commit and the tag to
+   jj. A version like `1.2.0-beta.1` becomes a pre-release, for beta testers.
+   The version in `package-lock.json` changes `npmDepsHash`, so run
+   `nix flake check` and put the hash it gives in `flake.nix`.
+3. **Push** the commit, then tag it, named for the version without a `v`:
+   `jj tag set <x.y.z> -r <commit>`, and `git push codeberg <x.y.z>`, since jj
+   doesn't push tags. Codeberg is the only remote: GitHub mirrors it. The
+   core's commit that `flake.lock` pins has to be on Codeberg first, since CI
+   clones it from there.
 4. When the tag reaches GitHub, `.github/workflows/release.yml` runs the CI
    checks, makes sure the tag is the version in `manifest.json`, `package.json`
    and `versions.json`, builds it, attests `main.js`, and creates a **draft**
