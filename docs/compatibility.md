@@ -105,10 +105,14 @@ The citation forms are an agreement with Paper Trail, described in
   breaking, because `versions.json` tells an older Obsidian which release it
   can still install. So every release keeps its line there: `npm version` adds
   it, and the release workflow refuses a tag without one.
-- **Desktop only** (`isDesktopOnly`), because an export runs pandoc.
+- **Desktop only** (`isDesktopOnly`), because an export runs pandoc, and the
+  built-in one runs through Node's WASI.
 - **Pandoc:** the README says which version Due Credit is tested with, the one
-  CI pins. Needing a newer pandoc for something that already worked is
-  breaking.
+  CI pins, which is the built-in pandoc's too. Needing a newer pandoc for
+  something that already worked is breaking. An installed pandoc on the PATH,
+  or the one the setting names, keeps coming first: running the built-in one
+  instead, when one is installed, is breaking. So is the built-in one losing a
+  format it makes: Word, Markdown and LaTeX.
 
 ## Not covered
 

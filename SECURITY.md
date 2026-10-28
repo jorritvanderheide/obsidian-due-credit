@@ -18,14 +18,18 @@ is made public.
 
 ## What counts
 
-Due Credit runs the pandoc you installed on the note you export. It reads that
+Due Credit runs the pandoc you installed on the note you export, or, without
+one, pandoc's built-in version, which it downloads once when you agree, checks
+against a pinned hash, and runs inside Obsidian. It reads that
 note, your bibliography and your citation style, and writes only the file you
 pick in the save dialog, never inside your vault, and a citation at the cursor
 when you insert or change one. See
 [section 11 of the README](README.md#11-network-and-file-disclosure). Anything
 that makes it run a program other than pandoc, write somewhere you didn't
 choose, or lets the text of a note change what pandoc reads, writes or runs is a
-security problem.
+security problem. So is the built-in pandoc being kept or run without matching
+its hash, seeing more of your disk than the vault and the files it needs, or
+Due Credit connecting anywhere but pandoc's release to download it.
 
 The plugin directory's health report warns that Due Credit executes programs
 and uses the filesystem directly. Those are pandoc and the files above, as

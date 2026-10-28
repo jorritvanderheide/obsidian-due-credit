@@ -32,11 +32,15 @@ and tags.
 
 ## 1 Installation
 
-1. **Install pandoc** from [pandoc.org](https://pandoc.org/installing.html).
-   Due Credit is tested with pandoc 3.7.
-2. **For PDF, install a TeX distribution** that includes xelatex, such as
-   [TeX Live](https://tug.org/texlive/) or [MiKTeX](https://miktex.org/). You
-   can skip this if you only need Word, Markdown or LaTeX.
+1. **Pandoc**, which makes the file. If you have it installed, Due Credit
+   uses it; it's tested with pandoc 3.13. If you don't, or can't install it,
+   as on a computer your work manages, Due Credit offers to download pandoc's
+   own built-in version the first time you export: 17 MB, once. It makes
+   Word, Markdown and LaTeX.
+2. **For PDF, install pandoc and a TeX distribution** that includes xelatex,
+   such as [TeX Live](https://tug.org/texlive/) or
+   [MiKTeX](https://miktex.org/). You can skip this if you only need Word,
+   Markdown or LaTeX.
 3. **For citations, export a `.bib` file from Zotero** with
    [Better BibTeX](https://retorque.re/zotero-better-bibtex/)'s auto-export
    turned on, so it stays up to date as you add papers. Without one, links
@@ -83,8 +87,9 @@ comments are stripped, and only a handful of properties, like the author and
 date, go into the file. [Section 11](#11-network-and-file-disclosure) lists
 exactly what it reads and writes.
 
-It doesn't connect to the internet itself, and the only program it runs is
-pandoc.
+It connects to the internet only to download the built-in pandoc, once, when
+you have no pandoc installed and agree to. The only program it runs is an
+installed pandoc; the built-in one runs inside Obsidian.
 
 The health report in Obsidian's plugin directory warns about two things, and
 both are how the export works. *Shell Execution* is pandoc: Due Credit starts
@@ -92,8 +97,8 @@ it directly, without a shell in between, and starts nothing else. *Direct
 Filesystem Access* is for what the Obsidian API can't reach: reading your
 bibliography and citation style wherever you keep them, checking that the
 files in your settings exist, putting pandoc's filters, the PDF font and the
-note's properties in a temporary folder, and making sure an export doesn't land
-in your vault.
+note's properties in a temporary folder, keeping the built-in pandoc in your
+cache folder, and making sure an export doesn't land in your vault.
 
 Every push is tested, and every release is built in the open with a signed
 attestation, so you can check that the file you installed is the one that was
@@ -310,7 +315,7 @@ or on its tab, so you can export a note without opening it.
 
 | Setting | Default | |
 | --- | --- | --- |
-| **Pandoc** | `pandoc` | Its name if it's on your PATH, or its full path. |
+| **Pandoc** | `pandoc` | Its name if it's on your PATH, or its full path. Without one, Due Credit offers to download pandoc's built-in version, once, for Word, Markdown and LaTeX. |
 | **Pandoc arguments** | None | Added to every export, such as `--toc`, `--number-sections`, `-V geometry:margin=2.5cm`, `-V "mainfont=TeX Gyre Pagella"` or `--filter pandoc-crossref`. Quotes keep a value with spaces together. Arguments that would change where the file goes, what's read or the format are refused. |
 | **Output folder** | `~/Documents` | Where the save dialog opens the first time. After that, it opens where your last export went. |
 | **Word template** | Pandoc's own | A `.docx` whose styles a Word export uses: fonts, headings and margins, as your university or journal wants them. |
@@ -348,8 +353,11 @@ gets the chapter out of your vault.
 
 ## 11 Network and file disclosure
 
-Due Credit runs entirely on your computer. It doesn't connect to the internet
-itself, and doesn't send anything anywhere.
+Due Credit runs entirely on your computer, and doesn't send anything of yours
+anywhere. It connects to the internet once, if you agree: to download the
+built-in pandoc from pandoc's own release on GitHub, `pandoc-3.13-wasm.zip`,
+when you have no pandoc installed. What comes back is checked against a hash
+in Due Credit before it's kept.
 
 ### 11.1 What it reads
 
@@ -374,6 +382,12 @@ in your vault.
   **Toggle author in citation**.
 - **The export:** Only the file you pick in the save dialog, never inside your
   vault.
+- **The built-in pandoc:** when you agree to download it, in your user cache
+  folder, outside the vault: `~/.cache/obsidian-citation-core` on Linux,
+  `~/Library/Caches/obsidian-citation-core` on macOS, and
+  `obsidian-citation-core\Cache` in `%LOCALAPPDATA%` on Windows. In the Open
+  uses the same file. You can delete it; it's downloaded again, if you agree,
+  the next time it's needed.
 - **Temporary files:** For each export, pandoc's filters, the PDF font and the
   note's properties go in a temporary folder, which is removed afterwards.
 
@@ -385,11 +399,14 @@ in your vault.
 ### 11.4 What it runs
 
 - **Pandoc:** The one you set in **Pandoc**, and for a PDF, xelatex through
-  pandoc. Nothing else.
+  pandoc. Without one, the built-in pandoc, which runs inside Obsidian and
+  sees only your vault, the files in your settings, the folder you export to
+  and its temporary folder. Nothing else.
 
-Pandoc itself downloads an image your note links to on the web, like
+An installed pandoc downloads an image your note links to on the web, like
 `![](https://…/figure.png)`, to put it in the file. That's pandoc's own
-behaviour, and it only happens for images that are on the web.
+behaviour, and it only happens for images that are on the web. The built-in
+pandoc can't: it puts the image's description in its place, and says so.
 
 ### 11.5 How releases are built
 

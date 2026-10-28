@@ -2,7 +2,8 @@
 
 Due Credit turns a note into pandoc's input, runs pandoc, and writes the file
 you chose. It also writes citations, at the cursor, from the bibliography. It
-writes nothing else in the vault and talks to nothing but pandoc.
+writes nothing else in the vault and talks to nothing but pandoc, except to
+download the built-in pandoc, once, when there's none installed.
 
 ## Layers
 
@@ -53,9 +54,11 @@ Obsidian and decide nothing.
 5. **Ask where to save**, with Electron's save dialog (through `remote`, as
    Obsidian's own PDF export does), and refuse a path inside the vault, by real
    path, so a symlink can't get around it.
-6. **Run pandoc** with the note on stdin, from a temporary folder holding the
-   filters, the Markdown template, the font and the metadata. The folder is
-   removed afterwards.
+6. **Run pandoc**, the installed one or the built-in one (the core's
+   `pandocFor`, which asks before downloading it; a PDF needs an installed
+   one), with every path as that pandoc sees it (`seen`, `seenArgs`), with the
+   note on stdin, from a temporary folder holding the filters, the Markdown
+   template, the font and the metadata. The folder is removed afterwards.
 7. **Report** where the file went, with Open and Show in folder, and pandoc's
    warnings if there were any.
 

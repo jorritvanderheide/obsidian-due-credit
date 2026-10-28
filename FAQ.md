@@ -11,19 +11,44 @@ Can't find your answer here? Please
 
 ## Getting it to run
 
+### "Download pandoc?"
+
+Due Credit can't find pandoc installed, so it offers pandoc's own built-in
+version: 17 MB from pandoc's release on GitHub, once, kept outside your vault.
+It makes Word, Markdown and LaTeX, but not a PDF. If pandoc is installed but
+not found, Obsidian may not see the same PATH as your terminal: set **Pandoc**
+in the settings to its full path instead. Run `which pandoc` (macOS, Linux)
+or `where pandoc` (Windows) in a terminal to find it.
+
 ### "Couldn't find pandoc at …"
 
-Due Credit runs pandoc, which you install separately from
-[pandoc.org](https://pandoc.org/installing.html). If it's installed but not
-found, Obsidian may not see the same PATH as your terminal. Set **Pandoc** in
-the settings to its full path: run `which pandoc` (macOS, Linux) or
-`where pandoc` (Windows) in a terminal to find it.
+**Pandoc** in the settings names a pandoc that isn't there. Fix the path, or
+set it back to `pandoc`: then Due Credit uses the one on your PATH, or offers
+its built-in one.
+
+### "Couldn't download pandoc: …"
+
+The download from GitHub failed, or what came back isn't the pandoc Due
+Credit was tested with, so it wasn't kept. Try again later, or install pandoc
+from [pandoc.org](https://pandoc.org/installing.html).
 
 ### A PDF export fails, but Word works
 
 A PDF needs xelatex, which comes with a TeX distribution such as
 [TeX Live](https://tug.org/texlive/) or [MiKTeX](https://miktex.org/). Install
 one, and restart Obsidian so it sees the new PATH.
+
+### "A PDF needs pandoc and xelatex installed, and Due Credit can't find pandoc. …"
+
+The built-in pandoc runs inside Obsidian, and can't run xelatex. Install
+pandoc and a TeX distribution, or set pandoc's full path in the settings if
+it's installed already.
+
+### "Could not fetch resource …: pandoc was compiled without HTTP support"
+
+The built-in pandoc can't download an image your note links to on the web,
+so the file has the image's description in its place. Save the image in your
+vault and embed that, or install pandoc, which downloads it.
 
 ### "There's no bibliography at …"
 

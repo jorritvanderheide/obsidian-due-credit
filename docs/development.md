@@ -55,9 +55,11 @@ tests, the filters through a real pandoc among them, are in the core.
 
 ### Moving to a newer pandoc
 
-The core's tests expect the pandoc in its flake's nixpkgs, 3.7.0.2. To move to
-a newer one, update nixpkgs in the core, update the expected output where
-citeproc changed it, and update "tested with pandoc" in the README here.
+The core's tests expect pandoc 3.13, the built-in pandoc's version, which the
+core's flake pins twice: pandoc's static build, and its WebAssembly build. To
+move to a newer one, update both in the core's flake and the hashes in its
+`src/core/built-in.ts`, update the expected output where citeproc changed it,
+and update "tested with pandoc" in the README here.
 
 ## The conformance check
 

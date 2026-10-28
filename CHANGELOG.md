@@ -3,6 +3,15 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- Export without pandoc installed: Due Credit offers to download pandoc's own
+  built-in version the first time, 17 MB, once, and runs it inside Obsidian,
+  for Word, Markdown and LaTeX. A PDF still needs pandoc and xelatex
+  installed, and an installed pandoc still comes first. Tested with pandoc
+  3.13, up from 3.7, whose reference lists differ slightly: a journal article
+  without a journal now has its title in italics.
+
 ## 1.4.0
 
 - **Insert citation** picks a paper from your bibliography and writes a link to

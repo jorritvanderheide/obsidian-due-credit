@@ -2,24 +2,29 @@
 import { existsSync, realpathSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { homedir } from 'os';
-import { basename, delimiter, dirname, join } from 'path';
+import path, { basename, dirname, isAbsolute, join } from 'path';
 import { remote, shell } from 'electron';
-import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
+import { FileSystemAdapter, MarkdownView, Notice, parseYaml, requestUrl, type App, type TFile } from 'obsidian';
 import {
 	bibKeys,
+	BUILT_IN,
+	builtInFolder,
+	choosePandoc,
 	cslPath,
-	dumpArgs,
 	expandHome,
 	ExportError,
+	findOnPath,
 	FORMATS,
 	inputFiles,
 	insideVault,
 	lineBreaks,
 	noteStyle,
 	pandocArgs,
+	pandocFor,
 	prepare,
 	refused,
-	run,
+	seen,
+	seenArgs,
 	settingPath,
 	splitArgs,
 	styled,
@@ -27,6 +32,7 @@ import {
 	withFiles,
 	type Format,
 	type Missing,
+	type Pandoc,
 	type Vault,
 } from 'obsidian-citation-core';
 import { startFolder } from '../core/settings';
@@ -63,7 +69,16 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const extra = splitArgs(settings.extraArgs, home);
 	const refusal = refused(extra);
 	if (refusal) throw new ExportError(`Your Pandoc arguments include ${refusal.arg}, which Due Credit doesn't pass on: ${refusal.why}.`);
-	const inputs = extra.length > 0 ? inputFiles(await dumpArgs(settings.pandocPath, extra, vault, SETTINGS)) : [];
+	// The built-in pandoc runs no PDF engine: said before it is downloaded for nothing.
+	if (format === 'pdf' && choosePandoc(settings.pandocPath, (name) => findOnPath(name, process.env, path, existsSync)).kind === 'built-in') {
+		throw new ExportError("A PDF needs pandoc and xelatex installed, and Due Credit can't find pandoc. Install both, or set pandoc's full path in the Due Credit settings. Word, Markdown and LaTeX work without them.");
+	}
+	const pandoc = await pandocToRun(app, settings.pandocPath, vault);
+	if (pandoc === null) return;
+	// Your arguments' paths as pandoc sees them: a file outside the vault is
+	// given to the built-in pandoc under a name of its own.
+	const args = seenArgs(extra, (host) => pandoc.see(host), (value) => isAbsolute(value) && existsSync(value));
+	const inputs = args.length > 0 ? inputFiles(await pandoc.dumpArgs(args)) : [];
 	if (inputs.length > 0) {
 		throw new ExportError(`Your Pandoc arguments include ${inputs.join(', ')}, which pandoc would export instead of the note. Make it an option's value, or leave it out.`);
 	}
@@ -76,7 +91,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		resolve: (linkpath) => {
 			const dest = app.metadataCache.getFirstLinkpathDest(linkpath, file.path);
 			if (!dest) return null;
-			return { path: dest.path, file: adapter.getFullPath(dest.path), frontmatter: app.metadataCache.getFileCache(dest)?.frontmatter };
+			return { path: dest.path, file: pandoc.see(adapter.getFullPath(dest.path)), frontmatter: app.metadataCache.getFileCache(dest)?.frontmatter };
 		},
 		// Not exported without them: the author and date would go missing without a word.
 		parseYaml: (yaml) => {
@@ -126,21 +141,24 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	let warnings: string;
 	try {
 		warnings = await withFiles(metadata, (files) =>
-			run(
-				settings.pandocPath,
-				pandocArgs(format, {
-					...files,
-					bibliography,
-					csl,
-					resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),
-					hardLineBreaks: lineBreaks(appConfig),
-					referenceDoc,
-					extra,
-					output,
-				}),
+			pandoc.run(
+				pandocArgs(
+					format,
+					seen(
+						{
+							...files,
+							bibliography,
+							csl,
+							resourcePath: [vault, dirname(adapter.getFullPath(file.path))].map((dir) => pandoc.see(dir)).join(pandoc.delimiter),
+							hardLineBreaks: lineBreaks(appConfig),
+							referenceDoc,
+							extra: args,
+							output,
+						},
+						(host) => pandoc.see(host),
+					),
+				),
 				markdown,
-				vault,
-				SETTINGS,
 			),
 		);
 	} finally {
@@ -150,6 +168,43 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	settings.lastFolder = dirname(output);
 	await context.saveSettings();
 	exported(output, warnings);
+}
+
+/**
+ * The pandoc the **Pandoc** setting asks for. Without an installed one, the
+ * built-in one, which is asked about and downloaded the first time; null when
+ * that's declined.
+ */
+async function pandocToRun(app: App, setting: string, vault: string): Promise<Pandoc | null> {
+	let downloading: Notice | null = null;
+	try {
+		return await pandocFor(
+			setting,
+			vault,
+			SETTINGS,
+			async () => {
+				const yes = await confirm(
+					app,
+					'Download pandoc?',
+					(el) => {
+						el.createEl('p', { text: "Exporting turns a note into a document with pandoc, and Due Credit can't find one installed." });
+						el.createEl('p', {
+							text: `Due Credit can download pandoc ${BUILT_IN.version} from pandoc's own release on GitHub (${BUILT_IN.megabytes} MB), once. It's kept in ${builtInFolder()}, outside your vault, and runs inside Obsidian, for Word, Markdown and LaTeX. Or install pandoc, or set its full path in the Due Credit settings, and export again.`,
+						});
+					},
+					'Download',
+				);
+				if (yes) downloading = new Notice(`Downloading pandoc ${BUILT_IN.version}…`, 0);
+				return yes;
+			},
+			async (url) => (await requestUrl({ url })).arrayBuffer,
+		);
+	} catch (error) {
+		if (error instanceof ExportError) throw error;
+		throw new ExportError(`Couldn't download pandoc: ${error instanceof Error ? error.message : String(error)}. Try again, or install pandoc.`);
+	} finally {
+		(downloading as Notice | null)?.hide();
+	}
 }
 
 function confirmReplace(context: Context, output: string): Promise<boolean> {

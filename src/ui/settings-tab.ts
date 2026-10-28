@@ -57,7 +57,7 @@ export class SettingsTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Pandoc',
-						desc: "The pandoc program: its name if it's on your PATH, or its full path. Exporting to PDF also needs xelatex, which comes with any TeX distribution.",
+						desc: "The pandoc program: its name if it's on your PATH, or its full path. Without one, Due Credit offers to download pandoc's built-in version, once, for Word, Markdown and LaTeX. Exporting to PDF needs pandoc installed, and xelatex, which comes with any TeX distribution.",
 						control: { type: 'text', key: 'pandocPath', placeholder: 'pandoc' },
 					},
 					{
