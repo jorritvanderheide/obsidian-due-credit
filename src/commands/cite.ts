@@ -19,7 +19,7 @@ async function works(context: Context): Promise<Entry[] | null> {
 	const adapter = app.vault.adapter;
 	if (!(adapter instanceof FileSystemAdapter)) return null;
 	if (settings.bibliography === '') {
-		new Notice('Insert citation lists the works in your bibliography, so it needs one: set its path in the Due Credit settings first.');
+		new Notice('Insert citation picks a paper from your bibliography, but no bibliography is set. Set its path in the Due Credit settings.');
 		return null;
 	}
 	const path = settingPath(settings.bibliography, adapter.getBasePath(), homedir());
@@ -32,7 +32,7 @@ async function works(context: Context): Promise<Entry[] | null> {
 	}
 	if (read?.path !== path || read.modified !== modified) read = { path, modified, entries: bibEntries(await readFile(path, 'utf8')) };
 	if (read.entries.length === 0) {
-		new Notice(`There are no works in ${path} yet.`);
+		new Notice(`There's nothing to cite in ${path} yet. Once Better BibTeX exports a paper to it, you can pick it here.`);
 		return null;
 	}
 	return read.entries;
@@ -48,8 +48,8 @@ function targetOf(app: App, key: string, property: string): string {
 	return note?.basename ?? key;
 }
 
-function askPage(app: App, name: string): Promise<string | null> {
-	return prompt(app, `Page in ${name}`, '4, or ch. 3', 'Cite');
+function askPage(app: App, name: string, cta: string): Promise<string | null> {
+	return prompt(app, `Page in ${name}`, '4, or ch. 3', cta);
 }
 
 export async function insertCitation(context: Context): Promise<void> {
@@ -68,7 +68,7 @@ export async function insertCitation(context: Context): Promise<void> {
 	// anywhere: a citation without the page you meant is a quiet mistake.
 	let page = '';
 	if (picked.withPage) {
-		const typed = await askPage(app, target);
+		const typed = await askPage(app, target, 'Cite');
 		if (typed === null) return;
 		page = typed;
 	}
@@ -102,13 +102,13 @@ export async function addPage(context: Context): Promise<void> {
 		return;
 	}
 	const before = editor.getLine(cursor.line).slice(link.from, link.to);
-	const page = await askPage(app, linkName(link));
+	const page = await askPage(app, linkName(link), 'Add page');
 	if (page === null) return;
 
 	// The note can change while the question is open, and replacing a range
 	// that now holds other words would overwrite them.
 	if (editor.getLine(cursor.line).slice(link.from, link.to) !== before) {
-		new Notice('The note changed while you were typing the page, so nothing was changed. Try again.');
+		new Notice('The note changed while you were typing the page, so Due Credit left the citation as it was. Please try again.');
 		return;
 	}
 	editor.replaceRange(withPage(link, page), { line: cursor.line, ch: link.from }, { line: cursor.line, ch: link.to });

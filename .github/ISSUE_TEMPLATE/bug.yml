@@ -5,7 +5,7 @@ body:
     - type: markdown
       attributes:
           value: |
-              Thanks for taking the time to report this. Before you start, have a quick look at the [FAQ](https://github.com/jorritvanderheide/obsidian-due-credit/blob/main/FAQ.md): the most common surprises, like a citation that comes out as plain text, are explained there.
+              Thanks for taking the time to report this. Before you start, have a quick look at the [FAQ](https://github.com/jorritvanderheide/obsidian-due-credit/blob/main/FAQ.md). It covers the things people run into most, like a citation that comes out as plain text.
 
               Found a security problem? Please don't report it here. Use [private reporting](https://github.com/jorritvanderheide/obsidian-due-credit/security/advisories/new) instead.
 
@@ -69,7 +69,7 @@ body:
       id: pandoc
       attributes:
           label: Pandoc version
-          description: The first line of `pandoc --version`.
+          description: The first line of `pandoc --version`, or "built-in" if Due Credit downloaded pandoc for you.
       validations:
           required: true
 

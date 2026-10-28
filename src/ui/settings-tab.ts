@@ -38,7 +38,7 @@ export class SettingsTab extends PluginSettingTab {
 
 	private argsStatus(): string {
 		const refusal = refused(splitArgs(this.plugin.settings.extraArgs, homedir()));
-		return refusal ? ` ⚠ ${refusal.arg} isn't passed on, so exports stop until you remove it: ${refusal.why}.` : '';
+		return refusal ? ` ⚠ Due Credit can't pass ${refusal.arg} on to pandoc, because ${refusal.why}. Exports stop until you take it out.` : '';
 	}
 
 	private cslStatus(): string {
@@ -57,25 +57,25 @@ export class SettingsTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Pandoc',
-						desc: "The pandoc program: its name if it's on your PATH, or its full path. Without one, Due Credit offers to download pandoc's built-in version, once, for Word, Markdown and LaTeX. Exporting to PDF needs pandoc installed, and xelatex, which comes with any TeX distribution.",
+						desc: "If you installed pandoc, this can usually stay pandoc. If Due Credit doesn't find it, give its full path. Without pandoc installed, Due Credit offers to download a copy that runs inside Obsidian, for Word, Markdown and LaTeX. A PDF needs pandoc installed, and xelatex, which comes with any TeX distribution.",
 						control: { type: 'text', key: 'pandocPath', placeholder: 'pandoc' },
 					},
 					{
 						name: 'Pandoc arguments',
 						desc:
-							'Added to every export, such as --toc, --number-sections, -V geometry:margin=2.5cm or, with pandoc installed, --filter pandoc-crossref. A filter of yours runs after Due Credit’s and before citations are rendered. Quotes keep a value with spaces together, ~ is your home folder, and a relative path starts from the vault. Arguments that change where the file goes, what’s read or the format are refused, because those are up to Due Credit.' +
+							'Added to every export, like --toc, --number-sections, -V geometry:margin=2.5cm or, with pandoc installed, --filter pandoc-crossref. A filter of yours runs after Due Credit’s own and before the citations are formatted. Put quotes around a value with spaces. ~ is your home folder, and a relative path starts from your vault. Due Credit can’t pass on an argument that changes where the file goes, how the note is read or the format, and if you add one, it says so here.' +
 							this.argsStatus(),
 						control: { type: 'text', key: 'extraArgs', placeholder: '--toc --number-sections' },
 					},
 					{
 						name: 'Output folder',
-						desc: 'Where the save dialog opens until your first export. After that, it opens where your last export went, until you change this. ~ is your home folder. An export can replace a file you pick, but is never saved inside the vault.',
+						desc: 'Where the save dialog opens the first time you export. After that, it opens where your last export went, until you change this. ~ is your home folder. Exports are never saved inside your vault. Outside it, the dialog asks before an export replaces a file.',
 						control: { type: 'text', key: 'outputFolder', placeholder: '~/Documents' },
 					},
 					{
 						name: 'Word template',
 						desc:
-							'A .docx whose styles a Word export uses: fonts, headings and margins, as your university or journal wants them. A path in the vault, or outside it starting with / or ~. Leave it empty for pandoc’s own styles. To start from those, run: pandoc -o reference.docx --print-default-data-file reference.docx' +
+							'A Word file with the fonts, headings and margins your university or journal wants, for Word exports to use. It can be in your vault, or outside it with a path starting with / or ~. Leave it empty for pandoc’s default styles. To make one from those, run pandoc -o reference.docx --print-default-data-file reference.docx and change the styles in Word.' +
 							this.fileStatus(this.plugin.settings.referenceDoc, 'Word exports stop'),
 						control: { type: 'text', key: 'referenceDoc', placeholder: 'Pandoc’s own' },
 					},
@@ -88,18 +88,18 @@ export class SettingsTab extends PluginSettingTab {
 					{
 						name: 'Bibliography',
 						desc:
-							'The .bib file Better BibTeX keeps up to date: a path in the vault, or outside it starting with / or ~. A link whose name is one of its keys exports as a citation, and every other link as its text. Leave it empty to export without citations.' +
+							'The .bib file that Better BibTeX’s auto-export keeps up to date. A link to one of its keys, like [[marsh2024]], exports as a citation, and any other link as its text. The file can be in your vault, or outside it with a path starting with / or ~. Leave it empty to export without citations.' +
 							this.fileStatus(this.plugin.settings.bibliography, 'exports stop'),
 						control: { type: 'text', key: 'bibliography', placeholder: 'Literature/library.bib' },
 					},
 					{
 						name: 'Papers folder',
-						desc: "Where your paper notes are. Before an export, links to papers that aren't in the bibliography are listed, so a changed key can't quietly turn a citation into plain text.",
+						desc: "The folder with your paper notes. Before an export, Due Credit lists every link to a paper note whose key isn't in your bibliography, because it would come out as plain text.",
 						control: { type: 'folder', key: 'literatureFolder', placeholder: 'Literature' },
 					},
 					{
 						name: 'Citation key property',
-						desc: 'The property that holds a paper note’s citation key. A link to a note with one cites that key, whatever the note is called, and keeps working when Better BibTeX changes the key. Paper Trail writes citekey.',
+						desc: 'The property that holds a paper note’s citation key. A link to a note with one cites that key, whatever the note is called. When Better BibTeX changes a key, your links keep working once the property has the new one. Paper Trail writes citekey.',
 						control: { type: 'text', key: 'keyProperty', placeholder: 'citekey' },
 					},
 					{

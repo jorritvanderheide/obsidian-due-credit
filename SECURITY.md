@@ -13,25 +13,32 @@ through GitHub instead:
 https://github.com/jorritvanderheide/obsidian-due-credit/security/advisories/new
 
 Include the Due Credit, Obsidian and pandoc versions, your operating system,
-and the steps to reproduce it. Reports are looked at before anything about them
-is made public.
+and the steps to reproduce it. I'll look into your report before anything about
+it is made public.
 
 ## What counts
 
-Due Credit runs the pandoc you installed on the note you export, or, without
-one, pandoc's built-in version, which it downloads once when you agree, checks
-against a pinned hash, and runs inside Obsidian. It reads that
-note, your bibliography and your citation style, and writes only the file you
-pick in the save dialog, never inside your vault, a citation at the cursor
-when you insert or change one, and, when you agree to download it, the
-built-in pandoc in your cache folder. See
-[section 11 of the README](README.md#11-network-and-file-disclosure). Anything
-that makes it run a program other than pandoc, write somewhere you didn't
-choose, or lets the text of a note change what pandoc reads, writes or runs is a
-security problem. So is the built-in pandoc being kept or run without matching
-its hash, seeing more of your disk than the vault, the folders of the files
-it's given and its temporary folders, or
-Due Credit connecting anywhere but pandoc's release to download it.
+Due Credit does only a few things:
+
+- It runs pandoc on the note you export. That's the pandoc you installed, or
+  without one, the built-in pandoc. Due Credit downloads that once, when you
+  agree, checks it against a SHA-256 hash it carries, and runs it inside
+  Obsidian.
+- It reads that note, your bibliography and your citation style.
+- It writes the file you pick in the save dialog, never inside your vault,
+  and a citation at the cursor when you insert or change one. When you agree
+  to download the built-in pandoc, it also writes that to your cache folder.
+
+[Section 11 of the README](README.md#11-network-and-file-disclosure) has the
+details. Anything that does one of these is a security problem:
+
+- makes Due Credit run a program other than pandoc,
+- makes it write somewhere you didn't choose,
+- lets the text of a note change what pandoc reads, writes or runs,
+- keeps or runs a built-in pandoc that doesn't match its hash,
+- lets the built-in pandoc see more of your disk than the vault, the folders
+  of the files it's given and its temporary folders,
+- or makes Due Credit connect anywhere other than pandoc's release on GitHub.
 
 The plugin directory's health report warns that Due Credit executes programs
 and uses the filesystem directly. Those are pandoc and the files above, as
@@ -42,4 +49,4 @@ with your permission and isn't covered. Neither are problems in pandoc itself:
 please report those to [pandoc](https://github.com/jgm/pandoc).
 
 A bug that exports the wrong text, or leaves something out, is serious too, but
-it isn't secret: please report that as a normal issue, so others can see it.
+it isn't secret. Please report it as a normal issue, so others can see it.

@@ -13,30 +13,33 @@ Can't find your answer here? Please
 
 ### "Download pandoc?"
 
-Due Credit can't find pandoc installed, so it offers pandoc's own built-in
-version: 17 MB from pandoc's release on GitHub, once, kept outside your vault.
-It makes Word, Markdown and LaTeX, but not a PDF. If pandoc is installed but
-not found, Obsidian may not see the same PATH as your terminal: set **Pandoc**
-in the settings to its full path instead. Run `which pandoc` (macOS, Linux)
-or `where pandoc` (Windows) in a terminal to find it.
+Due Credit can't find pandoc on your computer, so it offers to download the
+built-in pandoc, a version that runs inside Obsidian. It's a 17 MB download
+from pandoc's release on GitHub, kept outside your vault. It makes Word,
+Markdown and LaTeX, but not a PDF.
 
-### "Couldn't find pandoc at "…". Install it, or set its full path in the Due Credit settings."
+If pandoc is installed and Due Credit still asks, Obsidian may not see the same
+PATH as your terminal. Run `which pandoc` (macOS, Linux) or `where pandoc`
+(Windows) in a terminal, and set **Pandoc** in Settings → Due Credit to the
+path it shows.
 
-**Pandoc** in the settings names a pandoc that isn't there. Fix the path, or
-set it back to `pandoc`: then Due Credit uses the one on your PATH, or offers
-its built-in one.
+### "Couldn't find pandoc at "…". Check the path in Settings → Due Credit, or set it back to "pandoc"."
+
+The path in **Pandoc** doesn't lead to a pandoc. Fix the path, or set it back
+to `pandoc`. Due Credit then uses the pandoc on your PATH, or offers the
+built-in one if there isn't one.
 
 ### "Couldn't download pandoc: …"
 
-The download from GitHub failed, or the built-in pandoc couldn't be kept in
-your cache folder; the rest of the message says which. Try again later, or
-install pandoc from [pandoc.org](https://pandoc.org/installing.html).
+Either the download from GitHub failed, or the built-in pandoc couldn't be
+saved in your cache folder. The rest of the message says which. Try again
+later, or install pandoc from [pandoc.org](https://pandoc.org/installing.html).
 
-### "The built-in pandoc from … isn't the one this plugin was tested with, so it wasn't kept. Try again later, or install pandoc."
+### "The pandoc download didn't match the version this plugin was tested with, so it wasn't used. Try again later, or install pandoc yourself."
 
-What came back from GitHub doesn't match the hash Due Credit has for it, so it
-wasn't kept or run. Try again later; if it keeps happening, install pandoc
-from [pandoc.org](https://pandoc.org/installing.html).
+The file that came back from GitHub isn't exactly the one Due Credit was tested
+with, so Due Credit didn't keep it or run it. Try again later. If it keeps
+happening, install pandoc from [pandoc.org](https://pandoc.org/installing.html).
 
 ### A PDF export fails, but Word works
 
@@ -67,12 +70,12 @@ A style name like `apa` is looked up in Zotero's styles folder,
 `~/Zotero/styles`. Install the style in Zotero (Settings → Cite), or give the
 full path to a `.csl` file.
 
-### "Your Pandoc arguments include …, which Due Credit doesn't pass on"
+### "Your Pandoc arguments include …, which Due Credit can't pass on to pandoc"
 
-Some arguments would change what Due Credit decides: where the file goes, how
-the note is read, or the format. `-o`, `-f`, `-t` and a defaults file are among
-them. The message says why. [Settings](docs/settings.md#pandoc-arguments) in the
-docs has the full list.
+Due Credit takes care of where the file goes, how the note is read and the
+format. An argument that changes one of those, like `-o`, `-f`, `-t` or a
+defaults file, can't be passed on. The message says why, and
+[Settings](docs/settings.md#pandoc-arguments) in the docs has the full list.
 
 ### "… which pandoc would export instead of the note"
 
@@ -80,11 +83,12 @@ Pandoc reads a word that isn't an option's value as a file to export. Usually
 it's a value whose option is missing, or a value with spaces that needs quotes:
 `-V "mainfont=TeX Gyre Pagella"`.
 
-### "The properties of … aren't valid YAML"
+### "The properties of … have a mistake in them"
 
-The note's properties have a mistake in them. Open the note in source mode,
-where Obsidian shows what's wrong, and fix it. Due Credit doesn't export without
-them, because the author and date would go missing without a word.
+Something in the note's properties can't be read, like a quote that isn't
+closed. Open the note in source mode, where Obsidian shows what's wrong, and
+fix it. Due Credit won't export the note without its properties, because the
+author and date would go missing without a word.
 
 ## Citations
 
@@ -93,30 +97,33 @@ them, because the author and date would go missing without a word.
 The key isn't in your bibliography. Usually Better BibTeX changed the key, or its
 auto-export hasn't run since you added the paper. Due Credit lists these links
 before it exports, so you can fix them first. A link to one of your own notes
-always exports as its words, on purpose.
+always exports as its words. That's on purpose, because your reader can't open
+your vault.
 
 ### My citation came out as "((Marsh 2024))"
 
-Don't put your own parentheses around a citation: the export adds them. Write
-`as shown [[marsh2024]]`, not `as shown ([[marsh2024]])`.
+Don't put your own parentheses around a citation, because the export adds
+them. Write `as shown [[marsh2024]]` instead of `as shown ([[marsh2024]])`.
 
 ### Better BibTeX changed a key, and my old links broke
 
 If the paper has a note with a `citekey` property, links to that note keep
-working: Due Credit cites whatever key the property holds, whatever the note is
-called. Links that use the old key directly need updating.
+working once the property has the new key. Due Credit cites whatever key the
+property holds, whatever the note is called. Links that use the old key
+directly need updating.
 
 ### How do I name the author in my sentence?
 
 Run **Toggle author in citation** with the cursor on the citation. It puts a
 `-` against the key: `Marsh [[marsh2024|-marsh2024, p. 12]] argues` becomes
-"Marsh (2024, 12) argues". Or write pandoc's own `As @marsh2024 argues`.
+"Marsh (2024, 12) argues". Or write `As @marsh2024 argues`, the way pandoc
+does it.
 
 ### Can I write `[[marsh2024#p. 12]]`?
 
 Yes, a page after `#` works when it starts with a number, `§`, or a locator
 like `p.` or `ch.`. But Obsidian takes it for a heading the paper's note doesn't
-have, so `[[marsh2024|marsh2024, p. 12]]` is the better form, and it's what
+have. `[[marsh2024|marsh2024, p. 12]]` works better, and it's what
 **Insert citation** writes when you press Tab for a page.
 
 ### Which link forms are there?
@@ -135,8 +142,8 @@ part of its sentence, and a citation next to one of your footnotes shares it.
 
 ### Under a footnote style, the author is missing from the footnote
 
-That's the `-` against the key: it leaves the author out of the footnote too,
-because it says your sentence names them. Under a footnote style, you usually
+That's the `-` against the key. It says your sentence names the author, and
+that leaves them out of the footnote too. Under a footnote style, you usually
 want the author in the footnote, so drop the `-`. If you switch a draft from an
 author-date style to a footnote style, read those citations again.
 
@@ -151,10 +158,11 @@ applied, because the class decides.
 
 ### Why aren't my tags and properties in the Word file?
 
-On purpose: Word keeps every property pandoc is given inside the file, so your
-tags and anything else that organises your vault would travel with the file
-you send. Only `author`, `date`, `lang`, `abstract`, `keywords`, `subtitle` and
-`reference-section-title` go along.
+That's on purpose. Word keeps every property pandoc gives it inside the file,
+where anyone you send it to can find them. Your tags, and anything else you
+use to organise your vault, would go along with it. Only `author`, `date`,
+`lang`, `abstract`, `keywords`, `subtitle` and `reference-section-title` make
+it into the file.
 
 ### How do I set the author and date?
 
@@ -168,7 +176,7 @@ Set `reference-section-title` in the note's properties, for example
 ### How do I use my university's Word styles?
 
 Set **Word template** to a `.docx` with the styles you want. To start from
-pandoc's own, run
+pandoc's default styles, run
 `pandoc -o reference.docx --print-default-data-file reference.docx`, open it in
 Word, change the styles, and save it.
 
@@ -180,8 +188,9 @@ have installed, `-V papersize=letter` for US letter, and
 
 ### Why can't I save the export inside my vault?
 
-So an export can never replace a note: a Markdown export saved next to its note
-would be the note. Save it anywhere outside the vault.
+That way an export can never replace a note. A Markdown export saved next to
+its note, under the same name, would overwrite it. Save it anywhere outside the
+vault.
 
 ## Other
 

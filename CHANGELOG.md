@@ -3,6 +3,16 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- Plainer, friendlier wording in the README, the FAQ, the settings and the
+  messages. Messages that point to the settings now say Settings → Due Credit.
+- The dialog that lists links missing from your bibliography reads right when
+  there's only one.
+- When you add a page to a citation, the button now says Add page.
+- The README introduces In the Open, which publishes a note to your website
+  and reads citations the same way.
+
 ## 1.5.1
 
 - The settings say a `--filter` in **Pandoc arguments** needs pandoc

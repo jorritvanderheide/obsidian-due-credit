@@ -40,7 +40,7 @@ import { confirm } from '../ui/confirm';
 import type { Context } from '../context';
 
 /** Where pandoc's path is set, for the core's message when pandoc isn't there. */
-const SETTINGS = 'the Due Credit settings';
+const SETTINGS = 'Settings → Due Credit';
 
 export async function exportNote(context: Context, file: TFile, format: Format): Promise<void> {
 	const { app, settings } = context;
@@ -68,10 +68,14 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	// yours that pandoc would read in place of the note.
 	const extra = splitArgs(settings.extraArgs, home);
 	const refusal = refused(extra);
-	if (refusal) throw new ExportError(`Your Pandoc arguments include ${refusal.arg}, which Due Credit doesn't pass on: ${refusal.why}.`);
+	if (refusal) {
+		throw new ExportError(
+			`Your Pandoc arguments include ${refusal.arg}, which Due Credit can't pass on to pandoc, because ${refusal.why}. Take it out of Pandoc arguments in Settings → Due Credit.`,
+		);
+	}
 	// The built-in pandoc runs no PDF engine: said before it is downloaded for nothing.
 	if (format === 'pdf' && choosePandoc(settings.pandocPath, (name) => findOnPath(name, process.env, path, existsSync)).kind === 'built-in') {
-		throw new ExportError("A PDF needs pandoc and xelatex installed, and Due Credit can't find pandoc. Install both, or set pandoc's full path in the Due Credit settings. Word, Markdown and LaTeX work without them.");
+		throw new ExportError("A PDF needs pandoc and xelatex installed, and Due Credit can't find pandoc. Install both, or set pandoc's full path in Settings → Due Credit. Word, Markdown and LaTeX work without them.");
 	}
 	const pandoc = await pandocToRun(app, settings.pandocPath, vault);
 	if (pandoc === null) return;
@@ -98,7 +102,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 			try {
 				return parseYaml(yaml) as unknown;
 			} catch {
-				throw new ExportError(`The properties of ${file.basename} aren't valid YAML, so it can't be exported. Fix them in source mode, where Obsidian shows what's wrong.`);
+				throw new ExportError(`The properties of ${file.basename} have a mistake in them, so Due Credit can't export it. Open the note in source mode, where Obsidian shows what's wrong.`);
 			}
 		},
 	};
@@ -126,7 +130,7 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	// source would be the note, and the dialog only asks whether to replace a
 	// file.
 	if (insideVault(vault, output, realpathSync)) {
-		throw new ExportError(`${output} is inside your vault, and Due Credit never writes there. Save it somewhere else.`);
+		throw new ExportError(`${output} is inside your vault. Due Credit doesn't save exports there, so an export can never replace a note. Please save it somewhere outside the vault.`);
 	}
 
 	let appConfig: unknown = null;
@@ -187,9 +191,12 @@ async function pandocToRun(app: App, setting: string, vault: string): Promise<Pa
 					app,
 					'Download pandoc?',
 					(el) => {
-						el.createEl('p', { text: "Exporting turns a note into a document with pandoc, and Due Credit can't find one installed." });
+						el.createEl('p', { text: "Due Credit uses pandoc to turn a note into a document, and it can't find pandoc on this computer." });
 						el.createEl('p', {
-							text: `Due Credit can download pandoc ${BUILT_IN.version} from pandoc's own release on GitHub (${BUILT_IN.megabytes} MB), once. It's kept in ${builtInFolder()}, outside your vault, and runs inside Obsidian, for Word, Markdown and LaTeX. Or install pandoc, or set its full path in the Due Credit settings, and export again.`,
+							text: `It can download pandoc ${BUILT_IN.version} for you, from pandoc's release on GitHub. It's a ${BUILT_IN.megabytes} MB download, kept in ${builtInFolder()}, outside your vault. This copy runs inside Obsidian, and makes Word, Markdown and LaTeX files.`,
+						});
+						el.createEl('p', {
+							text: "You can also cancel and install pandoc yourself. If it's installed already, set its full path in the Due Credit settings, and export again.",
 						});
 					},
 					'Download',
@@ -217,6 +224,7 @@ function confirmReplace(context: Context, output: string): Promise<boolean> {
 }
 
 function confirmMissing(context: Context, missing: Missing, count: number, bib: string): Promise<boolean> {
+	const one = (keys: string[]) => keys.length === 1;
 	const list = (el: HTMLElement, keys: string[]) => {
 		const ul = el.createEl('ul');
 		for (const key of keys) ul.createEl('li').createEl('code', { text: key });
@@ -227,7 +235,9 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 		(el) => {
 			if (missing.papers.length > 0) {
 				el.createEl('p', {
-					text: `These link to papers that ${bib} doesn't have, so they'll export as plain names instead of citations:`,
+					text: one(missing.papers)
+						? `This links to a paper that ${bib} doesn't have, so it'll export as plain text instead of a citation:`
+						: `These link to papers that ${bib} doesn't have, so they'll export as plain text instead of citations:`,
 				});
 				list(el, missing.papers);
 				el.createEl('p', {
@@ -236,11 +246,13 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 			}
 			if (missing.unresolved.length > 0) {
 				el.createEl('p', {
-					text: `These don't link to a note, and ${bib} has no key with their name either, so they'll export as plain text:`,
+					text: one(missing.unresolved)
+						? `This doesn't link to a note, and ${bib} has no key by its name either. It'll export as plain text:`
+						: `These don't link to a note, and ${bib} has no keys by their names either. They'll export as plain text:`,
 				});
 				list(el, missing.unresolved);
 				el.createEl('p', {
-					text: "A paper you cited before it had a note ends up here if its key isn't in the bibliography yet. So does a note you haven't written yet, which is fine.",
+					text: "A link to a note you haven't written yet ends up here, and that's fine. So does a paper you cited by its key before Better BibTeX's auto-export added it.",
 				});
 			}
 		},
