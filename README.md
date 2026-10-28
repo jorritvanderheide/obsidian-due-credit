@@ -98,7 +98,8 @@ Filesystem Access* is for what the Obsidian API can't reach: reading your
 bibliography and citation style wherever you keep them, checking that the
 files in your settings exist, putting pandoc's filters, the PDF font, the
 note's properties and, for the built-in pandoc, the note itself in a temporary
-folder, keeping the built-in pandoc in your cache folder, and making sure an export doesn't land in your vault.
+folder, keeping the built-in pandoc in your cache folder, and making sure an
+export doesn't land in your vault.
 
 Every push is tested, and every release is built in the open with a signed
 attestation, so you can check that the file you installed is the one that was
