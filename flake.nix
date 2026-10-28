@@ -43,6 +43,13 @@
           # Update with: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
           npmDepsHash = "sha256-iB8MgK1moERc8I0Sp1aMP1ekoNXe5V1KJ5Hx8xL7E/w=";
           nodejs = pkgs.nodejs_24;
+          # The tests run with the build, so nix flake check is the whole check.
+          doCheck = true;
+          checkPhase = ''
+            runHook preCheck
+            npm test
+            runHook postCheck
+          '';
           # npm writes to its cache while it installs the core, a git dependency.
           makeCacheWritable = true;
           installPhase = ''
