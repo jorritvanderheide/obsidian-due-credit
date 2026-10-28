@@ -41,7 +41,7 @@
           inherit (package) version;
           src = ./.;
           # Update with: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
-          npmDepsHash = "sha256-QMCxg2fzGR/K+54fJiOhW23DLXA1oNCEe87XdKkpaI4=";
+          npmDepsHash = "sha256-gN85JnVpC7QPUE/RzJ+zJ4bR5dYOwaIjANAJJAjFsNQ=";
           nodejs = pkgs.nodejs_24;
           # npm writes to its cache while it installs the core, a git dependency.
           makeCacheWritable = true;
