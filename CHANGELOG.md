@@ -3,7 +3,7 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.5.0
 
 - Export without pandoc installed: Due Credit offers to download pandoc's own
   built-in version the first time, 17 MB, once, and runs it inside Obsidian,
