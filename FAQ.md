@@ -77,8 +77,9 @@ called. Links that use the old key directly need updating.
 
 ### How do I name the author in my sentence?
 
-Put a `-` against the key: `Marsh [[marsh2024|-marsh2024, p. 12]] argues`
-becomes "Marsh (2024, 12) argues". Or write pandoc's own `As @marsh2024 argues`.
+Run **Toggle author in citation** with the cursor on the citation. It puts a
+`-` against the key: `Marsh [[marsh2024|-marsh2024, p. 12]] argues` becomes
+"Marsh (2024, 12) argues". Or write pandoc's own `As @marsh2024 argues`.
 
 ### Can I write `[[marsh2024#p. 12]]`?
 

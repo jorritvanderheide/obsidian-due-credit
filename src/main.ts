@@ -1,6 +1,6 @@
 import { Notice, Plugin, TFile } from 'obsidian';
 import { ExportError, FORMATS, type Format } from 'obsidian-citation-core';
-import { addPage, insertCitation } from './commands/cite';
+import { addPage, insertCitation, toggleAuthorAt } from './commands/cite';
 import { exportNote } from './commands/export';
 import { loadSettings, type Settings } from './core/settings';
 import { SettingsTab } from './ui/settings-tab';
@@ -28,6 +28,7 @@ export default class DueCredit extends Plugin {
 		// Only where there's a note to write in.
 		this.addCommand({ id: 'insert-citation', name: 'Insert citation', editorCallback: () => this.attempt(insertCitation(this)) });
 		this.addCommand({ id: 'add-page', name: 'Add page to citation', editorCallback: () => this.attempt(addPage(this)) });
+		this.addCommand({ id: 'toggle-author', name: 'Toggle author in citation', editorCallback: () => toggleAuthorAt(this) });
 
 		this.registerEvent(
 			this.app.workspace.on('file-menu', (menu, file) => {

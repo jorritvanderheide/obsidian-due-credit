@@ -41,9 +41,10 @@ drops the rest the next time it saves.
 ## Your notes
 
 - **Nothing is written in the vault** but a citation, at the cursor, when you
-  run **Insert citation** or **Add page to citation**. An export reads the note
-  and writes only the file you pick, which can't be in the vault. A change to that goes in the
-  README's disclosure and `SECURITY.md` in the same release.
+  run **Insert citation**, **Add page to citation** or **Toggle author in
+  citation**. An export reads the note and writes only the file you pick,
+  which can't be in the vault. A change to that goes in the README's
+  disclosure and `SECURITY.md` in the same release.
 - **What's read from a note:** the title (its leading H1, then the `title`
   property), the properties in `DOCUMENT_KEYS` (the core's `core/document.ts`), every
   citation form in [Citations](citations.md#what-becomes-a-citation), and the
@@ -66,8 +67,9 @@ These keep being read the way they are now:
   line that starts an entry, `@article{key,` (`bibKeys` in the core's `core/citations.ts`
   and `read_bib` in the filter). **Insert citation** lists the same entries
   (`bibEntries` in the core's `core/bibliography.ts`).
-- **What Insert citation writes:** `[[key]]`, or the paper's note by its name,
-  and a page in the label, `[[key|key, p. 4]]`, as
+- **What the citation commands write:** `[[key]]`, or the paper's note by its
+  name, a page in the label, `[[key|key, p. 4]]`, and a `-` against the key,
+  `[[key|-key, p. 4]]`, as
   [Writing them](citations.md#writing-them) says. Writing a citation another
   way is breaking for anyone whose other tools read these.
 - **Citation styles:** a name rather than a path is
@@ -80,8 +82,8 @@ These keep being read the way they are now:
   `data.json` lives, and the start of every command ID.
 - **Command IDs** are `due-credit:export-docx`, `export-pdf`, `export-md` and
   `export-tex`, made from the keys of `FORMATS` in the core's `core/document.ts`,
-  and `due-credit:insert-citation` and `due-credit:add-page`. People
-  bind hotkeys to them, so renaming or removing one is breaking. A command's
+  and `due-credit:insert-citation`, `due-credit:add-page` and
+  `due-credit:toggle-author`. People bind hotkeys to them, so renaming or removing one is breaking. A command's
   name may change.
 - There are no views or `obsidian://` URIs to keep.
 

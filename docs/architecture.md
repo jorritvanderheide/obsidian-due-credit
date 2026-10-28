@@ -16,9 +16,9 @@ Obsidian.
 | --- | --- |
 | `src/core/settings.ts` | The settings shape, defaults and loading. Pure, with a test named after it. |
 | `src/commands/export.ts` | The export: checks the settings, reads the note, asks where to save, runs pandoc, reports back. |
-| `src/commands/cite.ts` | Insert citation and Add page to citation: the bibliography's works, read again only when the file changed, and the paper's note to link to. |
+| `src/commands/cite.ts` | Insert citation, Add page to citation and Toggle author in citation: the bibliography's works, read again only when the file changed, and the paper's note to link to. |
 | `src/ui/` | The confirmation dialog, the settings tab, the citation picker (`citation-picker.ts`) and the page question (`prompt.ts`). |
-| `src/main.ts` | Registers the six commands and the file menu items. |
+| `src/main.ts` | Registers the seven commands and the file menu items. |
 | `src/modules.d.ts` | What esbuild bundles from the core, and the part of Electron used here. |
 
 ### The core

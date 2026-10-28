@@ -11,6 +11,9 @@ breaking is in [Compatibility](docs/compatibility.md).
   rather than Zotero, so whatever you can pick, Due Credit can cite.
 - **Add page to citation** adds a page to the citation at the cursor, or just
   before it, where Obsidian's own `[[` leaves it.
+- **Toggle author in citation** leaves the author out of the citation at the
+  cursor, for a sentence that names them already: "Marsh [[marsh2024]] argues"
+  comes out as "Marsh (2024) argues". Run it again to name them again.
 
 ## 1.3.1
 

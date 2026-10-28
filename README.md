@@ -157,6 +157,9 @@ If you want to work on the plugin, or use its pandoc filter on its own:
   picker to add a page.
 - **Page numbers without retyping** - **Add page to citation** adds a page to
   a link you already wrote.
+- **The author named in your sentence** - **Toggle author in citation** leaves
+  the author out of a citation, so "Marsh [[marsh2024]] argues" comes out
+  as "Marsh (2024) argues", and puts them back if you run it again.
 - **Links become citations** - `[[marsh2024]]` becomes "(Marsh 2024)", with a
   reference list at the end.
 - **Pages, prefixes and more** - Everything pandoc can put in a citation, in
@@ -289,6 +292,9 @@ or on its tab, so you can export a note without opening it.
   writes a link to it at the cursor. Tab instead of Enter asks for a page.
 - `Due Credit: Add page to citation` - Adds a page to the citation at the
   cursor, or just before it, where Obsidian's own `[[` leaves it.
+- `Due Credit: Toggle author in citation` - Leaves the author out of the
+  citation at the cursor, for a sentence that names them already, or names
+  them again.
 - `Due Credit: Export to Word` - A `.docx` with citations and a reference list.
 - `Due Credit: Export to PDF` - The same, typeset with xelatex.
 - `Due Credit: Export to Markdown` - Plain Markdown under its title, with
@@ -363,8 +369,9 @@ itself, and doesn't send anything anywhere.
 In your notes, only what you ask for at the cursor, and nothing anywhere else
 in your vault.
 
-- **A citation:** at the cursor, when you run **Insert citation**, or a page
-  in the citation there, when you run **Add page to citation**.
+- **A citation:** at the cursor, when you run **Insert citation**, or a
+  change to the citation there, when you run **Add page to citation** or
+  **Toggle author in citation**.
 - **The export:** Only the file you pick in the save dialog, never inside your
   vault.
 - **Temporary files:** For each export, pandoc's filters, the PDF font and the

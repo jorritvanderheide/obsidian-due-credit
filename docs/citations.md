@@ -12,9 +12,10 @@ A wikilink becomes a citation when the bibliography has an entry by that key.
 Anything else exports as its words: a link to a note of your own reads as the
 text Obsidian shows, never as a dead link.
 
-Every form below is read. Due Credit writes two of them, `[[key]]` and a
-page in the label, through **Insert citation** and **Add page to citation**;
-the rest are other people's habits, and are read just the same.
+Every form below is read. Due Credit writes three of them, `[[key]]`, a
+page in the label and a `-` against the key, through **Insert citation**,
+**Add page to citation** and **Toggle author in citation**; the rest are other
+people's habits, and are read just the same.
 
 | Written | Exported |
 | --- | --- |
@@ -129,7 +130,10 @@ or the paper's note by its name when a note has the key in its citation key
 property, so the link resolves in the vault and lands in the paper's
 backlinks. Tab asks for a page, which goes in the label: `[[key|key, p. 4]]`.
 **Add page to citation** puts a page in a link already written, the way the
-label rules above read it. Both are in the core's `core/writing.ts`, which
+label rules above read it. **Toggle author in citation** puts a `-` against
+the key in the label, or takes it off: `[[key]]` becomes `[[key|-key]]`, and
+a label of your own becomes the key, with its page, since the export reads
+nothing else in it. All three are in the core's `core/writing.ts`, which
 reads the locator words from the same list as the filter: `LOCATOR_TERMS`,
 held to the filter's by a test.
 

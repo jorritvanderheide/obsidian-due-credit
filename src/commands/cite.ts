@@ -5,7 +5,7 @@
 import { readFile, stat } from 'fs/promises';
 import { homedir } from 'os';
 import { FileSystemAdapter, MarkdownView, Notice, type App } from 'obsidian';
-import { bibEntries, citationLink, linkAt, linkName, propertyKey, settingPath, withPage, type Entry } from 'obsidian-citation-core';
+import { bibEntries, citationLink, linkAt, linkName, propertyKey, settingPath, toggleAuthor, withPage, type Entry } from 'obsidian-citation-core';
 import { pickWork } from '../ui/citation-picker';
 import { prompt } from '../ui/prompt';
 import type { Context } from '../context';
@@ -112,4 +112,24 @@ export async function addPage(context: Context): Promise<void> {
 		return;
 	}
 	editor.replaceRange(withPage(link, page), { line: cursor.line, ch: link.from }, { line: cursor.line, ch: link.to });
+}
+
+/**
+ * Leave the author out of the citation at the cursor, for a sentence that
+ * names them already, or name them again: "Marsh (2024) argues" rather than
+ * "Marsh (Marsh 2024) argues".
+ */
+export function toggleAuthorAt(context: Context): void {
+	const editor = context.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
+	if (!editor) {
+		new Notice('Open a note and put the cursor on a citation.');
+		return;
+	}
+	const cursor = editor.getCursor();
+	const link = linkAt(editor.getLine(cursor.line), cursor.ch);
+	if (!link) {
+		new Notice('Put the cursor on a citation, or just after one, like [[key]].');
+		return;
+	}
+	editor.replaceRange(toggleAuthor(link), { line: cursor.line, ch: link.from }, { line: cursor.line, ch: link.to });
 }
