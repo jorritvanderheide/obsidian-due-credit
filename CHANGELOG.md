@@ -3,7 +3,7 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.4.0
 
 - **Insert citation** picks a paper from your bibliography and writes a link to
   it at the cursor, to the paper's note when it has one. Press Tab in the
