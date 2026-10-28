@@ -1,7 +1,8 @@
 # Architecture
 
 Due Credit turns a note into pandoc's input, runs pandoc, and writes the file
-you chose. It writes nothing in the vault and talks to nothing but pandoc.
+you chose. It also writes citations, at the cursor, from the bibliography. It
+writes nothing else in the vault and talks to nothing but pandoc.
 
 ## Layers
 
@@ -15,8 +16,9 @@ Obsidian.
 | --- | --- |
 | `src/core/settings.ts` | The settings shape, defaults and loading. Pure, with a test named after it. |
 | `src/commands/export.ts` | The export: checks the settings, reads the note, asks where to save, runs pandoc, reports back. |
-| `src/ui/` | The confirmation dialog and the settings tab. |
-| `src/main.ts` | Registers the four commands and the file menu items. |
+| `src/commands/cite.ts` | Insert citation and Add page to citation: the bibliography's works, read again only when the file changed, and the paper's note to link to. |
+| `src/ui/` | The confirmation dialog, the settings tab, the citation picker (`citation-picker.ts`) and the page question (`prompt.ts`). |
+| `src/main.ts` | Registers the six commands and the file menu items. |
 | `src/modules.d.ts` | What esbuild bundles from the core, and the part of Electron used here. |
 
 ### The core
@@ -25,7 +27,9 @@ Obsidian.
 | --- | --- |
 | `src/core/prepare.ts` | Every step from a note to pandoc's input, in order. See [Pipeline](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/docs/pipeline.md). |
 | `src/core/markdown.ts` | The individual rewrites: comments, tags, block IDs, footnotes, headings, images, links to paper notes. |
-| `src/core/citations.ts` | Reading a `.bib`, a link's key, and which links are about to lose their citation. |
+| `src/core/citations.ts` | Reading a `.bib`'s keys, a link's key, and which links are about to lose their citation. |
+| `src/core/bibliography.ts` | A `.bib`'s works as the picker shows them: key, names, year and title. |
+| `src/core/writing.ts` | Writing a citation, and a page into one, with the locator words held to the filter's. |
 | `src/core/document.ts` | The document's metadata, pandoc's arguments for each format, and which arguments of yours are refused. |
 | `src/core/paths.ts` | Settings paths, `~`, and whether a path is inside the vault. |
 | `src/pandoc.ts` | Running pandoc, and writing its files to a temporary folder. |

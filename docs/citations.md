@@ -12,8 +12,9 @@ A wikilink becomes a citation when the bibliography has an entry by that key.
 Anything else exports as its words: a link to a note of your own reads as the
 text Obsidian shows, never as a dead link.
 
-Every form below is read. Due Credit writes none of them: other people's
-citation habits land here, not in Paper Trail.
+Every form below is read. Due Credit writes two of them, `[[key]]` and a
+page in the label, through **Insert citation** and **Add page to citation**;
+the rest are other people's habits, and are read just the same.
 
 | Written | Exported |
 | --- | --- |
@@ -38,8 +39,8 @@ citation habits land here, not in Paper Trail.
 - **A `-` against the key** leaves the author out, as in `[-@key, p. 12]`, for a
   sentence that names them already.
 - **Any other label** is what Obsidian shows, apart from a page after its first
-  comma: `[[a|Marsh, p. 4]]` cites page 4. This is how Paper Trail's **Add page
-  to citation** adds a page to a label someone wrote.
+  comma: `[[a|Marsh, p. 4]]` cites page 4. This is how **Add page to
+  citation** adds a page to a label someone wrote.
 - **Neighbouring citations**, separated by at most a `;`, share brackets.
 
 A leading `@` in a link's name, as the Citations plugin names notes, isn't part
@@ -49,7 +50,7 @@ of the key.
 
 `[[key#p. 12]]` cites page 12 when what follows `#` starts with a number, `§`,
 or a locator word such as `p.`, `pp.`, `ch.`, `sec.` or `fig.`. Otherwise it's
-a heading, and `[[marsh2024#Claim]]` is the paper. Paper Trail doesn't write
+a heading, and `[[marsh2024#Claim]]` is the paper. Due Credit doesn't write
 this form, because Obsidian takes it for a heading the paper's note doesn't
 have, and its hover preview says so.
 
@@ -103,8 +104,8 @@ words instead of a citation (`missing` in the core's `core/prepare.ts`):
   note is one with a citation key property, or one in the papers folder. The
   key is almost always one Better BibTeX changed, or the paper is newer than
   its last auto-export.
-- **A link to no note at all, whose name isn't a key either.** Paper Trail
-  links a paper that has no note yet by its key, so a paper cited before its
+- **A link to no note at all, whose name isn't a key either.** Insert citation
+  links a paper that has no note by its key, so a paper cited before its
   auto-export ran lands here, and so does a note not written yet.
 
 A link to a note of your own is never listed. The check reads the note before
@@ -120,19 +121,26 @@ cases in `tests/pandoc.test.ts` ("one rule, written twice") runs through both. A
 The filter runs before `--citeproc`, because citeproc can only cite what the
 filter has already made.
 
+## Writing them
+
+**Insert citation** picks a work from the bibliography, the same `.bib` the
+export cites from, so whatever it offers can be cited. It writes `[[key]]`,
+or the paper's note by its name when a note has the key in its citation key
+property, so the link resolves in the vault and lands in the paper's
+backlinks. Tab asks for a page, which goes in the label: `[[key|key, p. 4]]`.
+**Add page to citation** puts a page in a link already written, the way the
+label rules above read it. Both are in the core's `core/writing.ts`, which
+reads the locator words from the same list as the filter: `LOCATOR_TERMS`,
+held to the filter's by a test.
+
 ## The agreement with Paper Trail
 
 [Paper Trail](https://github.com/jorritvanderheide/obsidian-paper-trail) writes
-citations; Due Credit reads them. Its side is in Paper Trail's
+one form: **Insert annotation** quotes a passage with a citation to its page,
+`[[key|key, p. 12]]`. Its side is in Paper Trail's
 [`docs/citations.md`](https://github.com/jorritvanderheide/obsidian-paper-trail/blob/main/docs/citations.md).
-
-- **Due Credit reads a form before Paper Trail writes it.** That's the order for
-  any new form, so no note is ever written in a spelling the export doesn't
-  know.
-- **The locator words are kept in two places, by hand.** `LOCATOR_TERMS` in
-  Paper Trail's `src/core/zotero.ts` is this filter's list of words that start a
-  locator. A change to one is a change to both: a word only one side knows is a
-  page the export drops. Make the Paper Trail change as its own change there.
+A new form is read here before Paper Trail writes it, so no note is ever
+written in a spelling the export doesn't know.
 
 ## Using the filter on its own
 

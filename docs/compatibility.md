@@ -1,7 +1,8 @@
 # Compatibility
 
 Due Credit's settings live in other people's vaults, people bind hotkeys to its
-commands, and Paper Trail writes the citations it reads. This page says what a
+commands, and the citations it reads are written by hand, by its own **Insert
+citation**, and by Paper Trail's **Insert annotation**. This page says what a
 release may and may not change, so all of that keeps working across updates.
 Changes are listed in [CHANGELOG.md](../CHANGELOG.md).
 
@@ -39,8 +40,9 @@ drops the rest the next time it saves.
 
 ## Your notes
 
-- **Nothing is written in the vault.** An export reads the note and writes only
-  the file you pick, which can't be in the vault. A change to that goes in the
+- **Nothing is written in the vault** but a citation, at the cursor, when you
+  run **Insert citation** or **Add page to citation**. An export reads the note
+  and writes only the file you pick, which can't be in the vault. A change to that goes in the
   README's disclosure and `SECURITY.md` in the same release.
 - **What's read from a note:** the title (its leading H1, then the `title`
   property), the properties in `DOCUMENT_KEYS` (the core's `core/document.ts`), every
@@ -62,7 +64,12 @@ These keep being read the way they are now:
 
 - **The bibliography**, a `.bib` file from Better BibTeX: a key is read from a
   line that starts an entry, `@article{key,` (`bibKeys` in the core's `core/citations.ts`
-  and `read_bib` in the filter).
+  and `read_bib` in the filter). **Insert citation** lists the same entries
+  (`bibEntries` in the core's `core/bibliography.ts`).
+- **What Insert citation writes:** `[[key]]`, or the paper's note by its name,
+  and a page in the label, `[[key|key, p. 4]]`, as
+  [Writing them](citations.md#writing-them) says. Writing a citation another
+  way is breaking for anyone whose other tools read these.
 - **Citation styles:** a name rather than a path is
   `~/Zotero/styles/<name>.csl`.
 - **Obsidian's `app.json`:** `strictLineBreaks`, for line breaks.
@@ -72,7 +79,8 @@ These keep being read the way they are now:
 - **The plugin ID** `due-credit` never changes. It's the plugin's folder, where
   `data.json` lives, and the start of every command ID.
 - **Command IDs** are `due-credit:export-docx`, `export-pdf`, `export-md` and
-  `export-tex`, made from the keys of `FORMATS` in the core's `core/document.ts`. People
+  `export-tex`, made from the keys of `FORMATS` in the core's `core/document.ts`,
+  and `due-credit:insert-citation` and `due-credit:add-page`. People
   bind hotkeys to them, so renaming or removing one is breaking. A command's
   name may change.
 - There are no views or `obsidian://` URIs to keep.
@@ -86,9 +94,6 @@ The citation forms are an agreement with Paper Trail, described in
   for both plugins.
 - **A new form is read here first.** Release Due Credit before Paper Trail
   writes it.
-- **The locator words** are in the filter's `LOCATOR_TERMS` and in Paper
-  Trail's, kept in step by hand. A word only one side knows is a page the
-  export drops, so change both.
 - **The Citation key property** defaults to `citekey`, which is what Paper
   Trail writes.
 

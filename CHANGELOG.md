@@ -3,6 +3,15 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- **Insert citation** picks a paper from your bibliography and writes a link to
+  it at the cursor, to the paper's note when it has one. Press Tab in the
+  picker to add a page. It moved here from Paper Trail, and reads your `.bib`
+  rather than Zotero, so whatever you can pick, Due Credit can cite.
+- **Add page to citation** adds a page to the citation at the cursor, or just
+  before it, where Obsidian's own `[[` leaves it.
+
 ## 1.3.1
 
 - The README and the security policy explain the two warnings in the plugin directory's health report: Due Credit runs pandoc, and reads your bibliography and citation style outside the vault.

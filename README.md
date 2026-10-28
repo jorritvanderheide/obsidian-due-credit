@@ -3,8 +3,8 @@
 **Export a note to Word, PDF or LaTeX through pandoc, with its links turned into real citations.**
 
 Works well with [Paper Trail](https://community.obsidian.md/plugins/paper-trail),
-which writes those links for you from your Zotero library. See
-[Works well with](#10-works-well-with).
+which turns your Zotero library into a reading queue, with a note for each
+paper. See [Works well with](#10-works-well-with).
 
 <br/>
 
@@ -55,8 +55,10 @@ Due Credit needs Obsidian 1.13 or later, on desktop.
    **Bibliography** to your `.bib` file. The default is
    `Literature/library.bib` in your vault, and a file outside the vault works
    too, starting with `/` or `~`.
-2. **Cite something.** In a note, write a link to a paper by its citation key:
-   `As [[marsh2024]] shows, …`.
+2. **Cite something.** In a note, run **Insert citation** and pick a paper
+   from your bibliography, or press Tab to add a page. It writes a link to
+   the paper by its citation key: `As [[marsh2024]] shows, …`. Typing the link
+   yourself works just as well.
 3. **Export it.** Run **Export to Word**, or right-click the note and choose it
    from the menu. Pick where to save it, and open the file: the link is now
    "(Marsh 2024)", and there's a reference list at the end.
@@ -64,15 +66,19 @@ Due Credit needs Obsidian 1.13 or later, on desktop.
 If a link is about to come out as plain text instead of a citation, Due Credit
 tells you before it exports. See [Before the export](#74-before-the-export).
 
+Due Credit cites from your `.bib`, and doesn't make a note for each paper. A
+link cites the paper either way, note or not. For a note per paper, use
+[Paper Trail](#101-paper-trail), or click the link to make one yourself.
+
 ![The menu of a note, with Export to Word, Export to PDF, Export to Markdown and Export to LaTeX](https://raw.githubusercontent.com/jorritvanderheide/obsidian-due-credit/main/images/export.png)
 
 <br/>
 
 ## 3 Safety and quality
 
-Due Credit reads your notes and writes nothing in your vault. It only writes
-the file you pick in the save dialog, and refuses any place inside your vault,
-so an export can never replace a note. What you wrote for yourself never leaves:
+Due Credit reads your notes, and writes in them only a citation you insert. An
+export only writes the file you pick in the save dialog, and refuses any place
+inside your vault, so it can never replace a note. What you wrote for yourself never leaves:
 comments are stripped, and only a handful of properties, like the author and
 date, go into the file. [Section 11](#11-network-and-file-disclosure) lists
 exactly what it reads and writes.
@@ -120,7 +126,8 @@ If you want to work on the plugin, or use its pandoc filter on its own:
 - [**Pipeline**](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/docs/pipeline.md) - Every step from a note to pandoc's input,
   in order.
 - [**Citations**](docs/citations.md) - Every link form that becomes a
-  citation, footnote styles, LaTeX, and the agreement with Paper Trail.
+  citation, how Insert citation writes them, footnote styles, LaTeX, and the
+  agreement with Paper Trail.
 - [**Settings**](docs/settings.md) - How settings are stored, and which pandoc
   arguments are refused and why.
 - [**Development**](docs/development.md) - Setup, tests, the conformance
@@ -145,6 +152,11 @@ If you want to work on the plugin, or use its pandoc filter on its own:
 
 ### 5.2 Citations
 
+- **Insert citation** - Pick a paper from your bibliography and get
+  `[[citekey]]`, linked to the paper's note when it has one. Press Tab in the
+  picker to add a page.
+- **Page numbers without retyping** - **Add page to citation** adds a page to
+  a link you already wrote.
 - **Links become citations** - `[[marsh2024]]` becomes "(Marsh 2024)", with a
   reference list at the end.
 - **Pages, prefixes and more** - Everything pandoc can put in a citation, in
@@ -270,9 +282,13 @@ own, see [Citations](docs/citations.md) in the docs and the [FAQ](FAQ.md).
 ## 8 Commands
 
 None of the commands has a hotkey, so you can choose your own in Settings →
-Hotkeys. Each one is also on a note's right-click menu, in the file explorer or
-on its tab, so you can export a note without opening it.
+Hotkeys. Each export is also on a note's right-click menu, in the file explorer
+or on its tab, so you can export a note without opening it.
 
+- `Due Credit: Insert citation` - Picks a paper from your bibliography and
+  writes a link to it at the cursor. Tab instead of Enter asks for a page.
+- `Due Credit: Add page to citation` - Adds a page to the citation at the
+  cursor, or just before it, where Obsidian's own `[[` leaves it.
 - `Due Credit: Export to Word` - A `.docx` with citations and a reference list.
 - `Due Credit: Export to PDF` - The same, typeset with xelatex.
 - `Due Credit: Export to Markdown` - Plain Markdown under its title, with
@@ -312,14 +328,15 @@ doesn't need the other, but they fit together nicely.
 ### 10.1 Paper Trail
 
 [Paper Trail](https://community.obsidian.md/plugins/paper-trail) turns your
-Zotero library into a reading queue, and writes citations as links: **Insert
-citation** picks a paper and writes `[[citekey]]`, with a page if you want one.
-Everything it writes, Due Credit reads, including prefixes, pages and the `-`
-for leaving out the author. It also gives every paper note the `citekey`
-property that keeps your citations working when Better BibTeX changes a key.
+Zotero library into a reading queue, with a note for each paper, named for its
+citation key. **Insert citation** links to those notes, so every place you
+cite a paper turns up in its backlinks. Paper Trail also gives every paper
+note the `citekey` property that keeps your citations working when Better
+BibTeX changes a key, and its **Insert annotation** quotes a passage you
+highlighted, with a citation Due Credit reads.
 
-Paper Trail helps you write the citations in your chapter, and Due Credit gets
-the chapter out of your vault.
+Paper Trail helps you read the papers, and Due Credit helps you cite them and
+gets the chapter out of your vault.
 
 <br/>
 
@@ -331,8 +348,10 @@ itself, and doesn't send anything anywhere.
 ### 11.1 What it reads
 
 - **Notes:** The note you export, and the citation keys of the notes it links
-  to.
-- **Bibliography:** The `.bib` file you set in **Bibliography**.
+  to. For **Insert citation**, the citation key property of your notes, to
+  link to a paper's note.
+- **Bibliography:** The `.bib` file you set in **Bibliography**, when you
+  export and when you insert a citation.
 - **Citation style:** From Zotero's styles folder (`~/Zotero/styles`), or the
   `.csl` file you set.
 - **Word template:** The `.docx` you set, if any.
@@ -341,8 +360,11 @@ itself, and doesn't send anything anywhere.
 
 ### 11.2 What it writes
 
-Nothing in your notes, and nothing anywhere else in your vault.
+In your notes, only what you ask for at the cursor, and nothing anywhere else
+in your vault.
 
+- **A citation:** at the cursor, when you run **Insert citation**, or a page
+  in the citation there, when you run **Add page to citation**.
 - **The export:** Only the file you pick in the save dialog, never inside your
   vault.
 - **Temporary files:** For each export, pandoc's filters, the PDF font and the

@@ -20,7 +20,8 @@ is made public.
 
 Due Credit runs the pandoc you installed on the note you export. It reads that
 note, your bibliography and your citation style, and writes only the file you
-pick in the save dialog, never inside your vault. See
+pick in the save dialog, never inside your vault, and a citation at the cursor
+when you insert one. See
 [section 11 of the README](README.md#11-network-and-file-disclosure). Anything
 that makes it run a program other than pandoc, write somewhere you didn't
 choose, or lets the text of a note change what pandoc reads, writes or runs is a

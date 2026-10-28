@@ -85,7 +85,7 @@ becomes "Marsh (2024, 12) argues". Or write pandoc's own `As @marsh2024 argues`.
 Yes, a page after `#` works when it starts with a number, `§`, or a locator
 like `p.` or `ch.`. But Obsidian takes it for a heading the paper's note doesn't
 have, so `[[marsh2024|marsh2024, p. 12]]` is the better form, and it's what
-Paper Trail writes.
+**Insert citation** writes when you press Tab for a page.
 
 ### Which link forms are there?
 
