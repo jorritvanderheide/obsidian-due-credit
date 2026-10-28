@@ -96,9 +96,9 @@ both are how the export works. *Shell Execution* is pandoc: Due Credit starts
 it directly, without a shell in between, and starts nothing else. *Direct
 Filesystem Access* is for what the Obsidian API can't reach: reading your
 bibliography and citation style wherever you keep them, checking that the
-files in your settings exist, putting pandoc's filters, the PDF font and the
-note's properties in a temporary folder, keeping the built-in pandoc in your
-cache folder, and making sure an export doesn't land in your vault.
+files in your settings exist, putting pandoc's filters, the PDF font, the
+note's properties and, for the built-in pandoc, the note itself in a temporary
+folder, keeping the built-in pandoc in your cache folder, and making sure an export doesn't land in your vault.
 
 Every push is tested, and every release is built in the open with a signed
 attestation, so you can check that the file you installed is the one that was
@@ -189,7 +189,7 @@ If you want to work on the plugin, or use its pandoc filter on its own:
 - **Word template** - Use your university's or journal's styles for fonts,
   headings and margins.
 - **Your own pandoc arguments** - Add a table of contents, numbered sections,
-  margins, a font, or a filter like pandoc-crossref.
+  margins, a font, or, with pandoc installed, a filter like pandoc-crossref.
 
 <br/>
 
@@ -315,8 +315,8 @@ or on its tab, so you can export a note without opening it.
 
 | Setting | Default | |
 | --- | --- | --- |
-| **Pandoc** | `pandoc` | Its name if it's on your PATH, or its full path. Without one, Due Credit offers to download pandoc's built-in version, once, for Word, Markdown and LaTeX. |
-| **Pandoc arguments** | None | Added to every export, such as `--toc`, `--number-sections`, `-V geometry:margin=2.5cm`, `-V "mainfont=TeX Gyre Pagella"` or `--filter pandoc-crossref`. Quotes keep a value with spaces together. Arguments that would change where the file goes, what's read or the format are refused. |
+| **Pandoc** | `pandoc` | Its name if it's on your PATH, or its full path. Without one, Due Credit offers to download pandoc's built-in version, once, for Word, Markdown and LaTeX. Exporting to PDF needs pandoc installed, and xelatex, which comes with any TeX distribution. |
+| **Pandoc arguments** | None | Added to every export, such as `--toc`, `--number-sections`, `-V geometry:margin=2.5cm`, `-V "mainfont=TeX Gyre Pagella"` or, with pandoc installed, `--filter pandoc-crossref`. Quotes keep a value with spaces together. Arguments that would change where the file goes, what's read or the format are refused. |
 | **Output folder** | `~/Documents` | Where the save dialog opens the first time. After that, it opens where your last export went. |
 | **Word template** | Pandoc's own | A `.docx` whose styles a Word export uses: fonts, headings and margins, as your university or journal wants them. |
 
@@ -371,6 +371,10 @@ in Due Credit before it's kept.
 - **Word template:** The `.docx` you set, if any.
 - **Obsidian's settings:** Whether strict line breaks are on, from the vault's
   `app.json`.
+- **Your PATH:** each folder on it, for a pandoc installed there.
+- **The built-in pandoc:** `pandoc-3.13.wasm` in your cache folder, when
+  there's no pandoc installed, checked against its hash once a session. A
+  file that doesn't match is deleted, and downloaded again if you agree.
 
 ### 11.2 What it writes
 
@@ -382,14 +386,16 @@ in your vault.
   **Toggle author in citation**.
 - **The export:** Only the file you pick in the save dialog, never inside your
   vault.
-- **The built-in pandoc:** when you agree to download it, in your user cache
-  folder, outside the vault: `~/.cache/obsidian-citation-core` on Linux,
+- **The built-in pandoc:** when you agree to download it, `pandoc-3.13.wasm`
+  (62 MB) in your user cache folder, outside the vault:
+  `~/.cache/obsidian-citation-core` on Linux (or in `$XDG_CACHE_HOME`),
   `~/Library/Caches/obsidian-citation-core` on macOS, and
   `obsidian-citation-core\Cache` in `%LOCALAPPDATA%` on Windows. In the Open
   uses the same file. You can delete it; it's downloaded again, if you agree,
   the next time it's needed.
 - **Temporary files:** For each export, pandoc's filters, the PDF font and the
-  note's properties go in a temporary folder, which is removed afterwards.
+  note's properties go in a temporary folder; with the built-in pandoc, the
+  note's text goes in a second one. Both are removed afterwards.
 
 ### 11.3 What it stores
 
@@ -400,8 +406,10 @@ in your vault.
 
 - **Pandoc:** The one you set in **Pandoc**, and for a PDF, xelatex through
   pandoc. Without one, the built-in pandoc, which runs inside Obsidian and
-  sees only your vault, the files in your settings, the folder you export to
-  and its temporary folder. Nothing else.
+  sees only your vault, the folders of the files in your settings and your
+  Pandoc arguments, the folder you export to, and its temporary folders:
+  never the rest of your disk. An installed pandoc can read and write
+  anything you can. Nothing else runs.
 
 An installed pandoc downloads an image your note links to on the web, like
 `![](https://…/figure.png)`, to put it in the file. That's pandoc's own

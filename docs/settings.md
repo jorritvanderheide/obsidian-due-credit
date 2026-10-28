@@ -13,7 +13,7 @@ The settings shape, defaults and loading are in `src/core/settings.ts`.
 | `bibliography` | `Literature/library.bib` | Export without citations |
 | `literatureFolder` | `Literature` | The default |
 | `keyProperty` | `citekey` | The default |
-| `csl` | `''` | Pandoc's built-in Chicago author-date |
+| `csl` | `''` | Pandoc's default, Chicago author-date |
 | `referenceDoc` | `''` | Pandoc's own Word styles |
 | `extraArgs` | `''` | No arguments of your own |
 
@@ -33,6 +33,15 @@ A setting that has to agree with something outside the plugin says when it
 doesn't: an export stops with a sentence when the bibliography, Word template or
 style isn't there.
 
+## Pandoc
+
+`pandoc`, the default, or empty, is the pandoc on the PATH (`findOnPath`), or
+the built-in one when there's none (`choosePandoc`, both in the core's
+`core/built-in.ts`). Any other value is used as it is, and never falls back to
+the built-in one, so a wrong path says "Couldn't find pandoc at …". A PDF
+needs an installed pandoc, and is refused before the built-in one would be
+downloaded.
+
 ## Pandoc arguments
 
 The one setting that isn't an address. `splitArgs` reads it: split at spaces,
@@ -41,7 +50,11 @@ Windows path is written as it is), and `~` at the start of a path is the home
 folder.
 
 The arguments go after Due Credit's own, so yours win, and before citeproc, so a
-filter of yours runs before citations are rendered.
+filter of yours runs before citations are rendered. A `--lua-filter` works
+with either pandoc; a `--filter` is a program of its own, which only an
+installed pandoc can run. For the built-in pandoc, an absolute path to a file
+is given as the name it sees the file by (`seenArgs`); a relative one is
+read from the vault, as an installed pandoc reads it.
 
 Some are refused (`refused` in the core's `core/document.ts`), because they'd change what
 Due Credit decides or break a promise it makes:
@@ -55,7 +68,8 @@ Due Credit decides or break a promise it makes:
 | `--extract-media`, `--log` | They write a file of their own, which could be in the vault. |
 | `--help`, `--version`, `--print-default-data-file` and the like | They print something and export nothing. |
 
-On top of that, `pandoc --dump-args` is asked what it makes of your arguments,
+On top of that, the chosen pandoc, which may first be the built-in one's
+download question, is asked what it makes of your arguments (`--dump-args`),
 and a word it would read as an input file is refused too: the export would be
 of that file instead of the note.
 

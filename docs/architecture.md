@@ -16,7 +16,7 @@ Obsidian.
 | Path | What it holds |
 | --- | --- |
 | `src/core/settings.ts` | The settings shape, defaults and loading. Pure, with a test named after it. |
-| `src/commands/export.ts` | The export: checks the settings, reads the note, asks where to save, runs pandoc, reports back. |
+| `src/commands/export.ts` | The export: checks the settings, picks the pandoc (asking before downloading the built-in one), reads the note, asks where to save, runs pandoc, reports back. |
 | `src/commands/cite.ts` | Insert citation, Add page to citation and Toggle author in citation: the bibliography's works, read again only when the file changed, and the paper's note to link to. |
 | `src/ui/` | The confirmation dialog, the settings tab, the citation picker (`citation-picker.ts`) and the page question (`prompt.ts`). |
 | `src/main.ts` | Registers the seven commands and the file menu items. |
@@ -33,7 +33,9 @@ Obsidian.
 | `src/core/writing.ts` | Writing a citation, and a page into one, with the locator words held to the filter's. |
 | `src/core/document.ts` | The document's metadata, pandoc's arguments for each format, and which arguments of yours are refused. |
 | `src/core/paths.ts` | Settings paths, `~`, and whether a path is inside the vault. |
-| `src/pandoc.ts` | Running pandoc, and writing its files to a temporary folder. |
+| `src/core/built-in.ts` | Which pandoc runs (`choosePandoc`), the built-in one's version and hashes (`BUILT_IN`), its cache folder, and the paths it sees (`Mounts`, `seen`, `seenArgs`). |
+| `src/pandoc.ts` | Running pandoc, installed or built-in through WASI, and writing its files to a temporary folder. |
+| `src/wasm.ts` | The built-in pandoc on disk: loading it, checked against its hash, downloading it, and `pandocFor`. |
 | `pandoc/` | The Lua filters. |
 | `fonts/` | Open Sans, for PDF. |
 
@@ -43,9 +45,11 @@ Obsidian and decide nothing.
 ## An export, from start to finish
 
 1. **Check the settings.** The bibliography, Word template and citation style
-   have to exist; your pandoc arguments can't include a refused one, or a word
-   pandoc would read as a file (`pandoc --dump-args`). Each failure is a
-   sentence saying what to do.
+   have to exist; a PDF needs an installed pandoc. Then the pandoc is chosen
+   (the core's `pandocFor`, which asks before downloading the built-in one),
+   since your pandoc arguments can't include a refused one, or a word pandoc
+   would read as a file (`--dump-args`, asked of that pandoc). Each failure is
+   a sentence saying what to do.
 2. **Read the note**, from the editor when it's open, because the file can be a
    moment behind what you just typed.
 3. **Prepare it** with `prepare`: the note as pandoc's markdown, its metadata,
@@ -54,17 +58,16 @@ Obsidian and decide nothing.
 5. **Ask where to save**, with Electron's save dialog (through `remote`, as
    Obsidian's own PDF export does), and refuse a path inside the vault, by real
    path, so a symlink can't get around it.
-6. **Run pandoc**, the installed one or the built-in one (the core's
-   `pandocFor`, which asks before downloading it; a PDF needs an installed
-   one), with every path as that pandoc sees it (`seen`, `seenArgs`), with the
-   note on stdin, from a temporary folder holding the filters, the Markdown
+6. **Run pandoc**, with every path as that pandoc sees it (`seen`,
+   `seenArgs`), from a temporary folder holding the filters, the Markdown
    template, the font and the metadata. The folder is removed afterwards.
 7. **Report** where the file went, with Open and Show in folder, and pandoc's
    warnings if there were any.
 
 ## How pandoc is run
 
-The note goes in on stdin, and its metadata in a file of its own. Pandoc reads a
+The note goes in on stdin, or as a file for the built-in pandoc, and its
+metadata in a file of its own. Pandoc reads a
 block between `---` lines as metadata wherever it is, and in a note that is text
 Obsidian shows.
 
@@ -84,13 +87,20 @@ flowchart LR
   it has already made.
 - Your own arguments come after Due Credit's, so an option of yours wins over
   its default, and before citeproc, so a filter like pandoc-crossref runs where
-  it has to.
+  it has to. A `--filter` needs an installed pandoc; a `--lua-filter` works
+  with either.
 - `after-citeproc.lua` clears the bibliography's and style's paths, which the
   Word writer would otherwise keep as properties, user name and all. Under a
   footnote style it also finishes footnotes. See
   [Citations](citations.md#footnote-styles).
 
 LaTeX skips citeproc and keeps `\cite` commands instead.
+
+The built-in pandoc runs inside Obsidian, through Node's WASI. It sees the
+vault as `/`, and each other folder a file it needs is in as `/.pandoc-<n>`,
+with `/` between folders and `:` between the resource path's; nothing else on
+the disk. It runs no other program, so no PDF engine and no `--filter`, and
+fetches nothing over the network, so an image on the web is left out.
 
 ## Bundled files
 
@@ -102,6 +112,10 @@ export.
 
 Open Sans is bundled because few machines have it, and xelatex stops at a font
 it can't find. A `mainfont` of your own replaces it.
+
+The built-in pandoc isn't bundled: it is 62 MB, downloaded once when someone
+without pandoc agrees, by the core's `src/wasm.ts`, and pinned by hash in its
+`core/built-in.ts`.
 
 ## Two rules that are written twice
 

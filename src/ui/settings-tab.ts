@@ -63,7 +63,7 @@ export class SettingsTab extends PluginSettingTab {
 					{
 						name: 'Pandoc arguments',
 						desc:
-							'Added to every export, such as --toc, --number-sections, -V geometry:margin=2.5cm or --filter pandoc-crossref. A filter of yours runs after Due Credit’s and before citations are rendered. Quotes keep a value with spaces together, ~ is your home folder, and a relative path starts from the vault. Arguments that change where the file goes, what’s read or the format are refused, because those are up to Due Credit.' +
+							'Added to every export, such as --toc, --number-sections, -V geometry:margin=2.5cm or, with pandoc installed, --filter pandoc-crossref. A filter of yours runs after Due Credit’s and before citations are rendered. Quotes keep a value with spaces together, ~ is your home folder, and a relative path starts from the vault. Arguments that change where the file goes, what’s read or the format are refused, because those are up to Due Credit.' +
 							this.argsStatus(),
 						control: { type: 'text', key: 'extraArgs', placeholder: '--toc --number-sections' },
 					},

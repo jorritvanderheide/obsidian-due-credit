@@ -3,6 +3,11 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- The settings say a `--filter` in **Pandoc arguments** needs pandoc
+  installed: the built-in pandoc runs no other program.
+
 ## 1.5.0
 
 - Export without pandoc installed: Due Credit offers to download pandoc's own
