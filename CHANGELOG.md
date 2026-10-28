@@ -3,7 +3,7 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.5.2
 
 - Plainer, friendlier wording in the README, the FAQ, the settings and the
   messages. Messages that point to the settings now say Settings → Due Credit.
