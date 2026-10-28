@@ -214,6 +214,7 @@ sense inside Obsidian:
 | An H1 on the first line | The document's title. Without one, the `title` property, then the file name. Every other heading moves up a level, unless the note uses H1 for its own sections. |
 | Properties | Only `author`, `date`, `lang`, `abstract`, `keywords`, `subtitle` and `reference-section-title` go along. |
 | `![[figure.png\|300]]` | The image, 300 pixels wide. |
+| `![A chart](figure.png)` | The image, wherever it is in your vault, as Obsidian finds it. |
 | An embedded note, PDF or canvas | Left out. It only works inside your vault. |
 | `dataview`, `dataviewjs`, `tasks`, `query` and `base` blocks | Left out. Outside Obsidian, they'd only show their query. |
 | `> [!note] Title` | A quote with the title in bold. A callout without a title is a plain quote. |

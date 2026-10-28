@@ -3,6 +3,13 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- Markdown images of files in your vault, like `![A chart](figure.png)`, are
+  exported wherever the file is, as `![[figure.png]]` always was. An image
+  whose path didn't start at the note's folder or the vault used to be left
+  out.
+
 ## 1.5.2
 
 - Plainer, friendlier wording in the README, the FAQ, the settings and the
