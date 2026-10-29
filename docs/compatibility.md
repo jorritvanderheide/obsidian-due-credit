@@ -30,7 +30,9 @@ so `version` is still 1.
 - **Refusing a pandoc argument** that wasn't refused before (`refused` in
   the core's `core/document.ts`) is breaking: exports stop for anyone who has it in
   **Pandoc arguments**. So is moving those arguments to another place among
-  Due Credit's own.
+  Due Credit's own. Refusing another spelling of an option that's already
+  refused, such as `-sd` for `-d` or `--extr=` for `--extract-media`, isn't:
+  that closes a way around a promise, and the option was never allowed.
 - **A test loads each release's `data.json`** (`tests/settings.test.ts`). When
   the stored shape changes, add a fixture named after the last version that
   saved the old one.
@@ -94,8 +96,9 @@ The citation forms are an agreement with Paper Trail, described in
 
 - **Every form Paper Trail writes is read.** No longer reading one is breaking
   for both plugins.
-- **A new form is read here first.** Release Due Credit before Paper Trail
-  writes it.
+- **A new form is read here first.** The core learns it and is tagged, Due
+  Credit and In the Open are released on that core, and only then does Paper
+  Trail write it.
 - **The Citation key property** defaults to `citekey`, which is what Paper
   Trail writes.
 

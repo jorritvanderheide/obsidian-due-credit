@@ -7,6 +7,7 @@ import { remote, shell } from 'electron';
 import { FileSystemAdapter, MarkdownView, Notice, parseYaml, requestUrl, type App, type TFile } from 'obsidian';
 import {
 	bibKeys,
+	bibliographiesIn,
 	BUILT_IN,
 	builtInFolder,
 	choosePandoc,
@@ -37,6 +38,7 @@ import {
 	type Pandoc,
 	type Vault,
 } from 'obsidian-citation-core';
+import { keysReadable } from '../core/bibliographies';
 import { startFolder } from '../core/settings';
 import { confirm } from '../ui/confirm';
 import type { Context } from '../context';
@@ -102,15 +104,19 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 			}
 		},
 	};
+	// Every bibliography pandoc reads, the setting's and any in your arguments, so
+	// the check knows every key the export can cite.
+	const bibliographies = [...(bibliography ? [bibliography] : []), ...bibliographiesIn(extra).map((value) => settingPath(value, vault, home))].filter((path) => existsSync(path));
+	const keys = keysReadable(bibliographies) ? new Set((await Promise.all(bibliographies.map((path) => readFile(path, 'utf8')))).flatMap((bib) => [...bibKeys(bib)])) : null;
 	const { markdown, metadata, missing } = prepare(text, lookup, {
 		name: file.basename,
 		papersFolder: settings.literatureFolder,
 		keyProperty: settings.keyProperty,
-		keys: bibliography ? bibKeys(await readFile(bibliography, 'utf8')) : null,
+		keys,
 		noteStyle: csl !== null && noteStyle(await readFile(csl, 'utf8')),
 	});
 	const lost = missing.papers.length + missing.unresolved.length;
-	if (bibliography && lost > 0 && !(await confirmMissing(context, missing, lost, basename(bibliography)))) return;
+	if (keys !== null && lost > 0 && !(await confirmMissing(context, missing, lost, bibliographies.map((path) => basename(path)).join(' or ')))) return;
 
 	const { name, extension } = FORMATS[format];
 	const answer = await remote.dialog.showSaveDialog({

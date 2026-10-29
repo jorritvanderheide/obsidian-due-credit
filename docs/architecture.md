@@ -16,6 +16,7 @@ Obsidian.
 | Path | What it holds |
 | --- | --- |
 | `src/core/settings.ts` | The settings shape, defaults and loading. Pure, with a test named after it. |
+| `src/core/bibliographies.ts` | Whether the check before an export can read every bibliography for its keys. Pure, with a test named after it. |
 | `src/commands/export.ts` | The export: checks the settings, picks the pandoc (asking before downloading the built-in one), reads the note, asks where to save, runs pandoc, reports back. |
 | `src/commands/cite.ts` | Insert citation, Add page to citation and Toggle author in citation: the bibliography's works, read again only when the file changed, and the paper's note to link to. |
 | `src/ui/` | The confirmation dialog, the settings tab, the citation picker (`citation-picker.ts`) and the page question (`prompt.ts`). |

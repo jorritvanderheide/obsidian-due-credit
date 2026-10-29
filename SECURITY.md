@@ -25,14 +25,18 @@ Due Credit does only a few things:
   agree, checks it against a SHA-256 hash it carries, and runs it inside
   Obsidian.
 - It reads that note and the citation keys of the notes it links to, your
-  bibliography, your citation style and Word template, whether strict line
+  bibliographies, your citation style and Word template, whether strict line
   breaks are on in your vault's settings, and the folders on your PATH, to
-  find pandoc.
+  find pandoc. Insert citation reads the citation key property of your notes,
+  and the settings tab reads the path and properties of every note.
 - It writes the file you pick in the save dialog, never inside your vault,
   and a citation at the cursor when you insert or change one. For each
   export, it writes the files pandoc needs to a temporary folder and removes
   them afterwards. When you agree to download the built-in pandoc, it also
-  writes that to your cache folder.
+  writes that to your cache folder, and deletes it again if it ever stops
+  matching its hash.
+- It stores its settings in its own `data.json`, including the folder your
+  last export went to.
 
 [Section 11 of the README](README.md#11-network-and-file-disclosure) has the
 details. Anything that does one of these is a security problem:

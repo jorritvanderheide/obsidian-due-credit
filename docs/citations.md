@@ -29,12 +29,21 @@ people's habits, and are read just the same.
 | `[[marsh2024#p. 12]]` | (Marsh 2024, 12) |
 | `[@marsh2024, p. 12]` | (Marsh 2024, 12) |
 | `[[smith:2017]]` | (Smith 2017) |
+| `[[jones/2019]]` | (Jones 2019) |
+| `[Smith](smith-2017.md)`, to a paper note | (Smith 2017) |
 | `[[My idea\|this idea]]` | this idea |
 | `[[My idea#Section]]` | My idea |
 
 A wikilink is never a web address, even with a colon in it: Better BibTeX
-allows one in a key, and a note's name can't have one. A markdown link with a
-scheme, `[the page](https://…)` or `[the item](zotero://…)`, stays a link.
+allows one in a key, and a note's name can't have one. A key can have a slash
+too, which a link reads as a folder, so the whole link is tried as a key before
+the part after its last slash. A markdown link with a scheme,
+`[the page](https://…)` or `[the item](zotero://…)`, stays a link.
+
+A Markdown link to a note, which Obsidian writes with "Use [[Wikilinks]]" off,
+is read as the wikilink it means: `[Smith](smith-2017.md)` is
+`[[smith-2017|Smith]]` (`wikilinked` in the core's `core/markdown.ts`), so
+everything below holds for it too.
 
 ### An `@` in a sentence
 
@@ -42,9 +51,10 @@ Pandoc reads `@marsh2024` in a sentence as an in-text citation, "Marsh (2024)",
 and `@marsh2024 [p. 12]` as one with a page. When the bibliography has no entry
 by that key, as with a handle like `@jack` in your prose or in a passage you
 quoted, it stays as written. In brackets, `[@typo]` was meant as a citation, and
-pandoc prints "(typo?)" for it. That needs a `.bib` or `.bibtex` bibliography:
-with one given another way, under **Pandoc arguments**, Due Credit can't tell
-which keys there are, and leaves it to pandoc.
+pandoc prints "(typo?)" for it. That needs every bibliography to be a `.bib` or
+`.bibtex` file. With a CSL JSON or YAML one, from the setting or under **Pandoc
+arguments**, Due Credit can't tell which keys there are, and leaves it to
+pandoc.
 
 ### The label
 
@@ -127,7 +137,11 @@ words instead of a citation (`missing` in the core's `core/prepare.ts`):
   auto-export ran lands here, and so does a note not written yet.
 
 A link to a note of your own is never listed. The check reads the note before
-any link is rewritten.
+any link is pointed at its key. It knows the keys of the **Bibliography**
+setting and of every `--bibliography` under **Pandoc arguments**
+(`bibliographiesIn`). With a bibliography that isn't a `.bib` among them, its
+keys can't be read, so there's no check (`keysReadable` in
+`src/core/bibliographies.ts`).
 
 ## One rule, written twice
 
@@ -164,10 +178,11 @@ has it in `citekey`. Without Better BibTeX it's named for its author, title and
 year and has no key, so its citations export as words, and the check before an
 export lists them. Its side is in Paper Trail's
 [`docs/citations.md`](https://github.com/jorritvanderheide/obsidian-paper-trail/blob/main/docs/citations.md).
-A new form is read here before Paper Trail writes it, so no note is ever
-written in a spelling the export doesn't know. In the Open reads citations
-through the same core, so it reads a new form once it has moved to that core
-too.
+A new form is read before Paper Trail writes it, so no note is ever written in
+a spelling an export or a post doesn't know: the core learns it and is tagged,
+Due Credit and In the Open are released on that core, and only then does Paper
+Trail write it. Paper Trail 2.1.0 names a note for a key with a colon, whose
+citations need Due Credit 1.7.0 or In the Open 1.4.0.
 
 ## Using the filter on its own
 

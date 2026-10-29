@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-due-credit",
 	"version": "1.7.0",
-	"description": "Export a note to Word, PDF or LaTeX through pandoc, with its links turned into real citations.",
+	"description": "Export a note to Word, PDF, Markdown or LaTeX through pandoc, with its links turned into real citations.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
@@ -30,7 +30,7 @@
 		"globals": "^17.6.0",
 		"jiti": "^2.6.1",
 		"obsidian": "~1.13.1",
-		"obsidian-citation-core": "github:jorritvanderheide/obsidian-citation-core#ef351156240147d7adba098b0869dd72e5b5d62a",
+		"obsidian-citation-core": "github:jorritvanderheide/obsidian-citation-core#0598a30ff83ad78a3969e64fbd14aabd0c944011",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.59.1",
 		"vitest": "^3.2.7"

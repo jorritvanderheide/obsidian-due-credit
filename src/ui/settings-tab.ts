@@ -44,7 +44,7 @@ export class SettingsTab extends PluginSettingTab {
 		const value = this.plugin.settings.csl;
 		if (value === '') return '';
 		const path = stylePath(value, homedir());
-		return existsSync(path) ? '' : ` ⚠ There's no style at ${path}.`;
+		return existsSync(path) ? '' : ` ⚠ There's no citation style at ${path}.`;
 	}
 
 	private papersStatus(): string {
@@ -77,7 +77,7 @@ export class SettingsTab extends PluginSettingTab {
 					{
 						name: 'Pandoc arguments',
 						desc:
-							'Added to every export, like --toc, --number-sections, -V geometry:margin=2.5cm or, with pandoc installed, --filter pandoc-crossref. A filter of yours runs after Due Credit’s own and before the citations are formatted. Put quotes around a value with spaces. ~ is your home folder, and a relative path starts from your vault. Due Credit can’t pass on an argument that changes where the file goes, how the note is read or the format, and if you add one, it says so here.' +
+							'Added to every export, like --toc, --number-sections, -V geometry:margin=2.5cm or, with pandoc installed, --filter pandoc-crossref. A filter of yours runs after Due Credit’s own and before the citations are formatted. Put quotes around a value with spaces. ~ is your home folder, and a relative path starts from your vault. A --bibliography here is checked before an export, as the Bibliography setting is. Due Credit can’t pass on an argument that changes where the file goes, how the note is read or the format, and if you add one, it says so here.' +
 							this.argsStatus(),
 						control: { type: 'text', key: 'extraArgs', placeholder: '--toc --number-sections' },
 					},

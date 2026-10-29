@@ -30,8 +30,11 @@ is looked up in Zotero's styles folder, `~/Zotero/styles/<name>.csl`
 (`cslPath`).
 
 A setting that has to agree with something outside the plugin says when it
-doesn't: an export stops with a sentence when the bibliography, Word template or
-style isn't there.
+doesn't, in a line under it in the settings tab: a bibliography, Word template
+or style that isn't there, a refused argument, a papers folder with no notes
+(`papersFolderStatus`) and a key property no note has (`keyPropertyStatus`).
+An export stops with a sentence when the bibliography, Word template or style
+isn't there.
 
 ## Pandoc
 

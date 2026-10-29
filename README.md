@@ -1,6 +1,6 @@
 # Due Credit
 
-**Export a note to Word, PDF or LaTeX through pandoc, with its links turned into real citations.**
+**Export a note to Word, PDF, Markdown or LaTeX through pandoc, with its links turned into real citations.**
 
 Works well with [Paper Trail](https://community.obsidian.md/plugins/paper-trail),
 which turns your Zotero library into a reading queue, with a note for each
@@ -220,6 +220,8 @@ sense inside Obsidian:
 | `dataview`, `dataviewjs`, `tasks`, `query` and `base` blocks | Left out. Outside Obsidian, they'd only show their query. |
 | `> [!note] Title` | A quote with the title in bold. A callout without a title is a plain quote. |
 | One newline | A line break, as Obsidian shows it, unless you turned on strict line breaks. |
+| A backslash, like `C:\path\x` | As written, as Obsidian shows it. LaTeX meant for a PDF, like `\newpage`, goes in as `` `\newpage`{=latex} ``. |
+| `[Smith](smith-2017.md)`, a Markdown link to a note | The same as `[[smith-2017\|Smith]]`, so a link to a paper note is a citation. |
 | `==highlight==` | Highlighted in Word, PDF and Markdown. Plain text in LaTeX. |
 | `[^1]` and `^[inline]` footnotes | Footnotes, read the way Obsidian reads them. |
 | A line of `#tags` | Left out. A tag in a sentence stays as its word: `#project/alpha` becomes "project/alpha". |
@@ -332,7 +334,7 @@ its tab, so you can export a note without opening it.
 | Setting | Default | |
 | --- | --- | --- |
 | **Pandoc** | `pandoc` | If you installed pandoc, this can usually stay `pandoc`. If Due Credit doesn't find it, give its full path. Without pandoc installed, Due Credit offers to download a copy that runs inside Obsidian, for Word, Markdown and LaTeX. A PDF needs pandoc installed, and xelatex, which comes with any TeX distribution. |
-| **Pandoc arguments** | None | Added to every export, like `--toc`, `--number-sections`, `-V geometry:margin=2.5cm`, `-V "mainfont=TeX Gyre Pagella"` or, with pandoc installed, `--filter pandoc-crossref`. Put quotes around a value with spaces. Due Credit can't pass on an argument that changes where the file goes, how the note is read or the format. |
+| **Pandoc arguments** | None | Added to every export, like `--toc`, `--number-sections`, `-V geometry:margin=2.5cm` or, with pandoc installed, `--filter pandoc-crossref`. A filter of yours runs after Due Credit's own and before the citations are formatted. Put quotes around a value with spaces. `~` is your home folder, and a relative path starts from your vault. A `--bibliography` here is checked before an export, as the **Bibliography** setting is. Due Credit can't pass on an argument that changes where the file goes, how the note is read or the format, and if you add one, it says so here. |
 | **Output folder** | `~/Documents` | Where the save dialog opens the first time you export. After that, it opens where your last export went, until you change this. |
 | **Word template** | Pandoc's own | A `.docx` with the fonts, headings and margins your university or journal wants, for Word exports to use. Leave it empty for pandoc's default styles. |
 
@@ -345,6 +347,11 @@ its tab, so you can export a note without opening it.
 | **Citation key property** | `citekey` | The property that holds a paper note's citation key. A link to a note with one cites that key, whatever the note is called. |
 | **Citation style** | Chicago author-date | A style Zotero has installed, such as `apa`, or the path to a `.csl` file. |
 
+A setting that has to agree with your vault or your computer says so right
+under it, in the settings: a bibliography, Word template or style that isn't
+there, an argument Due Credit can't pass on, a papers folder with no notes in
+it, or a citation key property no note has.
+
 <br/>
 
 ## 10 Works well with
@@ -355,12 +362,14 @@ together nicely.
 ### 10.1 Paper Trail
 
 [Paper Trail](https://community.obsidian.md/plugins/paper-trail) turns your
-Zotero library into a reading queue, with a note for each paper, named after
-its citation key. **Insert citation** links to those notes, so every place you
-cite a paper turns up in its backlinks.
+Zotero library into a reading queue, with a note for each paper. With Better
+BibTeX, each note is named after its citation key, and **Insert citation**
+links to those notes, so every place you cite a paper turns up in its
+backlinks.
 
-Paper Trail also gives every paper note the `citekey` property, which keeps
-your citations working when Better BibTeX changes a key. And its **Insert
+With Better BibTeX, Paper Trail also gives each paper note the `citekey`
+property, which keeps your citations working when Better BibTeX changes a key.
+Without it, the notes have no key, so a link to one exports as plain text. And its **Insert
 annotation** quotes a passage you highlighted, with a citation Due Credit
 reads.
 
@@ -396,12 +405,16 @@ comparing its SHA-256 hash, a fingerprint of the file's contents.
   to. For **Insert citation**, the citation key property of your notes, to
   link to a paper's note.
 - **Bibliography:** The `.bib` file you set in **Bibliography**, when you
-  export and when you insert a citation.
+  export and when you insert a citation, and any `--bibliography` in **Pandoc
+  arguments** when you export.
 - **Citation style:** From Zotero's styles folder (`~/Zotero/styles`), or the
   `.csl` file you set.
 - **Word template:** The `.docx` you set, if any.
 - **Obsidian's settings:** Whether strict line breaks are on, from the vault's
   `app.json`.
+- **The settings tab:** The path and properties of every note, while it's
+  open, to say when your **Papers folder** has no notes or no note has your
+  **Citation key property**.
 - **Your PATH:** each folder on it, for a pandoc installed there.
 - **The built-in pandoc:** `pandoc-3.13.wasm` in your cache folder, when
   there's no pandoc installed. Once a session, Due Credit checks its hash to

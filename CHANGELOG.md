@@ -3,6 +3,27 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- A backslash in a note exports as it shows in Obsidian, so a Windows path or
+  code in a quote comes out whole. Pandoc read `\word` as a LaTeX command and
+  left it out. LaTeX you wrote for a PDF, like `\newpage`, now shows as text:
+  write it as `` `\newpage`{=latex} `` instead.
+- A citation key with a slash in it, like `[[jones/2019]]`, exports as a
+  citation. It used to come out as plain text without a warning.
+- A bibliography entry with its key on the line after the brace is read. Since
+  1.7.0, citing it in a sentence came out as plain text.
+- A `--bibliography` under **Pandoc arguments** works next to the
+  **Bibliography** setting, and the check before an export reads both. With
+  two, every citation came out as plain text.
+- A Markdown link to a note, like `[Smith](smith-2017.md)`, which Obsidian
+  writes with "Use [[Wikilinks]]" turned off, works like a wikilink: a link to
+  a paper note is a citation, and the check lists one that won't be.
+- In a Markdown export, an image's caption stays on the line under it, as you
+  wrote it. 1.7.0 put a blank line between them.
+- The tagline says Due Credit exports Markdown too, and the warning under
+  **Citation style** says "citation style", as the message does.
+
 ## 1.7.0
 
 - An embed with alt text and a width, like `![[figure.png|A chart|300]]`,

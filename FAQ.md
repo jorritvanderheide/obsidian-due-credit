@@ -193,6 +193,13 @@ That way an export can never replace a note. A Markdown export saved next to
 its note, under the same name, would overwrite it. Save it anywhere outside the
 vault.
 
+### My `\newpage` shows up as text in the export
+
+Since 1.8.0, a backslash exports as it shows in Obsidian, so a Windows path or
+code in a quote comes out whole. A LaTeX command you meant for a PDF now needs
+to say so: write `` `\newpage`{=latex} `` instead of `\newpage`, and pandoc
+passes it on to LaTeX as before.
+
 ## Other
 
 ### Can I use the citation filter without Obsidian?
