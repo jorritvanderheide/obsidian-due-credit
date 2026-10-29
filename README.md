@@ -215,6 +215,7 @@ sense inside Obsidian:
 | Properties | Only `author`, `date`, `lang`, `abstract`, `keywords`, `subtitle` and `reference-section-title` go along. |
 | `![[figure.png\|300]]` | The image, 300 pixels wide. |
 | `![A chart](figure.png)` | The image, wherever it is in your vault, as Obsidian finds it. |
+| An image with `*Sales by month.*` on the line right under it | A figure, with "Sales by month." as its caption. An image on its own gets no caption: its alt text is for readers who can't see it. |
 | An embedded note, PDF or canvas | Left out. It only works inside your vault. |
 | `dataview`, `dataviewjs`, `tasks`, `query` and `base` blocks | Left out. Outside Obsidian, they'd only show their query. |
 | `> [!note] Title` | A quote with the title in bold. A callout without a title is a plain quote. |

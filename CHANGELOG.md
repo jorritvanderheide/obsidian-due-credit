@@ -3,6 +3,16 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- An image with a line in italics right under it, like `*Sales by month.*`,
+  is exported as a figure with that line as its caption. That's how a caption
+  looks in Obsidian.
+- An image on its own no longer gets its alt text as a caption in the export.
+  Obsidian never shows alt text, and it's meant for readers who can't see the
+  image. If you want the caption back, put it in italics on the line under the
+  image.
+
 ## 1.5.3
 
 - Markdown images of files in your vault, like `![A chart](figure.png)`, are
