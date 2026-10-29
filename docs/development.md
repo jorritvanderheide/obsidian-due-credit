@@ -46,7 +46,7 @@ GitHub mirror:
 
 ```sh
 nix flake update citation-core
-rev=$(jq -r '.nodes."citation-core".locked.rev' flake.lock)
+rev=$(node -p "JSON.parse(require('fs').readFileSync('flake.lock', 'utf8')).nodes['citation-core'].locked.rev")
 npm install "git+https://github.com/jorritvanderheide/obsidian-citation-core.git#$rev"
 nix run nixpkgs#prefetch-npm-deps -- package-lock.json   # the new npmDepsHash
 ```
@@ -116,5 +116,6 @@ comment:
 gh api repos/actions/checkout/commits/v6.1.0 --jq .sha
 ```
 
-Both workflows also default to read-only. Only the release job asks for more:
-writing the release, and signing the attestation.
+Both workflows also default to read-only. In the release workflow, the build job
+asks only to sign the attestation, and the release job only to write the
+release, which runs none of the repository's code.
