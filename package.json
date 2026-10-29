@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-due-credit",
-	"version": "1.8.1",
+	"version": "1.9.0",
 	"description": "Export a note to Word, PDF, Markdown or LaTeX through pandoc, with its links turned into real citations.",
 	"main": "main.js",
 	"type": "module",
