@@ -9,8 +9,8 @@
     # checks.core-pin holds the two together. Update both with:
     # nix flake update citation-core, then
     # npm install git+https://github.com/jorritvanderheide/obsidian-citation-core.git#<rev>
-    # With its own nixpkgs, not this one's, so its tests run with the pandoc
-    # they were written against.
+    # With its own nixpkgs, not this one's. The pandoc its tests expect it
+    # fetches by URL and hash itself, so that stays the same either way.
     citation-core.url = "git+https://codeberg.org/BW20/obsidian-citation-core";
   };
 
@@ -41,7 +41,7 @@
           inherit (package) version;
           src = ./.;
           # Update with: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
-          npmDepsHash = "sha256-qsOwBXzzmY+kScZ4L57m0aMdjVNZ49IN6u5zdYxNfC4=";
+          npmDepsHash = "sha256-cxV0FWedv8v3QiHdzHZiotka3g02J7H44gerKl87Mi0=";
           nodejs = pkgs.nodejs_24;
           # The tests run with the build, so nix flake check is the whole check.
           doCheck = true;

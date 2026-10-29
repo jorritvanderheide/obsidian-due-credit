@@ -122,5 +122,15 @@ These can change in any release:
   into it. 1.2.0 moved PDFs from Letter to A4, and **Pandoc arguments** can set
   it back.
 - The wording of commands, notices and the settings tab.
-- The code in `src/` and `pandoc/`. The filter keeps reading the forms above
-  when you use it on its own, but nothing else about it is promised.
+- The code in `src/`, and the core's. The core's filter keeps reading the
+  forms above when you use it on its own, but nothing else about it is
+  promised.
+
+## The core
+
+Most of what this page promises is the core's doing: how a note is read, which
+links cite, and which arguments are refused. So the promises hold for the core
+version a release bundles. A release that moves to a new one reads the core's
+[`CHANGELOG.md`](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/CHANGELOG.md)
+since the last, checks each change against this page, and writes what users
+notice under `## Unreleased` here.

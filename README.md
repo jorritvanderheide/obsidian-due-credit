@@ -215,7 +215,7 @@ sense inside Obsidian:
 | Properties | Only `author`, `date`, `lang`, `abstract`, `keywords`, `subtitle` and `reference-section-title` go along. |
 | `![[figure.png\|300]]`, `![[figure.png\|A chart\|300]]` | The image, 300 pixels wide. |
 | `![A chart](figure.png)` | The image, wherever it is in your vault, as Obsidian finds it. |
-| An image with `*Sales by month.*` on the line right under it | A figure, with "Sales by month." as its caption. An image on its own gets no caption: its alt text is for readers who can't see it. |
+| An image with `*Sales by month.*` on the line right under it | A figure, with "Sales by month." as its caption. An image on its own gets no caption: its alt text is for readers who can't see it. A Markdown export keeps the image and the line in italics as you wrote them. |
 | An embedded note, PDF or canvas | Left out. It only works inside your vault. |
 | `dataview`, `dataviewjs`, `tasks`, `query` and `base` blocks | Left out. Outside Obsidian, they'd only show their query. |
 | `> [!note] Title` | A quote with the title in bold. A callout without a title is a plain quote. |
@@ -287,7 +287,8 @@ plain text instead of a citation:
 
 - **A link to a paper note whose key isn't in your bibliography.** Usually
   Better BibTeX changed the key, or its auto-export hasn't run since you added
-  the paper.
+  the paper. A paper note without a citation key property is looked up by its
+  name, so it only cites when it's named for its key.
 - **A link to no note at all, whose name isn't a key either.** For example, a
   paper you cited before its auto-export ran, or a note you haven't written yet.
 

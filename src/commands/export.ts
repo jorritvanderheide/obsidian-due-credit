@@ -10,7 +10,8 @@ import {
 	BUILT_IN,
 	builtInFolder,
 	choosePandoc,
-	cslPath,
+	missingBibliography,
+	missingStyle,
 	expandHome,
 	ExportError,
 	findOnPath,
@@ -28,6 +29,7 @@ import {
 	settingPath,
 	splitArgs,
 	styled,
+	stylePath,
 	withExtension,
 	withFiles,
 	type Format,
@@ -50,19 +52,13 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	const home = homedir();
 
 	const bibliography = settings.bibliography ? settingPath(settings.bibliography, vault, home) : null;
-	if (bibliography && !existsSync(bibliography)) {
-		throw new ExportError(
-			`There's no bibliography at ${bibliography}. Point the Bibliography setting at your Better BibTeX export, or clear it to export without citations.`,
-		);
-	}
+	if (bibliography && !existsSync(bibliography)) throw new ExportError(missingBibliography(bibliography, 'export'));
 	const referenceDoc = settings.referenceDoc && format === 'docx' ? settingPath(settings.referenceDoc, vault, home) : null;
 	if (referenceDoc && !existsSync(referenceDoc)) {
 		throw new ExportError(`There's no Word template at ${referenceDoc}. Point the Word template setting at a .docx file, or clear it to use pandoc's own styles.`);
 	}
-	const csl = settings.csl && styled(format) ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;
-	if (csl && !existsSync(csl)) {
-		throw new ExportError(`There's no citation style at ${csl}. Use the name of a style Zotero has installed, such as apa, or the path to a .csl file.`);
-	}
+	const csl = settings.csl && styled(format) ? stylePath(settings.csl, home) : null;
+	if (csl && !existsSync(csl)) throw new ExportError(missingStyle(csl));
 
 	// Arguments of your own, except what Due Credit decides, and no file of
 	// yours that pandoc would read in place of the note.
@@ -124,14 +120,15 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	});
 	if (answer.canceled || !answer.filePath) return;
 	const output = withExtension(answer.filePath, extension);
-	// The dialog asked about replacing the name as typed, not this one.
-	if (output !== answer.filePath && existsSync(output) && !(await confirmReplace(context, output))) return;
 	// Nothing is written in the vault: a Markdown export saved next to its
 	// source would be the note, and the dialog only asks whether to replace a
-	// file.
+	// file. Before asking about replacing one, which would be a question with
+	// no right answer.
 	if (insideVault(vault, output, realpathSync)) {
 		throw new ExportError(`${output} is inside your vault. Due Credit doesn't save exports there, so an export can never replace a note. Please save it somewhere outside the vault.`);
 	}
+	// The dialog asked about replacing the name as typed, not this one.
+	if (output !== answer.filePath && existsSync(output) && !(await confirmReplace(context, output))) return;
 
 	let appConfig: unknown = null;
 	try {
@@ -241,7 +238,7 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 				});
 				list(el, missing.papers);
 				el.createEl('p', {
-					text: "Usually Better BibTeX changed the key, or its auto-export hasn't run since you added the paper.",
+					text: `Usually Better BibTeX changed the key, or its auto-export hasn't run since you added the paper. A paper note without a ${context.settings.keyProperty} property is looked up by its name, so it only cites when it's named for its key.`,
 				});
 			}
 			if (missing.unresolved.length > 0) {

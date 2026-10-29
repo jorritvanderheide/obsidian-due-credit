@@ -28,8 +28,23 @@ people's habits, and are read just the same.
 | `[[marsh2024\|marsh2024, p. 12]]; [[okafor2019]]` | (Marsh 2024, 12; Okafor 2019) |
 | `[[marsh2024#p. 12]]` | (Marsh 2024, 12) |
 | `[@marsh2024, p. 12]` | (Marsh 2024, 12) |
+| `[[smith:2017]]` | (Smith 2017) |
 | `[[My idea\|this idea]]` | this idea |
 | `[[My idea#Section]]` | My idea |
+
+A wikilink is never a web address, even with a colon in it: Better BibTeX
+allows one in a key, and a note's name can't have one. A markdown link with a
+scheme, `[the page](https://…)` or `[the item](zotero://…)`, stays a link.
+
+### An `@` in a sentence
+
+Pandoc reads `@marsh2024` in a sentence as an in-text citation, "Marsh (2024)",
+and `@marsh2024 [p. 12]` as one with a page. When the bibliography has no entry
+by that key, as with a handle like `@jack` in your prose or in a passage you
+quoted, it stays as written. In brackets, `[@typo]` was meant as a citation, and
+pandoc prints "(typo?)" for it. That needs a `.bib` or `.bibtex` bibliography:
+with one given another way, under **Pandoc arguments**, Due Credit can't tell
+which keys there are, and leaves it to pandoc.
 
 ### The label
 
@@ -104,7 +119,9 @@ words instead of a citation (`missing` in the core's `core/prepare.ts`):
 - **A link to a paper note whose key the bibliography doesn't have.** A paper
   note is one with a citation key property, or one in the papers folder. The
   key is almost always one Better BibTeX changed, or the paper is newer than
-  its last auto-export.
+  its last auto-export. A note in the papers folder without the property is
+  looked up by its name, so one not named for its key lands here too, and the
+  dialog says so.
 - **A link to no note at all, whose name isn't a key either.** Insert citation
   links a paper that has no note by its key, so a paper cited before its
   auto-export ran lands here, and so does a note not written yet.
@@ -141,10 +158,16 @@ held to the filter's by a test.
 
 [Paper Trail](https://github.com/jorritvanderheide/obsidian-paper-trail) writes
 one form: **Insert annotation** quotes a passage with a citation to its page,
-`[[key|key, p. 12]]`. Its side is in Paper Trail's
+by the paper note's name, `[[name|name, p. 12]]`, or `[[name]]` when the
+annotation has no page. With Better BibTeX the note is named for its key and
+has it in `citekey`. Without Better BibTeX it's named for its author, title and
+year and has no key, so its citations export as words, and the check before an
+export lists them. Its side is in Paper Trail's
 [`docs/citations.md`](https://github.com/jorritvanderheide/obsidian-paper-trail/blob/main/docs/citations.md).
 A new form is read here before Paper Trail writes it, so no note is ever
-written in a spelling the export doesn't know.
+written in a spelling the export doesn't know. In the Open reads citations
+through the same core, so it reads a new form once it has moved to that core
+too.
 
 ## Using the filter on its own
 

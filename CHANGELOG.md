@@ -8,6 +8,27 @@ breaking is in [Compatibility](docs/compatibility.md).
 - An embed with alt text and a width, like `![[figure.png|A chart|300]]`,
   is exported 300 pixels wide with "A chart" as its alt text. Before, the
   width was lost and became part of the alt text.
+- In a Markdown export, an image's caption stays the line in italics under
+  it, as you wrote it. With an older pandoc installed, the caption used to be
+  left out.
+- A citation key with a colon in it, like `[[smith:2017]]`, exports as a
+  citation. It used to come out as plain text, and the check before an export
+  didn't say so.
+- A word after an `@` in a sentence, like a handle in a passage you quoted,
+  stays as you wrote it when your bibliography has no entry by that name. It
+  used to export as "(jack?)". In brackets, `[@key]` is still a citation.
+- **Pandoc arguments** turns down an option however it's written, run together
+  like `-sd x.yaml` or shortened like `--extr=media`. Either could write a file
+  into your vault.
+- The settings say when there are no notes in your **Papers folder**, and when
+  no note has your **Citation key property**.
+- When a link to a paper note won't cite, the list before an export also says
+  that a note without a citation key property only cites when it's named for
+  its key.
+- When a citation style isn't found, the message says you can use the path to
+  the `.csl` file, for a Zotero that keeps its data somewhere else.
+- Saving an export inside your vault is turned down before you're asked
+  whether to replace a file there.
 
 ## 1.6.0
 

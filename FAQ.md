@@ -68,7 +68,8 @@ Better BibTeX exports, or clear it to export without citations.
 
 A style name like `apa` is looked up in Zotero's styles folder,
 `~/Zotero/styles`. Install the style in Zotero (Settings → Cite), or give the
-full path to a `.csl` file.
+full path to a `.csl` file. If you moved Zotero's data folder, its styles are
+there instead, so use the full path.
 
 ### "Your Pandoc arguments include …, which Due Credit can't pass on to pandoc"
 
