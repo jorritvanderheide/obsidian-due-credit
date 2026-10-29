@@ -3,7 +3,7 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.6.0
 
 - An image with a line in italics right under it, like `*Sales by month.*`,
   is exported as a figure with that line as its caption. That's how a caption
