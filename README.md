@@ -342,7 +342,7 @@ its tab, so you can export a note without opening it.
 
 | Setting | Default | |
 | --- | --- | --- |
-| **Bibliography** | `Literature/library.bib` | The `.bib` file that Better BibTeX's auto-export keeps up to date. A link to one of its keys exports as a citation, and any other link as its text. The file can be in your vault, or outside it with a path starting with `/` or `~`. Leave it empty to export without citations. |
+| **Bibliography** | `Literature/library.bib` | The `.bib` file that Better BibTeX's auto-export keeps up to date. A link to one of its keys exports as a citation, and any other link as its text. The file can be in your vault, or outside it with a path starting with `/` or `~`. Leave it empty to export without citations, unless a `--bibliography` under **Pandoc arguments** gives one. |
 | **Papers folder** | `Literature` | The folder with your paper notes. Before an export, Due Credit lists every link to a paper note whose key isn't in your bibliography. |
 | **Citation key property** | `citekey` | The property that holds a paper note's citation key. A link to a note with one cites that key, whatever the note is called. |
 | **Citation style** | Chicago author-date | A style Zotero has installed, such as `apa`, or the path to a `.csl` file. |

@@ -54,8 +54,10 @@ and uses the filesystem directly. Those are pandoc and the files above, as
 [section 3 of the README](README.md#3-safety-and-quality) explains.
 
 What you add yourself under **Pandoc arguments**, such as your own filter, runs
-with your permission and isn't covered. Neither are problems in pandoc itself:
-please report those to [pandoc](https://github.com/jgm/pandoc).
+with your permission and isn't covered. An installed pandoc downloading an image
+your note shows from the web isn't either: that's how pandoc works, as section 11
+of the README says. Problems in pandoc itself aren't covered: please report
+those to [pandoc](https://github.com/jgm/pandoc).
 
 A bug that exports the wrong text, or leaves something out, is serious too, but
 it isn't secret. Please report it as a normal issue, so others can see it.

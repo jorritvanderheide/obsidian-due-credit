@@ -95,7 +95,7 @@ The citation forms are an agreement with Paper Trail, described in
 [Citations](citations.md#the-agreement-with-paper-trail).
 
 - **Every form Paper Trail writes is read.** No longer reading one is breaking
-  for both plugins.
+  for all three plugins, In the Open's too.
 - **A new form is read here first.** The core learns it and is tagged, Due
   Credit and In the Open are released on that core, and only then does Paper
   Trail write it.

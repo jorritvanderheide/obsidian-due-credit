@@ -8,9 +8,10 @@ core Due Credit shares with its sibling plugins.
 
 ## What becomes a citation
 
-A wikilink becomes a citation when the bibliography has an entry by that key.
-Anything else exports as its words: a link to a note of your own reads as the
-text Obsidian shows, never as a dead link.
+A wikilink becomes a citation when the bibliography has an entry by that key,
+in a `.bib` or `.bibtex` file: a key only in a CSL JSON or YAML one is never
+found. Anything else exports as its words: a link to a note of your own reads
+as the text Obsidian shows, never as a dead link.
 
 Every form below is read. Due Credit writes three of them, `[[key]]`, a
 page in the label and a `-` against the key, through **Insert citation**,
@@ -139,9 +140,8 @@ words instead of a citation (`missing` in the core's `core/prepare.ts`):
 A link to a note of your own is never listed. The check reads the note before
 any link is pointed at its key. It knows the keys of the **Bibliography**
 setting and of every `--bibliography` under **Pandoc arguments**
-(`bibliographiesIn`). With a bibliography that isn't a `.bib` among them, its
-keys can't be read, so there's no check (`keysReadable` in
-`src/core/bibliographies.ts`).
+(`bibliographiesIn`), from `.bib` text only, as the filter does, so it lists a
+key that's only in a CSL JSON or YAML bibliography: that one won't cite.
 
 ## One rule, written twice
 
@@ -181,8 +181,9 @@ export lists them. Its side is in Paper Trail's
 A new form is read before Paper Trail writes it, so no note is ever written in
 a spelling an export or a post doesn't know: the core learns it and is tagged,
 Due Credit and In the Open are released on that core, and only then does Paper
-Trail write it. Paper Trail 2.1.0 names a note for a key with a colon, whose
-citations need Due Credit 1.7.0 or In the Open 1.4.0.
+Trail write it. Paper Trail 2.1.0 names a note for a key with a colon or a
+slash with a dash. Its citations need Due Credit 1.7.0 or In the Open 1.4.0 for
+a colon, and Due Credit 1.8.0 or In the Open 1.5.0 for a slash.
 
 ## Using the filter on its own
 

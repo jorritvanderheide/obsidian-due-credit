@@ -38,7 +38,6 @@ import {
 	type Pandoc,
 	type Vault,
 } from 'obsidian-citation-core';
-import { keysReadable } from '../core/bibliographies';
 import { startFolder } from '../core/settings';
 import { confirm } from '../ui/confirm';
 import type { Context } from '../context';
@@ -107,7 +106,9 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	// Every bibliography pandoc reads, the setting's and any in your arguments, so
 	// the check knows every key the export can cite.
 	const bibliographies = [...(bibliography ? [bibliography] : []), ...bibliographiesIn(extra).map((value) => settingPath(value, vault, home))].filter((path) => existsSync(path));
-	const keys = keysReadable(bibliographies) ? new Set((await Promise.all(bibliographies.map((path) => readFile(path, 'utf8')))).flatMap((bib) => [...bibKeys(bib)])) : null;
+	// The filter finds keys only in .bib text, in any of them, so the check reads
+	// them the same way: a key only in a CSL JSON file is one that won't cite.
+	const keys = bibliographies.length > 0 ? new Set((await Promise.all(bibliographies.map((path) => readFile(path, 'utf8')))).flatMap((bib) => [...bibKeys(bib)])) : null;
 	const { markdown, metadata, missing } = prepare(text, lookup, {
 		name: file.basename,
 		papersFolder: settings.literatureFolder,

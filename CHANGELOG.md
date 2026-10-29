@@ -3,6 +3,21 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- A Markdown link is read as a link to a note only when it points at one, a
+  `.md` file. 1.8.0 also listed links to web pages, folders and PDFs before an
+  export as citations about to be lost. A Markdown link in a table no longer
+  splits its cell, a path with parentheses is read whole, and an image inside a
+  link, a footnote and math are left alone.
+- A backslash before a space exports as written, so a quote ending in
+  `C:\temp\` keeps its last backslash.
+- The check before an export reads every bibliography again, a CSL JSON one
+  included: a key that's only in one of those is listed, since it won't cite.
+  1.8.0 skipped the check when one was there. It also reads a `]` in a link's
+  words, and a bibliography given as `-M bibliography=…`.
+- The temporary folders an export uses are called `obsidian-citation-core-…`.
+
 ## 1.8.0
 
 - A backslash in a note exports as it shows in Obsidian, so a Windows path or

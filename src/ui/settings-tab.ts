@@ -102,7 +102,7 @@ export class SettingsTab extends PluginSettingTab {
 					{
 						name: 'Bibliography',
 						desc:
-							'The .bib file that Better BibTeX’s auto-export keeps up to date. A link to one of its keys, like [[marsh2024]], exports as a citation, and any other link as its text. The file can be in your vault, or outside it with a path starting with / or ~. Leave it empty to export without citations.' +
+							'The .bib file that Better BibTeX’s auto-export keeps up to date. A link to one of its keys, like [[marsh2024]], exports as a citation, and any other link as its text. The file can be in your vault, or outside it with a path starting with / or ~. Leave it empty to export without citations, unless a --bibliography under Pandoc arguments gives one.' +
 							this.fileStatus(this.plugin.settings.bibliography, 'exports stop'),
 						control: { type: 'text', key: 'bibliography', placeholder: 'Literature/library.bib' },
 					},
