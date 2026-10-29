@@ -91,8 +91,10 @@ It's in the core: see
    takes it from the mirror and Nix from Codeberg.
 4. When the tag reaches GitHub, `.github/workflows/release.yml` runs the CI
    checks, makes sure the tag is the version in `manifest.json`, `package.json`
-   and `versions.json`, builds it, attests `main.js`, and creates a **draft**
-   GitHub release named like "Due Credit 1.3.1", with the version's part of
+   and `versions.json`, and builds it without running any dependency's install
+   script. It attests `main.js` and `manifest.json`, and a second job, the only
+   one that can write to the repository, puts them in a **draft** GitHub
+   release named like "Due Credit 1.3.1", with the version's part of
    `CHANGELOG.md` as its notes.
 5. **Publish the draft.** Obsidian's community directory installs from GitHub
    releases, and a tag alone is not one.

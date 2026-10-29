@@ -43,10 +43,12 @@
           # Update with: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
           npmDepsHash = "sha256-nZdmO2DNsX0d748iEi++VB1UewCKwhdTIbffeRr8muU=";
           nodejs = pkgs.nodejs_24;
-          # The tests run with the build, so nix flake check is the whole check.
+          # The lint and the tests run with the build, so nix flake check is the
+          # whole check.
           doCheck = true;
           checkPhase = ''
             runHook preCheck
+            npm run lint
             npm test
             runHook postCheck
           '';
