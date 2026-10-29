@@ -44,7 +44,11 @@ the part after its last slash. A markdown link with a scheme,
 A Markdown link to a note, which Obsidian writes with "Use [[Wikilinks]]" off,
 is read as the wikilink it means: `[Smith](smith-2017.md)` is
 `[[smith-2017|Smith]]` (`wikilinked` in the core's `core/markdown.ts`), so
-everything below holds for it too.
+everything below holds for it too. So is a link without `.md`,
+`[Smith](smith-2017)`, which Obsidian reads as a link to a note as well, and
+one with a title, `[Smith](smith-2017.md "Smith")`, whose title is dropped. A
+link to a file with another extension, such as a PDF, or to a folder stays a
+link.
 
 ### An `@` in a sentence
 

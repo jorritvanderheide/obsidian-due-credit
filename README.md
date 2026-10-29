@@ -220,8 +220,8 @@ sense inside Obsidian:
 | `dataview`, `dataviewjs`, `tasks`, `query` and `base` blocks | Left out. Outside Obsidian, they'd only show their query. |
 | `> [!note] Title` | A quote with the title in bold. A callout without a title is a plain quote. |
 | One newline | A line break, as Obsidian shows it, unless you turned on strict line breaks. |
-| A backslash, like `C:\path\x` | As written, as Obsidian shows it. LaTeX meant for a PDF, like `\newpage`, goes in as `` `\newpage`{=latex} ``. |
-| `[Smith](smith-2017.md)`, a Markdown link to a note | The same as `[[smith-2017\|Smith]]`, so a link to a paper note is a citation. |
+| A backslash, like `C:\path\x` | As written, as Obsidian shows it. Before a space, pandoc reads one as a space that doesn't break, so write `\\` for a backslash there. LaTeX meant for a PDF, like `\newpage`, goes in as `` `\newpage`{=latex} ``. |
+| `[Smith](smith-2017.md)` or `[Smith](smith-2017)`, a Markdown link to a note | The same as `[[smith-2017\|Smith]]`, so a link to a paper note is a citation. |
 | `==highlight==` | Highlighted in Word, PDF and Markdown. Plain text in LaTeX. |
 | `[^1]` and `^[inline]` footnotes | Footnotes, read the way Obsidian reads them. |
 | A line of `#tags` | Left out. A tag in a sentence stays as its word: `#project/alpha` becomes "project/alpha". |

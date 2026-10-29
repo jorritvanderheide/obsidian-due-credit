@@ -11,6 +11,21 @@ breaking is in [Compatibility](docs/compatibility.md).
   Debian 13 install a pandoc in that range. Due Credit now says so once a
   session, and still exports. A pandoc older than 3.0 can't read a note at
   all, and the message now says which version is needed.
+- A backslash before a space goes to pandoc as you wrote it again, as before
+  1.8.1, and pandoc reads it as a space that doesn't break. 1.8.1 kept it as
+  a backslash, but that also doubled backslashes in a link's words, in
+  indented code and in raw HTML. Write `\\` for a backslash before a space.
+- A Markdown link to a note without `.md`, `[Smith](smith-2017)`, is a
+  citation or a link to that note, as Obsidian reads it, and so is one with a
+  title or with brackets in its words. A link after an escaped backslash is
+  read too, and one in a table row without a leading `|` no longer splits its
+  cell.
+- Math is found as pandoc finds it. A link next to a price, like `\$5`, is
+  read, and math no longer runs past a blank line.
+- The check before an export reads your bibliography's keys exactly as the
+  export does, so it no longer misses or adds the odd citation. A
+  bibliography given in **Pandoc arguments** as `-M bibliography=…` is left
+  out of the check when **Bibliography** is set, since pandoc ignores it then.
 
 ## 1.8.1
 

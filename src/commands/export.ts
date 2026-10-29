@@ -106,8 +106,9 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 		},
 	};
 	// Every bibliography pandoc reads, the setting's and any in your arguments, so
-	// the check knows every key the export can cite.
-	const bibliographies = [...(bibliography ? [bibliography] : []), ...bibliographiesIn(extra).map((value) => settingPath(value, vault, home))].filter((path) => existsSync(path));
+	// the check knows every key the export can cite. With the setting's given as
+	// --bibliography, pandoc ignores one given as metadata.
+	const bibliographies = [...(bibliography ? [bibliography] : []), ...bibliographiesIn(extra, bibliography !== null).map((value) => settingPath(value, vault, home))].filter((path) => existsSync(path));
 	// The filter finds keys only in .bib text, in any of them, so the check reads
 	// them the same way: a key only in a CSL JSON file is one that won't cite.
 	const keys = bibliographies.length > 0 ? new Set((await Promise.all(bibliographies.map((path) => readFile(path, 'utf8')))).flatMap((bib) => [...bibKeys(bib)])) : null;
