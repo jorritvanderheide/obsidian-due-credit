@@ -3,7 +3,7 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.8.0
 
 - A backslash in a note exports as it shows in Obsidian, so a Windows path or
   code in a quote comes out whole. Pandoc read `\word` as a LaTeX command and
