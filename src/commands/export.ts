@@ -76,6 +76,8 @@ export async function exportNote(context: Context, file: TFile, format: Format):
 	}
 	const pandoc = await pandocToRun(app, settings.pandocPath, vault);
 	if (pandoc === null) return;
+	// Once a session, for a pandoc that turns some citations into text.
+	if (pandoc.notice) new Notice(pandoc.notice, 0);
 	// Your arguments' paths as pandoc sees them: a file outside the vault is
 	// given to the built-in pandoc under a name of its own.
 	const args = seenArgs(extra, (host) => pandoc.see(host), (value) => isAbsolute(value) && existsSync(value));

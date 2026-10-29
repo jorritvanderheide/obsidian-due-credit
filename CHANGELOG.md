@@ -3,6 +3,15 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- Due Credit asks an installed pandoc its version before it runs it. Pandoc
+  3.0 to 3.6.3 turns some citations into plain text without saying so,
+  such as a key with a colon or a link to a heading, and Ubuntu 24.04 and
+  Debian 13 install a pandoc in that range. Due Credit now says so once a
+  session, and still exports. A pandoc older than 3.0 can't read a note at
+  all, and the message now says which version is needed.
+
 ## 1.8.1
 
 - A Markdown link is read as a link to a note only when it points at one, a

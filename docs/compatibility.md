@@ -111,8 +111,10 @@ The citation forms are an agreement with Paper Trail, described in
 - **Desktop only** (`isDesktopOnly`), because an export runs pandoc, and the
   built-in one runs through Node's WASI.
 - **Pandoc:** the README says which version Due Credit is tested with, the one
-  CI pins, which is the built-in pandoc's too. Needing a newer pandoc for
-  something that already worked is breaking. An installed pandoc on the PATH,
+  CI pins, which is the built-in pandoc's too, and the oldest that works,
+  3.6.4 (the core's `OLDEST_PANDOC`). An older one from 3.0 on still runs,
+  with a notice once a session. Needing a newer pandoc for something that
+  already worked is breaking, and so is refusing a pandoc that runs today. An installed pandoc on the PATH,
   or the one the setting names, keeps coming first: running the built-in one
   instead, when one is installed, is breaking. So is the built-in one losing a
   format it makes: Word, Markdown and LaTeX.

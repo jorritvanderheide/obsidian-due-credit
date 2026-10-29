@@ -20,8 +20,8 @@ it is made public.
 
 Due Credit does only a few things:
 
-- It runs pandoc on the note you export. That's the pandoc you installed, or
-  without one, the built-in pandoc. Due Credit downloads that once, when you
+- It runs pandoc on the note you export. That's the pandoc you installed,
+  which it first asks for its version, or without one, the built-in pandoc. Due Credit downloads that once, when you
   agree, checks it against a SHA-256 hash it carries, and runs it inside
   Obsidian.
 - It reads that note and the citation keys of the notes it links to, your

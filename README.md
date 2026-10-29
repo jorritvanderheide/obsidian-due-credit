@@ -33,8 +33,8 @@ that only makes sense in Obsidian, like your comments and tags, stays behind.
 
 ## 1 Installation
 
-1. **Pandoc** makes the file. If you have it installed, Due Credit uses it,
-   and it's tested with pandoc 3.13. If you don't, or can't install it, as on
+1. **Pandoc** makes the file. If you have it installed, Due Credit uses it.
+   It needs pandoc 3.6.4 or later, and it's tested with 3.13. If you don't, or can't install it, as on
    a computer your work manages, Due Credit offers to download pandoc for you
    the first time you export. This built-in pandoc is a 17 MB download that
    runs inside Obsidian, and it makes Word, Markdown and LaTeX files.
@@ -451,7 +451,9 @@ at the cursor. It never writes anywhere else in your vault.
 ### 11.4 What it runs
 
 - **Pandoc:** The one you set in **Pandoc**, and for a PDF, xelatex through
-  pandoc. An installed pandoc can read and write anything you can.
+  pandoc. Before each export, Due Credit asks an installed pandoc its version
+  (`pandoc --version`). An installed pandoc can read and write anything you
+  can.
 - **The built-in pandoc,** when there's no pandoc installed. It runs inside
   Obsidian, and only sees your vault, the folders of the files in your
   settings and your Pandoc arguments, the folder you export to, and its
