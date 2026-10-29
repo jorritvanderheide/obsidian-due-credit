@@ -213,7 +213,7 @@ sense inside Obsidian:
 | `^abc123` block IDs | Left out. |
 | An H1 on the first line | The document's title. Without one, the `title` property, then the file name. Every other heading moves up a level, unless the note uses H1 for its own sections. |
 | Properties | Only `author`, `date`, `lang`, `abstract`, `keywords`, `subtitle` and `reference-section-title` go along. |
-| `![[figure.png\|300]]` | The image, 300 pixels wide. |
+| `![[figure.png\|300]]`, `![[figure.png\|A chart\|300]]` | The image, 300 pixels wide. |
 | `![A chart](figure.png)` | The image, wherever it is in your vault, as Obsidian finds it. |
 | An image with `*Sales by month.*` on the line right under it | A figure, with "Sales by month." as its caption. An image on its own gets no caption: its alt text is for readers who can't see it. |
 | An embedded note, PDF or canvas | Left out. It only works inside your vault. |
