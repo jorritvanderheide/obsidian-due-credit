@@ -3,7 +3,7 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.9.1
 
 - A `%%comment%%` stays out of an export in more kinds of note. A line
   of ```` ``` ```` indented four spaces opened a code block that ran to the
