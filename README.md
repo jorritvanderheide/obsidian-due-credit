@@ -455,9 +455,12 @@ at the cursor. It never writes anywhere else in your vault.
   (`pandoc --version`). An installed pandoc can read and write anything you
   can.
 - **The built-in pandoc,** when there's no pandoc installed. It runs inside
-  Obsidian, and only sees your vault, the folders of the files in your
-  settings and your Pandoc arguments, the folder you export to, and its
-  temporary folders. It can't see anything else on your disk.
+  Obsidian, and Due Credit only gives it your vault, the folders of the files
+  in your settings and your Pandoc arguments, the folder you export to, and
+  its temporary folders. Node, which runs it inside Obsidian, doesn't
+  guarantee that a program can't get past those folders, for example through
+  a link in your vault to a folder outside it. So don't rely on those folders
+  to keep a file private from it.
 
 Nothing else runs.
 

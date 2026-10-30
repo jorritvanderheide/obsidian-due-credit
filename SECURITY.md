@@ -45,8 +45,8 @@ details. Anything that does one of these is a security problem:
 - makes it write somewhere you didn't choose,
 - lets the text of a note change what pandoc reads, writes or runs,
 - keeps or runs a built-in pandoc that doesn't match its hash,
-- lets the built-in pandoc see more of your disk than the vault, the folders
-  of the files it's given and its temporary folders,
+- gives the built-in pandoc more of your disk than the vault, the folders of
+  the files it's given and its temporary folders,
 - or makes Due Credit connect anywhere other than pandoc's release on GitHub.
 
 The plugin directory's health report warns that Due Credit executes programs

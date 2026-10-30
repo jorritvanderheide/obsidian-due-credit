@@ -3,6 +3,13 @@
 What changed in each release of Due Credit, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- The README and SECURITY.md said the built-in pandoc can't see anything on
+  your disk outside the folders Due Credit gives it. Node, which runs it
+  inside Obsidian, doesn't guarantee that, so they now say what Due Credit
+  gives it and that Node doesn't enforce the limit.
+
 ## 1.9.0
 
 - Due Credit asks an installed pandoc its version before it runs it. Pandoc
