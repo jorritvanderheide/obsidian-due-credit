@@ -5,6 +5,12 @@ breaking is in [Compatibility](docs/compatibility.md).
 
 ## Unreleased
 
+- A `%%comment%%` stays out of an export in more kinds of note. A line
+  of ```` ``` ```` indented four spaces opened a code block that ran to the
+  end of the note, so every comment after it was kept. Code blocks are now
+  found the way Obsidian and CommonMark find them, in quotes and lists too.
+- A note with a very long line of list markers, or a very deep list, no
+  longer holds up an export for seconds or minutes.
 - The README and SECURITY.md said the built-in pandoc can't see anything on
   your disk outside the folders Due Credit gives it. Node, which runs it
   inside Obsidian, doesn't guarantee that, so they now say what Due Credit
