@@ -388,6 +388,15 @@ Give both plugins the same **Bibliography** and **Citation style**. A chapter
 you export and a blog post you publish from it then cite the same way, and
 your comments stay behind in both.
 
+### 10.3 Take the Floor
+
+[Take the Floor](https://community.obsidian.md/plugins/take-the-floor) presents a note as slides, with
+your speaker notes on your own screen. It reads a note the same way Due Credit does, with the same code,
+so **Insert citation** writes the links it shows as citations.
+
+Give both plugins the same **Bibliography** and **Citation style**. Your chapter and your talk then cite
+the same way.
+
 <br/>
 
 ## 11 Network and file disclosure
